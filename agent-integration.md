@@ -142,8 +142,8 @@ npm run build
 php artisan l5-swagger:generate
 ```
 
-### 9. Commit Final
-```bash
-git add .
-git commit -m "feat: integrate all modules, connect frontend to backend"
-```
+### 9. Solicitar commit ao humano
+
+> [!IMPORTANT]
+> **NÃO faça commits.** Pause a execução e solicite ao humano que revise e faça o commit manualmente.
+> Mensagem sugerida: `"Integração concluída. Sugestão de commit: feat: integrate all modules, connect frontend to backend"`

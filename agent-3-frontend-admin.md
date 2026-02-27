@@ -57,7 +57,7 @@ resources/js/
 │       ├── StatusBadge.tsx
 │       ├── Sidebar.tsx
 │       ├── SearchBar.tsx
-│       └── SkeletonLoader.tsx
+│       └── ... (importar SkeletonLoader de ../Shared/)
 ├── Layouts/
 │   └── AdminLayout.tsx
 ├── Pages/
@@ -78,7 +78,7 @@ resources/js/
 │       └── Stock/
 │           └── LowStock.tsx
 └── types/
-    └── admin.ts  (interfaces TypeScript)
+    └── admin.ts  (apenas types específicos do admin, importar shared de @/types/shared)
 ```
 
 ---
@@ -86,21 +86,24 @@ resources/js/
 ## Ordem de Execução (Passo a Passo)
 
 ### Etapa 1 — TypeScript Types (`resources/js/types/admin.ts`)
-Defina todas as interfaces:
+
+> [!IMPORTANT]
+> **Importe os types compartilhados de `@/types/shared`** (criado na Fase 0). Defina aqui apenas types específicos do admin:
+
 ```typescript
-interface Product {
-  id: number; name: string; slug: string; description: string;
-  price: number; cost_price: number; quantity: number; min_quantity: number;
-  active: boolean; category: Category; tags: Tag[];
-  created_at: string; updated_at: string;
+import { Product, Category, Order, OrderStatus, OrderItem, PaginatedResponse } from '@/types/shared';
+
+// Re-export para conveniência
+export type { Product, Category, Order, OrderStatus, OrderItem, PaginatedResponse };
+
+// Types específicos do admin
+export interface DashboardStats {
+  total_products: number;
+  total_orders: number;
+  total_revenue: number;
+  low_stock_count: number;
+  recent_orders: Order[];
 }
-interface Category { id: number; name: string; slug: string; description: string; parent_id: number | null; active: boolean; children?: Category[]; }
-interface Tag { id: number; name: string; slug: string; }
-interface Order { id: number; user_id: number; status: OrderStatus; total: number; subtotal: number; tax: number; shipping_cost: number; items: OrderItem[]; created_at: string; }
-type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-interface OrderItem { id: number; product: Product; quantity: number; unit_price: number; total_price: number; }
-interface PaginatedResponse<T> { data: T[]; meta: { current_page: number; per_page: number; total: number; last_page: number; }; links: { first: string; last: string; prev: string | null; next: string | null; }; }
-interface DashboardStats { total_products: number; total_orders: number; total_revenue: number; low_stock_count: number; recent_orders: Order[]; }
 ```
 
 ### Etapa 2 — Layout Admin (`resources/js/Layouts/AdminLayout.tsx`)
@@ -123,7 +126,9 @@ interface DashboardStats { total_products: number; total_orders: number; total_r
 | `StatusBadge.tsx` | `status` | Badge colorido por status (pending=amarelo, shipped=azul, etc) |
 | `Sidebar.tsx` | `items`, `activeItem` | Navegação lateral |
 | `SearchBar.tsx` | `onSearch`, `placeholder` | Input com debounce |
-| `SkeletonLoader.tsx` | `type` (table, card, form) | Loading states |
+
+> [!NOTE]
+> **SkeletonLoader:** Importe de `@/Components/Shared/SkeletonLoader` (criado na Fase 0). Não crie um SkeletonLoader próprio.
 
 **Marcar:** `[x] Componentes Admin compartilhados`
 
@@ -166,4 +171,4 @@ interface DashboardStats { total_products: number; total_orders: number; total_r
 1. Verificar build: `npm run build`
 2. Verificar TypeScript: `npx tsc --noEmit`
 3. Verificar responsividade em diferentes tamanhos
-4. **Commit:** `feat: complete admin frontend with dashboard, CRUD and reports`
+4. **Solicitar commit ao humano:** Pause e sugira: `feat: complete admin frontend with dashboard, CRUD and reports`

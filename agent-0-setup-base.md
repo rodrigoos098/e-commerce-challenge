@@ -102,6 +102,9 @@ Adicionar aos models:
 
 Configurar migrations com todos os campos, tipos e índices. Criar pivot `product_tag`.
 
+> [!IMPORTANT]
+> **Os Models devem ser criados COMPLETOS aqui** (com `$fillable`, relacionamentos, scopes, casts). O Agente 1 **NÃO vai recriar os Models** — ele começa diretamente nos Repositories (Etapa 2 do seu plano).
+
 Rodar:
 ```bash
 php artisan migrate --no-interaction
@@ -160,14 +163,123 @@ createInertiaApp({
 
 **Marcar:** `[x] Criar layout base Inertia`
 
-### 11. Verificação
+### 11. Criar TypeScript Types compartilhados
+
+Criar `resources/js/types/shared.ts` com as interfaces comuns que serão reutilizadas pelos Agentes 3 e 4:
+
+```typescript
+// Types compartilhados entre Admin e Public
+export interface Product {
+  id: number; name: string; slug: string; description: string;
+  price: number; cost_price?: number; quantity: number; min_quantity: number;
+  active: boolean; category: Category; tags: Tag[];
+  created_at: string; updated_at: string;
+}
+export interface Category {
+  id: number; name: string; slug: string; description?: string;
+  parent_id: number | null; active: boolean; children?: Category[];
+}
+export interface Tag { id: number; name: string; slug: string; }
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export interface Order {
+  id: number; user_id: number; status: OrderStatus; total: number;
+  subtotal: number; tax: number; shipping_cost: number;
+  items: OrderItem[]; shipping_address?: string; billing_address?: string;
+  notes?: string; created_at: string;
+}
+export interface OrderItem {
+  id: number; product: Product; quantity: number;
+  unit_price: number; total_price: number;
+}
+export interface User { id: number; name: string; email: string; }
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: { current_page: number; per_page: number; total: number; last_page: number; };
+  links: { first: string; last: string; prev: string | null; next: string | null; };
+}
+```
+
+> [!IMPORTANT]
+> Os Agentes 3 e 4 devem **importar de `@/types/shared`** em vez de redefinir essas interfaces. Cada agente pode estender com types específicos no seu próprio arquivo (`admin.ts` ou `public.ts`).
+
+### 12. Criar componente SkeletonLoader compartilhado
+
+Criar `resources/js/Components/Shared/SkeletonLoader.tsx` — componente reutilizável pelos Agentes 3 e 4:
+
+```tsx
+import React from 'react';
+
+interface SkeletonLoaderProps {
+  type: 'card' | 'table' | 'form' | 'text' | 'avatar';
+  count?: number;
+}
+
+export default function SkeletonLoader({ type, count = 1 }: SkeletonLoaderProps) {
+  // Implementar skeleton genérico com animação pulse
+  // Os agentes 3 e 4 podem importar este componente
+}
+```
+
+### 13. Criar rotas web stub para desenvolvimento
+
+Criar rotas básicas em `routes/web.php` para que os Agentes 3 e 4 possam testar suas páginas visualmente durante o desenvolvimento:
+
+```php
+// Stubs — serão substituídas na Fase de Integração com dados reais
+Route::get('/', fn() => Inertia::render('Home'));
+Route::get('/products', fn() => Inertia::render('Products/Index'));
+Route::get('/products/{slug}', fn() => Inertia::render('Products/Show'));
+Route::get('/login', fn() => Inertia::render('Auth/Login'))->name('login');
+Route::get('/register', fn() => Inertia::render('Auth/Register'));
+
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', fn() => Inertia::render('Customer/Cart'));
+    Route::get('/checkout', fn() => Inertia::render('Customer/Checkout'));
+    Route::get('/orders', fn() => Inertia::render('Customer/Orders/Index'));
+    Route::get('/profile', fn() => Inertia::render('Customer/Profile'));
+});
+
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', fn() => Inertia::render('Admin/Dashboard'));
+    Route::get('/products', fn() => Inertia::render('Admin/Products/Index'));
+    Route::get('/products/create', fn() => Inertia::render('Admin/Products/Create'));
+    Route::get('/categories', fn() => Inertia::render('Admin/Categories/Index'));
+    Route::get('/orders', fn() => Inertia::render('Admin/Orders/Index'));
+    Route::get('/stock/low', fn() => Inertia::render('Admin/Stock/LowStock'));
+});
+```
+
+> [!NOTE]
+> Essas rotas são stubs sem dados. Na Fase de Integração (`agent-integration.md`), serão substituídas por controllers Inertia que passam dados reais do backend.
+
+---
+
+## Regras de Ownership de Arquivos
+
+> [!CAUTION]
+> Para evitar conflitos entre agentes trabalhando em paralelo, respeite estas regras:
+
+| Arquivo/Diretório | Owner exclusivo | Outros agentes |
+|---|---|---|
+| `app/Providers/AppServiceProvider.php` | **Agente 1** | Não tocar |
+| `routes/api.php` | **Agente 1** | Não tocar |
+| `routes/web.php` | **Fase 0 / Integração** | Não tocar durante Fase 1 |
+| `resources/js/types/shared.ts` | **Fase 0** | Importar, não modificar |
+| `resources/js/Components/Admin/` | **Agente 3** | Ninguém mais toca |
+| `resources/js/Components/Public/` | **Agente 4** | Ninguém mais toca |
+| `resources/js/Components/Shared/` | **Fase 0** | Importar, não modificar |
+| `config/logging.php` | **Agente 5** | Ninguém mais toca |
+| `tsconfig.json`, `.eslintrc.json`, `.prettierrc` | **Agente 5** | Ninguém mais toca |
+| `tests/` | **Agente 2** | Ninguém mais toca |
+
+### 14. Verificação
 ```bash
 php artisan migrate:status
 npm run build
 ```
 
-### 12. Commit
-```bash
-git add .
-git commit -m "feat: project base setup with architecture scaffolding"
-```
+### 15. Solicitar commit ao humano
+
+> [!IMPORTANT]
+> **NÃO faça commits.** Pause a execução e solicite ao humano que revise e faça o commit manualmente.
+> Mensagem sugerida: `"Fase 0 concluída. Sugestão de commit: feat: project base setup with architecture scaffolding"`

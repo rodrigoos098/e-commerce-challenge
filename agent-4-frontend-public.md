@@ -67,7 +67,7 @@ resources/js/
 │       ├── OrderStatusTimeline.tsx
 │       ├── QuantitySelector.tsx
 │       ├── Pagination.tsx
-│       ├── SkeletonLoader.tsx
+│       ├── ... (importar SkeletonLoader de ../Shared/)
 │       ├── HeroBanner.tsx
 │       └── Footer.tsx
 ├── Layouts/
@@ -88,7 +88,7 @@ resources/js/
 │       │   └── Show.tsx
 │       └── Profile.tsx
 └── types/
-    └── public.ts
+    └── public.ts  (apenas types específicos do público, importar shared de @/types/shared)
 ```
 
 ---
@@ -96,17 +96,19 @@ resources/js/
 ## Ordem de Execução (Passo a Passo)
 
 ### Etapa 1 — TypeScript Types (`resources/js/types/public.ts`)
-Defina todas as interfaces (podem reutilizar as mesmas do admin, mas com foco no que o frontend público precisa):
+
+> [!IMPORTANT]
+> **Importe os types compartilhados de `@/types/shared`** (criado na Fase 0). Defina aqui apenas types específicos do frontend público:
+
 ```typescript
-interface Product { id: number; name: string; slug: string; description: string; price: number; quantity: number; active: boolean; category: Category; tags: Tag[]; created_at: string; }
-interface Category { id: number; name: string; slug: string; children?: Category[]; }
-interface Tag { id: number; name: string; slug: string; }
-interface CartItem { id: number; product: Product; quantity: number; }
-interface Cart { id: number; items: CartItem[]; total: number; }
-interface Order { id: number; status: OrderStatus; total: number; subtotal: number; tax: number; shipping_cost: number; items: OrderItem[]; shipping_address: string; created_at: string; }
-type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-interface OrderItem { id: number; product: Product; quantity: number; unit_price: number; total_price: number; }
-interface User { id: number; name: string; email: string; }
+import { Product, Category, Tag, Order, OrderStatus, OrderItem, User, PaginatedResponse } from '@/types/shared';
+
+// Re-export para conveniência
+export type { Product, Category, Tag, Order, OrderStatus, OrderItem, User, PaginatedResponse };
+
+// Types específicos do público
+export interface CartItem { id: number; product: Product; quantity: number; }
+export interface Cart { id: number; items: CartItem[]; total: number; }
 ```
 
 ### Etapa 2 — Layout Público (`resources/js/Layouts/PublicLayout.tsx`)
@@ -138,9 +140,11 @@ interface User { id: number; name: string; email: string; }
 | `QuantitySelector.tsx` | `value`, `onChange`, `max` | Botões +/- com input numérico |
 | `OrderStatusTimeline.tsx` | `status` | Timeline visual: pending → processing → shipped → delivered |
 | `Pagination.tsx` | `meta`, `onPageChange` | Botões de paginação ou infinite scroll |
-| `SkeletonLoader.tsx` | `type` | Skeleton screens para cards, listas, formulários |
 | `HeroBanner.tsx` | `title`, `subtitle`, `cta` | Banner hero com gradiente e CTA |
 | `Footer.tsx` | — | Footer da loja |
+
+> [!NOTE]
+> **SkeletonLoader:** Importe de `@/Components/Shared/SkeletonLoader` (criado na Fase 0). Não crie um SkeletonLoader próprio.
 
 **Marcar:** `[x] Componentes compartilhados`
 
@@ -220,4 +224,4 @@ interface User { id: number; name: string; email: string; }
 2. Verificar TypeScript: `npx tsc --noEmit`
 3. Verificar responsividade: mobile, tablet, desktop
 4. Verificar acessibilidade: alt texts, aria labels, foco
-5. **Commit:** `feat: complete public frontend with shop, cart, checkout and user pages`
+5. **Solicitar commit ao humano:** Pause e sugira: `feat: complete public frontend with shop, cart, checkout and user pages`

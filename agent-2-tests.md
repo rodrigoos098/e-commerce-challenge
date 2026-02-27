@@ -48,13 +48,23 @@ Você é o agente responsável por toda a **suíte de testes** do sistema de e-c
 
 ## Dependências
 
-> [!WARNING]
-> Você tem **dependência parcial** do Agente 1 (Backend Core). Siga esta estratégia:
-> - **Comece imediatamente** com testes unitários de Models (Etapas 1-2) — eles dependem apenas dos Models que são criados na Fase 0
-> - **Aguarde o Agente 1** completar Services e Repositories antes de iniciar a Etapa 3
-> - **Aguarde o Agente 1** completar Controllers e Rotas antes de iniciar as Etapas 4-6
+> [!CAUTION]
+> Você tem **dependência parcial** do Agente 1 (Backend Core). **Estratégia de lançamento em 2 fases:**
 >
-> Entre as esperas, revise e refine os testes já escritos.
+> **Lançamento 1 (imediato, junto com os outros agentes):**
+> - Etapa 1: Testes unitários de Models ✅
+> - Etapa 2: Testes unitários de Repositories ✅ (se Repositories já existirem da Fase 0)
+>
+> **Lançamento 2 (após Agente 1 concluir):**
+> - Etapa 3: Testes unitários de Services
+> - Etapa 4: Testes de integração API
+> - Etapa 5: Testes de feature (fluxos completos)
+> - Etapa 6: Testes de validação e autorização
+> - Etapa 7: Verificação final
+>
+> **Entre as esperas, revise e refine os testes já escritos.**
+>
+> **Ownership exclusivo:** Apenas você toca o diretório `tests/`. Nenhum outro agente deve criar ou modificar testes.
 
 ---
 
@@ -191,4 +201,4 @@ Teste fluxos de ponta a ponta:
 2. **Verificar cobertura:** `php artisan test --coverage --min=80`
 3. **Verificar se há testes falhando:** Corrigir todos
 4. **Rodar Pint:** `vendor/bin/pint --dirty --format agent`
-5. **Commit:** `test: complete test suite with 80%+ coverage`
+5. **Solicitar commit ao humano:** Pause e sugira: `test: complete test suite with 80%+ coverage`

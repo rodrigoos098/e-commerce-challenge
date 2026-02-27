@@ -38,10 +38,20 @@ Você é o agente responsável pela **documentação da API (Swagger/OpenAPI)**,
 
 ## Dependências
 
-> [!WARNING]
-> A documentação Swagger/OpenAPI **depende dos Controllers do Agente 1**. Siga esta estratégia:
-> - **Comece imediatamente** com Etapas 1, 2, 3, 4 (configurações, PROJECT.md, logging, qualidade)
-> - **Aguarde o Agente 1** completar Controllers para adicionar anotações Swagger (Etapa 5)
+> [!CAUTION]
+> A documentação Swagger/OpenAPI **depende dos Controllers do Agente 1**. **Estratégia de lançamento em 2 fases:**
+>
+> **Lançamento 1 (imediato, junto com os outros agentes):**
+> - Etapa 1: Configurações de qualidade (Pint, ESLint, Prettier, TS) ✅
+> - Etapa 2: Migrations de fila ✅
+> - Etapa 3: Logging estruturado ✅
+> - Etapa 4: PROJECT.md (versão inicial) ✅
+>
+> **Lançamento 2 (após Agente 1 concluir):**
+> - Etapa 5: Swagger/OpenAPI (precisa dos controllers)
+> - Etapa 4: Atualizar PROJECT.md com informações finais
+>
+> **Ownership exclusivo:** Você é o único agente que toca `config/logging.php`, `tsconfig.json`, `.eslintrc.json`, `.prettierrc`, `pint.json` e `PROJECT.md`. Nenhum outro agente deve modificar esses arquivos.
 
 ---
 
@@ -268,4 +278,4 @@ php artisan l5-swagger:generate
 2. Rodar ESLint: `npx eslint resources/js/ --ext .ts,.tsx`
 3. Verificar PROJECT.md está completo
 4. Verificar Swagger UI carrega
-5. **Commit:** `docs: add API documentation, PROJECT.md, and code quality configs`
+5. **Solicitar commit ao humano:** Pause e sugira: `docs: add API documentation, PROJECT.md, and code quality configs`

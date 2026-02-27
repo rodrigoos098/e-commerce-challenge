@@ -116,7 +116,7 @@ graph TD
 
 11. **Criar o layout base do Inertia** (`resources/js/app.tsx`, `resources/js/Layouts/`).
 
-12. **Commit inicial:** `feat: project base setup with architecture scaffolding`
+12. **Solicitar commit ao humano:** Pause e sugira: `feat: project base setup with architecture scaffolding`
 
 ---
 
@@ -585,20 +585,19 @@ npm run build
 
 ## Resumo da Paralelização
 
-| Agente | Pode iniciar imediatamente após Fase 0? | Depende de | Tempo estimado |
-|--------|------------------------------------------|------------|----------------|
-| 🔵 Agente 1 (Backend) | ✅ Sim | Fase 0 apenas | Alto |
-| 🟢 Agente 2 (Testes) | ⚠️ Parcialmente — Models sim, API após Agente 1 | Agente 1 (parcial) | Médio |
-| 🟡 Agente 3 (Admin Frontend) | ✅ Sim — pode criar UI antes de conectar API | Fase 0 apenas | Médio |
-| 🟠 Agente 4 (Público Frontend) | ✅ Sim — pode criar UI antes de conectar API | Fase 0 apenas | Médio |
-| 🟣 Agente 5 (Docs & DevOps) | ⚠️ Parcialmente — config sim, Swagger após Agente 1 | Agente 1 (parcial) | Baixo |
+| Agente | Lançamento 1 (imediato) | Lançamento 2 (após Agente 1) | Tempo estimado |
+|--------|------------------------|-------------------------------|----------------|
+| 🔵 Agente 1 (Backend) | ✅ Completo | — | Alto |
+| 🟢 Agente 2 (Testes) | ⚠️ Etapas 1-2 (Models, Repos) | Etapas 3-7 (Services, API, Features) | Médio |
+| 🟡 Agente 3 (Admin Frontend) | ✅ Completo (com mocks) | — | Médio |
+| 🟠 Agente 4 (Público Frontend) | ✅ Completo (com mocks) | — | Médio |
+| 🟣 Agente 5 (Docs & DevOps) | ⚠️ Etapas 1-4 (config, docs, log) | Etapa 5 (Swagger) | Baixo |
 
 > [!TIP]
-> **Estratégia de paralelização ótima:**
-> - Inicie os 5 agentes logo após a Fase 0
-> - Agentes 3 e 4 criam a UI com **dados mockados** inicialmente
-> - Agente 2 começa com testes de Models e espera Agente 1 para testes de API
-> - Na Fase de Integração, substitua mocks por chamadas reais
+> **Estratégia de paralelização ótima (2 fases):**
+> 1. **Lançamento 1:** Inicie todos os 5 agentes após a Fase 0. Agentes 1, 3 e 4 executam completamente. Agentes 2 e 5 executam apenas suas etapas independentes.
+> 2. **Lançamento 2:** Após o Agente 1 concluir, relance os Agentes 2 e 5 para completar suas etapas dependentes (testes de API/feature e Swagger).
+> 3. **Fase de Integração:** Após todos os agentes concluírem, executar `agent-integration.md`.
 
 ---
 
