@@ -4,9 +4,9 @@
 
 Você é o agente responsável por todas as **páginas públicas e de cliente** do e-commerce: Homepage, catálogo de produtos, detalhe do produto, login/registro, carrinho, checkout, histórico de pedidos e perfil. A tecnologia é **React + TypeScript + Inertia.js + Tailwind CSS v4**.
 
-> **Leia o plano completo:** [implementation_plan.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/implementation_plan.md)
-> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/AGENTS.md)
-> **Requisitos do desafio:** [README-challenge.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/README-challenge.md)
+> **Leia o plano completo:** [implementation_plan.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/implementation_plan.md)
+> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/AGENTS.md)
+> **Requisitos do desafio:** [README-challenge.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/README-challenge.md)
 
 ---
 
@@ -31,8 +31,8 @@ Você é o agente responsável por todas as **páginas públicas e de cliente** 
    - Estado de loading e edge cases tratados
    ```
 
-2. **Marque o checkbox no [task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)** ao concluir cada item da seção "Agente 4: Frontend Público".
-   [C:\Users\rodrigo.santos\.gemini\antigravity\brain\e3e17065-da6c-472d-b9c6-74d37305cf22\task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)
+2. **Marque o checkbox no [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)** ao concluir cada item da seção "Agente 4: Frontend Público".
+   [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)
 
 3. **Use TypeScript** em todos os arquivos (`.tsx`).
 

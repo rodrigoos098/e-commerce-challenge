@@ -4,9 +4,9 @@
 
 Você é o agente responsável por toda a **suíte de testes** do sistema de e-commerce. O projeto usa **PHPUnit** (NÃO Pest). Seu objetivo é atingir **≥80% de cobertura de código** com testes bem organizados e abrangentes.
 
-> **Leia o plano completo:** [implementation_plan.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/implementation_plan.md)
-> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/AGENTS.md)
-> **Requisitos do desafio:** [README-challenge.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/README-challenge.md)
+> **Leia o plano completo:** [implementation_plan.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/implementation_plan.md)
+> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/AGENTS.md)
+> **Requisitos do desafio:** [README-challenge.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/README-challenge.md)
 
 ---
 
@@ -30,8 +30,8 @@ Você é o agente responsável por toda a **suíte de testes** do sistema de e-c
    - Problemas encontrados e soluções
    ```
 
-2. **Marque o checkbox no [task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)** ao concluir cada item da seção "Agente 2: Testes".
-   [C:\Users\rodrigo.santos\.gemini\antigravity\brain\e3e17065-da6c-472d-b9c6-74d37305cf22\task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)
+2. **Marque o checkbox no [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)** ao concluir cada item da seção "Agente 2: Testes".
+   [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)
 
 3. **Use PHPUnit, NÃO Pest.** Se encontrar qualquer teste em Pest, converta para PHPUnit.
 

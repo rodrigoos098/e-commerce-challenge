@@ -4,21 +4,21 @@
 
 Esta fase conecta o trabalho dos 5 agentes paralelos. Deve ser executada **somente após** todos os agentes completarem suas tarefas na Fase 1.
 
-> **Leia o plano completo:** [implementation_plan.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/implementation_plan.md)
+> **Leia o plano completo:** [implementation_plan.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/implementation_plan.md)
 
 ---
 
 ## Regras de Trabalho
 
 1. **Documente tudo** no arquivo `progress-integration.md` (raiz do projeto).
-2. **Marque o checkbox no [task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)** ao concluir cada item da seção "Fase 2 — Integração".
+2. **Marque o checkbox no [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)** ao concluir cada item da seção "Fase 2 — Integração".
 3. **Rode Pint** após modificar PHP: `vendor/bin/pint --dirty --format agent`
 
 ---
 
 ## Passo a Passo
 
-### 1. Criar Rotas Web Inertia ([routes/web.php](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/routes/web.php))
+### 1. Criar Rotas Web Inertia ([routes/web.php](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/routes/web.php))
 
 Conectar as páginas React com rotas Laravel. Criar controllers Inertia que passam dados do backend para o frontend:
 
@@ -85,7 +85,7 @@ Repetir para todos os controllers de página.
 Para SPAs com Inertia, Sanctum usa autenticação baseada em cookies (não tokens):
 
 1. Verificar `config/sanctum.php` → `stateful` domains incluem localhost
-2. Verificar middleware em [bootstrap/app.php](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/bootstrap/app.php)
+2. Verificar middleware em [bootstrap/app.php](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/bootstrap/app.php)
 3. Testar login/logout em ambos os frontends
 4. Garantir que CSRF token é enviado
 

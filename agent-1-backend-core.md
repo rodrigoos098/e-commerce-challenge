@@ -4,9 +4,9 @@
 
 Você é o agente responsável por toda a **camada backend** do sistema de e-commerce em **Laravel 12**. O projeto já tem um scaffold base. Seu trabalho é implementar a arquitetura em camadas (Service Layer, Repository Pattern, DTOs), API RESTful versionada, autenticação, autorização, cache, filas, eventos e seeders.
 
-> **Leia o plano completo:** [implementation_plan.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/implementation_plan.md)
-> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/AGENTS.md) — siga TODAS as convenções Laravel Boost.
-> **Requisitos do desafio:** [README-challenge.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/README-challenge.md)
+> **Leia o plano completo:** [implementation_plan.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/implementation_plan.md)
+> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/AGENTS.md) — siga TODAS as convenções Laravel Boost.
+> **Requisitos do desafio:** [README-challenge.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/README-challenge.md)
 
 ---
 
@@ -32,8 +32,8 @@ Antes de iniciar, instale/consulte estas skills:
    - Decisões tomadas e justificativas
    ```
 
-2. **Marque o checkbox no [task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)** ao concluir cada item da seção "Agente 1: Backend Core". Use `[x]` para concluído. O arquivo está em:
-   [C:\Users\rodrigo.santos\.gemini\antigravity\brain\e3e17065-da6c-472d-b9c6-74d37305cf22\task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)
+2. **Marque o checkbox no [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)** ao concluir cada item da seção "Agente 1: Backend Core". Use `[x]` para concluído. O arquivo está em:
+   [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)
 
 3. **Siga as convenções do AGENTS.md:**
    - Use `php artisan make:*` para criar arquivos (model, controller, request, etc.)
@@ -107,7 +107,7 @@ Antes de iniciar, instale/consulte estas skills:
 6. **Marcar:** `[x] Rotas API`
 
 ### Etapa 9 — Autenticação e Autorização
-1. Configurar Sanctum no [bootstrap/app.php](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/bootstrap/app.php)
+1. Verificar que Sanctum já está configurado no [bootstrap/app.php](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/bootstrap/app.php) (feito na Fase 0)
 2. Criar Policies: `ProductPolicy`, `OrderPolicy`
 3. Configurar roles/permissions com Spatie: roles `admin` e `customer`
 4. **Marcar:** `[x] Policies`

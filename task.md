@@ -2,7 +2,7 @@
 
 ## Fase 0 — Setup Base
 - [ ] Instalar dependências (Composer + NPM)
-- [ ] Configurar [.env](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/.env) e gerar chave
+- [ ] Configurar [.env](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/.env) e gerar chave
 - [ ] Configurar Sanctum e Spatie Permission
 - [ ] Criar estrutura de pastas (DTOs, Repositories, Services, etc.)
 - [ ] Criar Models base com migrations

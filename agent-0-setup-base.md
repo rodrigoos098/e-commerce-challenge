@@ -4,15 +4,15 @@
 
 Esta fase cria a **fundação compartilhada** que todos os 5 agentes paralelos precisam. Deve ser executada **inteiramente antes** de iniciar qualquer agente.
 
-> **Leia o plano completo:** [implementation_plan.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/implementation_plan.md)
-> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/AGENTS.md)
+> **Leia o plano completo:** [implementation_plan.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/implementation_plan.md)
+> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/AGENTS.md)
 
 ---
 
 ## Regras de Trabalho
 
 1. **Documente tudo em tempo real** no arquivo `progress-fase-0.md` (raiz do projeto).
-2. **Marque o checkbox no [task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)** ao concluir cada item da seção "Fase 0 — Setup Base".
+2. **Marque o checkbox no [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)** ao concluir cada item da seção "Fase 0 — Setup Base".
 3. **Siga as convenções do AGENTS.md** — use `php artisan make:*`, `--no-interaction`, etc.
 4. **Rode Pint** após cada grupo de arquivos PHP: `vendor/bin/pint --dirty --format agent`
 
@@ -35,8 +35,8 @@ npm install react-hot-toast react-hook-form @hookform/resolvers zod
 npm install @tanstack/react-query axios
 ```
 
-### 3. Configurar [.env](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/.env)
-Editar [.env](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/.env) com:
+### 3. Configurar [.env](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/.env)
+Editar [.env](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/.env) com:
 ```dotenv
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -111,7 +111,7 @@ php artisan migrate --no-interaction
 ```
 **Marcar:** `[x] Criar Models base com migrations`
 
-### 8. Configurar [bootstrap/app.php](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/bootstrap/app.php)
+### 8. Configurar [bootstrap/app.php](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/bootstrap/app.php)
 - Adicionar middleware Sanctum
 - Configurar rate limiting (100 req/min)
 - Registrar arquivo `routes/api.php`
@@ -120,7 +120,7 @@ php artisan migrate --no-interaction
 
 ### 9. Configurar Vite + React + Inertia
 
-Atualizar [vite.config.js](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/vite.config.js):
+Atualizar [vite.config.js](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/vite.config.js):
 ```js
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';

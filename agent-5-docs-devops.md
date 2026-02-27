@@ -4,16 +4,15 @@
 
 Você é o agente responsável pela **documentação da API (Swagger/OpenAPI)**, **PROJECT.md**, **logging estruturado** e **configurações de qualidade de código** (Pint, ESLint, Prettier, TypeScript). Seu trabalho garante que o projeto esteja profissionalmente documentado e configurado.
 
-> **Leia o plano completo:** [implementation_plan.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/implementation_plan.md)
-> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/AGENTS.md)
-> **Requisitos do desafio:** [README-challenge.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/README-challenge.md)
+> **Leia o plano completo:** [implementation_plan.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/implementation_plan.md)
+> **Leia as diretrizes do projeto:** [AGENTS.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/AGENTS.md)
+> **Requisitos do desafio:** [README-challenge.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/README-challenge.md)
 
 ---
 
 ## Skills Recomendadas (skills.sh)
 
 - [api-design-principles](https://skills.sh/wshobson/agents/api-design-principles)
-- [git-commit](https://skills.sh/github/awesome-copilot/git-commit)
 - [code-review-excellence](https://skills.sh/wshobson/agents/code-review-excellence)
 - [docker-expert](https://skills.sh/sickn33/antigravity-awesome-skills/docker-expert) (diferencial)
 - [writing-plans](https://skills.sh/obra/superpowers/writing-plans)
@@ -29,8 +28,8 @@ Você é o agente responsável pela **documentação da API (Swagger/OpenAPI)**,
    - Arquivos criados/modificados
    ```
 
-2. **Marque o checkbox no [task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)** ao concluir cada item da seção "Agente 5: Documentação & DevOps".
-   [C:\Users\rodrigo.santos\.gemini\antigravity\brain\e3e17065-da6c-472d-b9c6-74d37305cf22\task.md](file:///C:/Users/rodrigo.santos/.gemini/antigravity/brain/e3e17065-da6c-472d-b9c6-74d37305cf22/task.md)
+2. **Marque o checkbox no [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)** ao concluir cada item da seção "Agente 5: Documentação & DevOps".
+   [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)
 
 3. **Rode Pint** após modificar PHP: `vendor/bin/pint --dirty --format agent`
 
@@ -124,7 +123,7 @@ Criar `tsconfig.json`:
 }
 ```
 
-Adicionar scripts ao [package.json](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/package.json):
+Adicionar scripts ao [package.json](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/package.json):
 ```json
 {
   "scripts": {
@@ -147,7 +146,7 @@ Verificar que a tabela `jobs` foi criada.
 
 ### Etapa 3 — Logging Estruturado
 
-**3.1 — Configurar canais de log** em [config/logging.php](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/config/logging.php):
+**3.1 — Configurar canais de log** em [config/logging.php](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/config/logging.php):
 - Canal `orders` para operações de pedidos
 - Canal `stock` para movimentações de estoque
 - Canal `auth` para eventos de autenticação

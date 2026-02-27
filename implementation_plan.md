@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-Desenvolvimento de um sistema e-commerce completo com **Laravel 12** (API backend) e **React + TypeScript + Inertia.js** (frontend SPA), conforme definido no [README-challenge.md](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/README-challenge.md).
+Desenvolvimento de um sistema e-commerce completo com **Laravel 12** (API backend) e **React + TypeScript + Inertia.js** (frontend SPA), conforme definido no [README-challenge.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/README-challenge.md).
 
 O projeto já possui um scaffold Laravel 12 configurado com Tailwind CSS v4, Vite, PHPUnit e Laravel Boost.
 
@@ -64,7 +64,7 @@ graph TD
    npm install @tanstack/react-query axios
    ```
 
-3. **Configurar o [.env](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/.env):**
+3. **Configurar o [.env](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/.env):**
    - `DB_CONNECTION=mysql`
    - `DB_HOST=127.0.0.1`
    - `DB_PORT=3306`
@@ -110,9 +110,9 @@ graph TD
 
 8. **Criar todas as Migrations** com os campos e índices especificados no desafio.
 
-9. **Configurar [bootstrap/app.php](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/bootstrap/app.php)** com middleware de rate limiting, Sanctum, etc.
+9. **Configurar [bootstrap/app.php](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/bootstrap/app.php)** com middleware de rate limiting, Sanctum, etc.
 
-10. **Configurar [vite.config.js](file:///c:/Users/rodrigo.santos/Documents/personal/e-commerce-challenge/vite.config.js)** para suportar React + Inertia.
+10. **Configurar [vite.config.js](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/vite.config.js)** para suportar React + Inertia.
 
 11. **Criar o layout base do Inertia** (`resources/js/app.tsx`, `resources/js/Layouts/`).
 
@@ -292,7 +292,9 @@ Route::prefix('v1')->group(function () {
 - [systematic-debugging](https://skills.sh/obra/superpowers/systematic-debugging) — Debugging sistemático
 
 > [!WARNING]
-> **Este agente depende parcialmente do Agente 1.** Ele pode começar criando a estrutura dos testes e os testes de Model/relacionamentos, mas os testes de integração da API precisarão dos controllers e services implementados. **Recomendo que comece pelos testes unitários de Models e Repositories, e aguarde o Agente 1 completar os controllers para escrever os testes de integração.**
+> **Este agente depende parcialmente do Agente 1.** Estratégia de 2 lançamentos:
+> - **Lançamento 1 (imediato):** Testes unitários de Models e Repositories (Etapas 1-2)
+> - **Lançamento 2 (após Agente 1):** Testes de Services, API, Features e Autorização (Etapas 3-7)
 
 #### Passo a Passo Detalhado
 
@@ -378,7 +380,7 @@ Route::prefix('v1')->group(function () {
 | `StatusBadge.tsx` | Badge de status com cores |
 | `Sidebar.tsx` | Sidebar de navegação |
 | `SearchBar.tsx` | Barra de busca global |
-| `SkeletonLoader.tsx` | Loading states |
+| *(importar `SkeletonLoader` de `Shared/`)* | Loading states |
 
 **3. Páginas Admin** (`resources/js/Pages/Admin/`)
 | Página | Funcionalidade |
@@ -437,7 +439,7 @@ Route::prefix('v1')->group(function () {
 | `OrderStatusTimeline.tsx` | Timeline visual do status do pedido |
 | `QuantitySelector.tsx` | Input +/- para quantidade |
 | `Pagination.tsx` | Paginação ou infinite scroll |
-| `SkeletonLoader.tsx` | Loading states e skeleton screens |
+| *(importar `SkeletonLoader` de `Shared/`)* | Loading states e skeleton screens |
 
 **3. Páginas Públicas** (`resources/js/Pages/`)
 | Página | Funcionalidade |
@@ -470,10 +472,9 @@ Route::prefix('v1')->group(function () {
 
 **Skills Recomendadas (skills.sh):**
 - [api-design-principles](https://skills.sh/wshobson/agents/api-design-principles) — Princípios de API e documentação
-- [git-commit](https://skills.sh/github/awesome-copilot/git-commit) — Boas práticas de commits
+- [writing-plans](https://skills.sh/obra/superpowers/writing-plans) — Escrita de documentação clara
 - [code-review-excellence](https://skills.sh/wshobson/agents/code-review-excellence) — Excelência em code review
 - [docker-expert](https://skills.sh/sickn33/antigravity-awesome-skills/docker-expert) — Se quiser adicionar Docker (diferencial)
-- [writing-plans](https://skills.sh/obra/superpowers/writing-plans) — Escrita de documentação clara
 
 #### Passo a Passo Detalhado
 
@@ -690,7 +691,13 @@ e-commerce-challenge/
 │       ├── app.tsx
 │       ├── Components/
 │       │   ├── Admin/
-│       │   └── Public/
+│       │   ├── Public/
+│       │   └── Shared/
+│       │       └── SkeletonLoader.tsx
+│       ├── types/
+│       │   ├── shared.ts
+│       │   ├── admin.ts
+│       │   └── public.ts
 │       ├── Layouts/
 │       │   ├── AdminLayout.tsx
 │       │   └── PublicLayout.tsx
