@@ -53,9 +53,9 @@ Você é o agente responsável por toda a **suíte de testes** do sistema de e-c
 >
 > **Lançamento 1 (imediato, junto com os outros agentes):**
 > - Etapa 1: Testes unitários de Models ✅
-> - Etapa 2: Testes unitários de Repositories ✅ (se Repositories já existirem da Fase 0)
 >
 > **Lançamento 2 (após Agente 1 concluir):**
+> - Etapa 2: Testes unitários de Repositories
 > - Etapa 3: Testes unitários de Services
 > - Etapa 4: Testes de integração API
 > - Etapa 5: Testes de feature (fluxos completos)

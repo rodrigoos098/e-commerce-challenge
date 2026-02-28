@@ -292,8 +292,8 @@ Route::prefix('v1')->group(function () {
 
 > [!WARNING]
 > **Este agente depende parcialmente do Agente 1.** Estratégia de 2 lançamentos:
-> - **Lançamento 1 (imediato):** Testes unitários de Models e Repositories (Etapas 1-2)
-> - **Lançamento 2 (após Agente 1):** Testes de Services, API, Features e Autorização (Etapas 3-7)
+> - **Lançamento 1 (imediato):** Testes unitários de Models (Etapa 1)
+> - **Lançamento 2 (após Agente 1):** Testes de Repositories, Services, API, Features e Autorização (Etapas 2-7)
 
 #### Passo a Passo Detalhado
 
@@ -592,7 +592,7 @@ npm run build
 | Agente | Lançamento 1 (imediato) | Lançamento 2 (após Agente 1) | Tempo estimado |
 |--------|------------------------|-------------------------------|----------------|
 | 🔵 Agente 1 (Backend) | ✅ Completo | — | Alto |
-| 🟢 Agente 2 (Testes) | ⚠️ Etapas 1-2 (Models, Repos) | Etapas 3-7 (Services, API, Features) | Médio |
+| 🟢 Agente 2 (Testes) | ⚠️ Etapa 1 (Models) | Etapas 2-7 (Repos, Services, API, Features) | Médio |
 | 🟡 Agente 3 (Admin Frontend) | ✅ Completo (com mocks) | — | Médio |
 | 🟠 Agente 4 (Público Frontend) | ✅ Completo (com mocks) | — | Médio |
 | 🟣 Agente 5 (Docs & DevOps) | ⚠️ Etapas 1-4 (config, docs, log) | Etapa 5 (Swagger) | Baixo |
