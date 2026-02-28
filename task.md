@@ -63,8 +63,8 @@
 
 ## Fase 2 — Integração
 - [ ] Conectar rotas web Inertia com controllers
-- [ ] Conectar admin frontend com API
-- [ ] Conectar público frontend com API
+- [ ] Conectar admin frontend com backend via Inertia
+- [ ] Conectar público frontend com backend via Inertia
 - [ ] Ajustar autenticação Sanctum + Inertia
 - [ ] Rodar seeders
 - [ ] Suíte de testes completa

@@ -47,7 +47,16 @@ Você é o agente responsável por todas as **páginas públicas e de cliente** 
 
 6. **Acessibilidade WCAG 2.1 AA:** alt texts, aria labels, foco visível, contraste adequado.
 
-7. **Crie dados mockados inicialmente.** Na integração (Fase 2), serão substituídos por dados reais via Inertia.
+7. **Crie dados mockados inicialmente.** Crie constantes mock no topo de cada página simulando as props que o Inertia vai entregar. Na integração (Fase 2), serão substituídos pelas props reais do `Inertia::render()`.
+
+> [!IMPORTANT]
+> **Estratégia de data fetching — 100% Inertia:**
+> - **Dados de página:** Recebidos via Inertia props (`usePage().props`). Os Page Controllers passam dados via `Inertia::render()` usando a camada de Services.
+> - **Mutações (carrinho, checkout, login/registro):** `router.post()` / `router.put()` / `router.delete()` do `@inertiajs/react`, que submete para controllers Inertia no server.
+> - **Filtros, paginação e busca:** `router.get()` ou `router.visit()` com query params — o Inertia recarrega a página com os novos dados do server.
+> - **Não use Axios nem React Query.** O Inertia gerencia tudo: navegação, revalidação, erros de validação (via `usePage().props.errors`), e redirecionamentos.
+>
+> A API REST (`/api/v1/...`) existe para **clientes externos, testes e documentação Swagger**, não sendo consumida pelo frontend Inertia. Essa decisão será documentada no `PROJECT.md`.
 
 ---
 

@@ -61,7 +61,6 @@ graph TD
    npm install react react-dom @inertiajs/react @types/react @types/react-dom
    npm install -D typescript @vitejs/plugin-react
    npm install react-hot-toast react-hook-form @hookform/resolvers zod
-   npm install @tanstack/react-query axios
    ```
 
 3. **Configurar o [.env](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/.env):**
@@ -398,7 +397,9 @@ Route::prefix('v1')->group(function () {
 | `Stock/LowStock.tsx` | Relatório de produtos com estoque baixo |
 
 **4. Gerenciamento de Estado**
-- React Query para data fetching e cache
+- Inertia props para dados de página (via `Inertia::render()`)
+- `router.post/put/delete` do Inertia para mutações (CRUD, ações)
+- `router.get` com query params para filtros, paginação e busca
 - React Hook Form + Zod para formulários
 - Toast notifications para feedback
 
@@ -460,8 +461,10 @@ Route::prefix('v1')->group(function () {
 | `Profile.tsx` | Perfil do usuário, editar dados |
 
 **5. Gerenciamento de Estado**
-- React Query para data fetching e cache
-- Context API para carrinho (estado global)
+- Inertia props para dados de página (via `Inertia::render()`)
+- `router.post/put/delete` do Inertia para mutações (carrinho, checkout, login)
+- `router.get` com query params para filtros, paginação e busca
+- Context API para carrinho (estado local entre navegações)
 - React Hook Form + Zod para formulários
 
 ---
@@ -518,12 +521,12 @@ Após todos os agentes completarem seu trabalho, a integração conecta as parte
 - Criar `PageController`s do Inertia que passam dados via `Inertia::render()`
 - Mapear rotas públicas, autenticadas e admin
 
-**2. Conectar Frontend Admin com API**
-- Verificar que os componentes admin chamam os endpoints corretos
+**2. Conectar Frontend Admin com Backend via Inertia**
+- Verificar que os componentes admin usam `router.post/put/delete` do Inertia corretamente
 - Testar CRUD de produtos, categorias, pedidos via interface
 
-**3. Conectar Frontend Público com API**
-- Verificar carrinho, checkout, histórico de pedidos
+**3. Conectar Frontend Público com Backend via Inertia**
+- Verificar carrinho, checkout, histórico de pedidos usam `router.*` do Inertia
 - Testar fluxo completo: navegar → adicionar ao carrinho → checkout → pedido
 
 **4. Ajustar Autenticação**

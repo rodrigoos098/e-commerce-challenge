@@ -23,22 +23,38 @@ Esta fase conecta o trabalho dos 5 agentes paralelos. Deve ser executada **somen
 Conectar as páginas React com rotas Laravel. Criar controllers Inertia que passam dados do backend para o frontend:
 
 ```php
-// Páginas públicas
+// Páginas públicas (GET — renderizam páginas)
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [ProductPageController::class, 'index'])->name('products.index');
 Route::get('/products/{product:slug}', [ProductPageController::class, 'show'])->name('products.show');
 
-// Auth
-Route::get('/login', [AuthPageController::class, 'login'])->name('login');
-Route::get('/register', [AuthPageController::class, 'register'])->name('register');
+// Auth (GET para páginas + POST para ações)
+Route::get('/login', [AuthPageController::class, 'loginForm'])->name('login');
+Route::post('/login', [AuthPageController::class, 'login']);
+Route::get('/register', [AuthPageController::class, 'registerForm'])->name('register');
+Route::post('/register', [AuthPageController::class, 'register']);
+Route::post('/logout', [AuthPageController::class, 'logout'])->name('logout');
 
 // Customer (autenticado)
 Route::middleware('auth')->group(function () {
+    // Páginas (GET)
     Route::get('/cart', [CartPageController::class, 'index'])->name('cart');
     Route::get('/checkout', [CheckoutPageController::class, 'index'])->name('checkout');
     Route::get('/orders', [OrderPageController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderPageController::class, 'show'])->name('orders.show');
     Route::get('/profile', [ProfilePageController::class, 'index'])->name('profile');
+
+    // Mutações carrinho (POST/PUT/DELETE)
+    Route::post('/cart/items', [CartPageController::class, 'addItem'])->name('cart.add');
+    Route::put('/cart/items/{item}', [CartPageController::class, 'updateItem'])->name('cart.update');
+    Route::delete('/cart/items/{item}', [CartPageController::class, 'removeItem'])->name('cart.remove');
+    Route::delete('/cart', [CartPageController::class, 'clear'])->name('cart.clear');
+
+    // Mutações pedidos (POST)
+    Route::post('/orders', [OrderPageController::class, 'store'])->name('orders.store');
+
+    // Mutações perfil (PUT)
+    Route::put('/profile', [ProfilePageController::class, 'update'])->name('profile.update');
 });
 
 // Admin
@@ -48,6 +64,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::resource('/categories', AdminCategoryController::class)->names('admin.categories');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+    Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
     Route::get('/stock/low', [AdminStockController::class, 'lowStock'])->name('admin.stock.low');
 });
 ```
@@ -62,23 +79,31 @@ Estes controllers usam `Inertia::render()` para passar dados do backend para com
 // app/Http/Controllers/HomeController.php
 class HomeController extends Controller
 {
+    public function __construct(
+        private ProductService $productService,
+        private CategoryService $categoryService,
+    ) {}
+
     public function index(): Response
     {
         return Inertia::render('Home', [
             'featuredProducts' => ProductResource::collection(
-                Product::active()->inStock()->latest()->take(8)->get()
+                $this->productService->getFeatured(limit: 8)
             ),
             'categories' => CategoryResource::collection(
-                Category::whereNull('parent_id')->with('children')->get()
+                $this->categoryService->getRootWithChildren()
             ),
         ]);
     }
 }
 ```
 
+> [!IMPORTANT]
+> **Todos os Page Controllers Inertia devem usar Services** (nunca Model diretamente). O Agente 1 criou toda a camada de Service/Repository — use-a.
+
 Repetir para todos os controllers de página.
 
-**Marcar:** parte de `[x] Conectar admin frontend com API` e `[x] Conectar público frontend com API`
+**Marcar:** parte de `[x] Conectar admin frontend com backend via Inertia` e `[x] Conectar público frontend com backend via Inertia`
 
 ### 3. Ajustar Autenticação Sanctum + Inertia
 
@@ -91,7 +116,7 @@ Para SPAs com Inertia, Sanctum usa autenticação baseada em cookies (não token
 
 **Marcar:** `[x] Ajustar autenticação Sanctum + Inertia`
 
-### 4. Substituir Mocks por Dados Reais
+### 4. Substituir Mocks por Dados Reais via Inertia
 
 Nos componentes React dos Agentes 3 e 4, substituir dados mockados pelas props recebidas via Inertia:
 
@@ -99,10 +124,31 @@ Nos componentes React dos Agentes 3 e 4, substituir dados mockados pelas props r
 // Antes (mock)
 const products = mockProducts;
 
-// Depois (Inertia)
+// Depois (Inertia props)
 import { usePage } from '@inertiajs/react';
-const { featuredProducts } = usePage().props;
+const { products } = usePage<{ products: PaginatedResponse<Product> }>().props;
 ```
+
+Para mutações, usar `router` do Inertia em vez de Axios:
+```tsx
+import { router } from '@inertiajs/react';
+
+// Criar produto (admin)
+router.post('/admin/products', formData, {
+    onSuccess: () => toast.success('Produto criado!'),
+});
+
+// Adicionar ao carrinho
+router.post('/cart/items', { product_id: id, quantity: 1 });
+
+// Filtrar produtos (atualiza a página com novos dados)
+router.get('/products', { category: selectedCategory, page: 2 }, {
+    preserveState: true,
+});
+```
+
+> [!NOTE]
+> A API REST (`/api/v1/...`) **não é consumida pelo frontend Inertia** — ela existe para clientes externos, testes automatizados e documentação Swagger. Essa decisão será documentada no `PROJECT.md`.
 
 ### 5. Rodar Seeders
 ```bash

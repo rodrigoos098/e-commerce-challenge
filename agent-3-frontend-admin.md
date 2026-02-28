@@ -40,7 +40,16 @@ Você é o agente responsável por todas as **páginas administrativas** do e-co
 
 5. **Design premium e responsivo (mobile-first).** O admin deve parecer profissional — use um design system consistente com cores harmônicas, sombras, bordas arredondadas, transições suaves.
 
-6. **Crie dados mockados inicialmente.** Como o backend pode não estar pronto, use dados mockados com a mesma estrutura da API. Na integração (Fase 2), eles serão substituídos por chamadas reais via Inertia.
+6. **Crie dados mockados inicialmente.** Como o backend pode não estar pronto, crie constantes mock no topo de cada página simulando as props que o Inertia vai entregar. Na integração (Fase 2), serão substituídos pelas props reais do `Inertia::render()`.
+
+> [!IMPORTANT]
+> **Estratégia de data fetching — 100% Inertia:**
+> - **Dados de página:** Recebidos via Inertia props (`usePage().props`). Os Page Controllers passam dados via `Inertia::render()` usando a camada de Services.
+> - **Mutações (criar/editar/excluir):** `router.post()` / `router.put()` / `router.delete()` do `@inertiajs/react`, que submete para controllers Inertia no server.
+> - **Filtros, paginação e busca:** `router.get()` ou `router.visit()` com query params — o Inertia recarrega a página com os novos dados do server.
+> - **Não use Axios nem React Query.** O Inertia gerencia tudo: navegação, revalidação, erros de validação (via `usePage().props.errors`), e redirecionamentos.
+>
+> A API REST (`/api/v1/...`) existe para **clientes externos, testes e documentação Swagger**, não sendo consumida pelo frontend Inertia. Essa decisão será documentada no `PROJECT.md`.
 
 ---
 

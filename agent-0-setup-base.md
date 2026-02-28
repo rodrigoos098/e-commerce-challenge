@@ -15,6 +15,7 @@ Esta fase cria a **fundação compartilhada** que todos os 5 agentes paralelos p
 2. **Marque o checkbox no [task.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/task.md)** ao concluir cada item da seção "Fase 0 — Setup Base".
 3. **Siga as convenções do AGENTS.md** — use `php artisan make:*`, `--no-interaction`, etc.
 4. **Rode Pint** após cada grupo de arquivos PHP: `vendor/bin/pint --dirty --format agent`
+5. **Criação de pastas aprovada:** O AGENTS.md diz "don't create new base folders without approval". A criação de `DTOs/`, `Repositories/`, `Services/`, `Events/`, `Listeners/`, `Jobs/`, `Rules/` e demais pastas listadas neste plano **foi aprovada pelo humano** como parte da arquitetura do projeto.
 
 ---
 
@@ -32,7 +33,6 @@ composer require --dev laravel/telescope
 npm install react react-dom @inertiajs/react @types/react @types/react-dom
 npm install -D typescript @vitejs/plugin-react
 npm install react-hot-toast react-hook-form @hookform/resolvers zod
-npm install @tanstack/react-query axios
 ```
 
 ### 3. Configurar [.env](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/.env)
