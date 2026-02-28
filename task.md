@@ -1,14 +1,14 @@
 # E-commerce System — Implementation Tracker
 
 ## Fase 0 — Setup Base
-- [ ] Instalar dependências (Composer + NPM)
-- [ ] Configurar [.env](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/.env) e gerar chave
-- [ ] Configurar Sanctum e Spatie Permission
-- [ ] Criar estrutura de pastas (DTOs, Repositories, Services, etc.)
-- [ ] Criar Models base com migrations
-- [ ] Configurar bootstrap/app.php (middleware, routing)
-- [ ] Configurar Vite + React + Inertia
-- [ ] Criar layout base Inertia
+- [x] Instalar dependências (Composer + NPM)
+- [x] Configurar [.env](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/.env) e gerar chave
+- [x] Configurar Sanctum e Spatie Permission
+- [x] Criar estrutura de pastas (DTOs, Repositories, Services, etc.)
+- [x] Criar Models base com migrations
+- [x] Configurar bootstrap/app.php (middleware, routing)
+- [x] Configurar Vite + React + Inertia
+- [x] Criar layout base Inertia
 
 ## Fase 1 — Desenvolvimento Paralelo
 ### Agente 1: Backend Core
