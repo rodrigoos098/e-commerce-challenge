@@ -2,8 +2,8 @@
     "agents": [
         "copilot"
     ],
-    "herd_mcp": false,
-    "mcp": true,
-    "nightwatch_mcp": false,
-    "sail": false
+    "skills": [
+        "inertia-react-development",
+        "tailwindcss-development"
+    ]
 }
