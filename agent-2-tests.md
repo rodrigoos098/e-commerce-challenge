@@ -44,6 +44,16 @@ Você é o agente responsável por toda a **suíte de testes** do sistema de e-c
 
 7. **Rode Pint** após modificar PHP: `vendor/bin/pint --dirty --format agent`
 
+8. **Commits por etapa.** Ao concluir cada etapa numerada, **pause a implementação**, solicite aprovação ao humano e sugira o commit. O formato obrigatório é:
+   ```
+   A2 - Testes - [descrição do que foi feito na etapa]
+   ```
+   Exemplos:
+   - `A2 - Testes - testes unitarios de Models`
+   - `A2 - Testes - testes de integracao API (Auth, Product, Cart, Order)`
+   - `A2 - Testes - testes de feature (fluxos completos)`
+   **Aguarde o humano aprovar** antes de prosseguir para a próxima etapa.
+
 ---
 
 ## Dependências
@@ -201,4 +211,4 @@ Teste fluxos de ponta a ponta:
 2. **Verificar cobertura:** `php artisan test --coverage --min=80`
 3. **Verificar se há testes falhando:** Corrigir todos
 4. **Rodar Pint:** `vendor/bin/pint --dirty --format agent`
-5. **Solicitar commit ao humano:** Pause e sugira: `test: complete test suite with 80%+ coverage`
+5. **Solicitar commit ao humano** com a mensagem sugerida: `A2 - Testes - verificacao final cobertura minima 80 porcento`

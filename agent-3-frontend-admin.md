@@ -42,6 +42,16 @@ Você é o agente responsável por todas as **páginas administrativas** do e-co
 
 6. **Crie dados mockados inicialmente.** Como o backend pode não estar pronto, crie constantes mock no topo de cada página simulando as props que o Inertia vai entregar. Na integração (Fase 2), serão substituídos pelas props reais do `Inertia::render()`.
 
+7. **Commits por etapa.** Ao concluir cada etapa numerada, **pause a implementação**, solicite aprovação ao humano e sugira o commit. O formato obrigatório é:
+   ```
+   A3 - Admin - [descrição do que foi feito na etapa]
+   ```
+   Exemplos:
+   - `A3 - Admin - layout AdminLayout com sidebar responsiva`
+   - `A3 - Admin - componentes compartilhados (DataTable, StatCard, Modal)`
+   - `A3 - Admin - CRUD de produtos (Index, Create, Edit, Show)`
+   **Aguarde o humano aprovar** antes de prosseguir para a próxima etapa.
+
 > [!IMPORTANT]
 > **Estratégia de data fetching — 100% Inertia:**
 > - **Dados de página:** Recebidos via Inertia props (`usePage().props`). Os Page Controllers passam dados via `Inertia::render()` usando a camada de Services.
@@ -180,4 +190,4 @@ export interface DashboardStats {
 1. Verificar build: `npm run build`
 2. Verificar TypeScript: `npx tsc --noEmit`
 3. Verificar responsividade em diferentes tamanhos
-4. **Solicitar commit ao humano:** Pause e sugira: `feat: complete admin frontend with dashboard, CRUD and reports`
+4. **Solicitar commit ao humano** com a mensagem sugerida: `A3 - Admin - verificacao final build e typescript`

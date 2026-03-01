@@ -49,6 +49,16 @@ Você é o agente responsável por todas as **páginas públicas e de cliente** 
 
 7. **Crie dados mockados inicialmente.** Crie constantes mock no topo de cada página simulando as props que o Inertia vai entregar. Na integração (Fase 2), serão substituídos pelas props reais do `Inertia::render()`.
 
+8. **Commits por etapa.** Ao concluir cada etapa numerada, **pause a implementação**, solicite aprovação ao humano e sugira o commit. O formato obrigatório é:
+   ```
+   A4 - Frontend - [descrição do que foi feito na etapa]
+   ```
+   Exemplos:
+   - `A4 - Frontend - layout PublicLayout com header e footer`
+   - `A4 - Frontend - componentes ProductCard, ProductGrid, CartIcon`
+   - `A4 - Frontend - paginas de autenticacao Login e Register`
+   **Aguarde o humano aprovar** antes de prosseguir para a próxima etapa.
+
 > [!IMPORTANT]
 > **Estratégia de data fetching — 100% Inertia:**
 > - **Dados de página:** Recebidos via Inertia props (`usePage().props`). Os Page Controllers passam dados via `Inertia::render()` usando a camada de Services.
@@ -233,4 +243,4 @@ export interface Cart { id: number; items: CartItem[]; total: number; }
 2. Verificar TypeScript: `npx tsc --noEmit`
 3. Verificar responsividade: mobile, tablet, desktop
 4. Verificar acessibilidade: alt texts, aria labels, foco
-5. **Solicitar commit ao humano:** Pause e sugira: `feat: complete public frontend with shop, cart, checkout and user pages`
+5. **Solicitar commit ao humano** com a mensagem sugerida: `A4 - Frontend - verificacao final build typescript e acessibilidade`

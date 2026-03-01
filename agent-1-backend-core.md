@@ -41,7 +41,15 @@ Antes de iniciar, instale/consulte estas skills:
    - Rode `vendor/bin/pint --dirty --format agent` após modificar arquivos PHP
    - Use return types, constructor promotion, PHPDoc blocks
 
-4. **NÃO faça commits.** Quando julgar que já fez conteúdo suficiente para um commit, **pause a implementação** e solicite ao humano que revise e faça o commit manualmente. Sugira a mensagem de commit.
+4. **Commits por etapa.** Ao concluir cada etapa numerada, **pause a implementação**, solicite aprovação ao humano e sugira o commit. O formato obrigatório é:
+   ```
+   A1 - Backend - [descrição do que foi feito na etapa]
+   ```
+   Exemplos:
+   - `A1 - Backend - repository contracts e implementations`
+   - `A1 - Backend - DTOs (ProductDTO, OrderDTO, CartItemDTO, StockMovementDTO)`
+   - `A1 - Backend - services com logica de negocio`
+   **Aguarde o humano aprovar** antes de prosseguir para a próxima etapa.
 
 5. **Database é MySQL.** Configure corretamente as migrations para MySQL.
 
@@ -144,7 +152,7 @@ Antes de iniciar, instale/consulte estas skills:
 1. Rodar `vendor/bin/pint --dirty --format agent`
 2. Verificar que todas as rotas existem: `php artisan route:list --path=api`
 3. Testar manualmente 2-3 endpoints básicos (GET products, POST login)
-4. **Solicitar commit ao humano:** Pause e sugira: `feat: complete backend core implementation`
+4. **Solicitar commit ao humano** com a mensagem sugerida: `A1 - Backend - verificacao final e ajustes`
 
 ---
 

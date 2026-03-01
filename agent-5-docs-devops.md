@@ -33,6 +33,17 @@ Você é o agente responsável pela **documentação da API (Swagger/OpenAPI)**,
 
 3. **Rode Pint** após modificar PHP: `vendor/bin/pint --dirty --format agent`
 
+4. **Commits por etapa.** Ao concluir cada etapa numerada, **pause a implementação**, solicite aprovação ao humano e sugira o commit. O formato obrigatório é:
+   ```
+   A5 - DevOps - [descrição do que foi feito na etapa]
+   ```
+   Exemplos:
+   - `A5 - DevOps - configuracoes de qualidade (Pint, ESLint, Prettier, tsconfig)`
+   - `A5 - DevOps - logging estruturado (canais orders, stock, auth)`
+   - `A5 - DevOps - PROJECT.md com setup, arquitetura e bibliotecas`
+   - `A5 - DevOps - swagger openapi com anotacoes em todos os controllers`
+   **Aguarde o humano aprovar** antes de prosseguir para a próxima etapa.
+
 ---
 
 ## Dependências
@@ -279,4 +290,4 @@ php artisan l5-swagger:generate
 2. Rodar ESLint: `npx eslint resources/js/ --ext .ts,.tsx`
 3. Verificar PROJECT.md está completo
 4. Verificar Swagger UI carrega
-5. **Solicitar commit ao humano:** Pause e sugira: `docs: add API documentation, PROJECT.md, and code quality configs`
+5. **Solicitar commit ao humano** com a mensagem sugerida: `A5 - DevOps - verificacao final documentacao e qualidade de codigo`
