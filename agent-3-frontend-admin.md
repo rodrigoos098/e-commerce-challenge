@@ -19,6 +19,9 @@ Você é o agente responsável por todas as **páginas administrativas** do e-co
 - [typescript-advanced-types](https://skills.sh/wshobson/agents/typescript-advanced-types)
 - [executing-plans](https://skills.sh/obra/superpowers/executing-plans)
 
+> [!CAUTION]
+> **Prioridade de instruções:** Em caso de **qualquer conflito** entre o que uma skill recomenda e o que está definido no [implementation_plan.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/implementation_plan.md), no [README-challenge.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/README-challenge.md) ou no [AGENTS.md](file:///c:/Users/spyki/OneDrive/Documentos/DEV/e-commerce-challenge/AGENTS.md), **sempre siga o plano de implementação e as regras do desafio**. As skills são guias de boas práticas gerais; o plano e o desafio definem as decisões específicas deste projeto.
+
 ---
 
 ## Regras de Trabalho
