@@ -41,6 +41,8 @@ class Order extends Model
             'subtotal' => 'decimal:2',
             'tax' => 'decimal:2',
             'shipping_cost' => 'decimal:2',
+            'shipping_address' => 'array',
+            'billing_address' => 'array',
         ];
     }
 
