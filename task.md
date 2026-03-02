@@ -12,19 +12,19 @@
 
 ## Fase 1 — Desenvolvimento Paralelo
 ### Agente 1: Backend Core
-- [ ] Repository Contracts + Implementations
-- [ ] DTOs
-- [ ] Services
-- [ ] Form Requests
-- [ ] API Resources
-- [ ] Controllers API v1
-- [ ] Rotas API
-- [ ] Events & Listeners
-- [ ] Jobs
-- [ ] Policies
-- [ ] Scopes e Custom Rules
-- [ ] Cache
-- [ ] Seeders & Factories
+- [x] Repository Contracts + Implementations
+- [x] DTOs
+- [x] Services
+- [x] Form Requests
+- [x] API Resources
+- [x] Controllers API v1
+- [x] Rotas API
+- [x] Events & Listeners
+- [x] Jobs
+- [x] Policies
+- [x] Scopes e Custom Rules
+- [x] Cache
+- [x] Seeders & Factories
 
 ### Agente 2: Testes
 - [ ] Testes unitários de Models
