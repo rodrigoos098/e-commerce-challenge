@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
+use App\Models\StockMovement;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,12 @@ class StockMovementFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'product_id' => Product::factory(),
+            'type' => fake()->randomElement(StockMovement::TYPES),
+            'quantity' => fake()->numberBetween(1, 50),
+            'reason' => fake()->optional(0.7)->sentence(),
+            'reference_type' => null,
+            'reference_id' => null,
         ];
     }
 }
