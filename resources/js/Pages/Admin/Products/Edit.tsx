@@ -184,7 +184,7 @@ export default function ProductsEdit({
                                     required
                                     min={0.01}
                                     step={0.01}
-                                    register={register('price')}
+                                    register={register('price', { valueAsNumber: true })}
                                     error={errors.price?.message}
                                 />
                                 <FormField
@@ -193,7 +193,7 @@ export default function ProductsEdit({
                                     type="number"
                                     min={0}
                                     step={0.01}
-                                    register={register('cost_price')}
+                                    register={register('cost_price', { valueAsNumber: true })}
                                     error={errors.cost_price?.message}
                                 />
                             </div>

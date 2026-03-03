@@ -35,6 +35,10 @@ export default function SearchBar({
     }
 
     function handleClear() {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
         setValue('');
         onSearch('');
     }

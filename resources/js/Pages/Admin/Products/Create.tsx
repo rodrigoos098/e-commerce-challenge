@@ -157,7 +157,7 @@ export default function ProductsCreate({
                                     placeholder="0,00"
                                     min={0.01}
                                     step={0.01}
-                                    register={register('price')}
+                                    register={register('price', { valueAsNumber: true })}
                                     error={errors.price?.message}
                                     hint="Preço exibido para o cliente"
                                 />
@@ -168,7 +168,7 @@ export default function ProductsCreate({
                                     placeholder="0,00"
                                     min={0}
                                     step={0.01}
-                                    register={register('cost_price')}
+                                    register={register('cost_price', { valueAsNumber: true })}
                                     error={errors.cost_price?.message}
                                     hint="Valor pago pelo produto (interno)"
                                 />
