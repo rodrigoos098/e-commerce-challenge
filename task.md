@@ -35,13 +35,13 @@
 - [x] Testes de validação e autorização
 
 ### Agente 3: Frontend Admin
-- [ ] Layout Admin
-- [ ] Componentes Admin compartilhados
-- [ ] Dashboard
-- [ ] CRUD de Produtos
-- [ ] CRUD de Categorias
-- [ ] Listagem de Pedidos
-- [ ] Relatório de Estoque Baixo
+- [x] Layout Admin
+- [x] Componentes Admin compartilhados
+- [x] Dashboard
+- [x] CRUD de Produtos
+- [x] CRUD de Categorias
+- [x] Listagem de Pedidos
+- [x] Relatório de Estoque Baixo
 
 ### Agente 4: Frontend Público
 - [ ] Layout Público
