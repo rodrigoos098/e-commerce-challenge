@@ -19,10 +19,22 @@ class OrderController extends Controller
 
     public function __construct(
         private readonly OrderService $orderService,
-    ) {}
+    ) {
+    }
 
     /**
      * List orders for the authenticated user (or all orders for admin).
+     *
+     * @OA\Get(
+     *     path="/orders",
+     *     summary="Listar pedidos",
+     *     tags={"Pedidos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="status", in="query", description="Filtrar por status", @OA\Schema(type="string", enum={"pending","processing","shipped","delivered","cancelled"})),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=15)),
+     *     @OA\Response(response=200, description="Lista paginada de pedidos"),
+     *     @OA\Response(response=401, description="Não autenticado")
+     * )
      */
     public function index(Request $request): JsonResponse
     {
@@ -40,6 +52,16 @@ class OrderController extends Controller
 
     /**
      * Display a specific order.
+     *
+     * @OA\Get(
+     *     path="/orders/{id}",
+     *     summary="Exibir pedido",
+     *     tags={"Pedidos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Detalhes do pedido com itens"),
+     *     @OA\Response(response=404, description="Pedido não encontrado")
+     * )
      */
     public function show(Request $request, int $id): JsonResponse
     {
@@ -58,6 +80,30 @@ class OrderController extends Controller
 
     /**
      * Create a new order from the user's cart.
+     *
+     * @OA\Post(
+     *     path="/orders",
+     *     summary="Criar pedido a partir do carrinho",
+     *     tags={"Pedidos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"shipping_address","billing_address"},
+     *             @OA\Property(property="shipping_address", type="object",
+     *                 @OA\Property(property="street", type="string"),
+     *                 @OA\Property(property="city", type="string"),
+     *                 @OA\Property(property="state", type="string"),
+     *                 @OA\Property(property="zip", type="string"),
+     *                 @OA\Property(property="country", type="string")
+     *             ),
+     *             @OA\Property(property="billing_address", type="object"),
+     *             @OA\Property(property="notes", type="string", nullable=true)
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Pedido criado com sucesso"),
+     *     @OA\Response(response=422, description="Carrinho vazio ou estoque insuficiente", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
      */
     public function store(StoreOrderRequest $request): JsonResponse
     {
@@ -68,6 +114,24 @@ class OrderController extends Controller
 
     /**
      * Update the status of an order (admin only).
+     *
+     * @OA\Put(
+     *     path="/orders/{id}/status",
+     *     summary="Atualizar status do pedido (admin)",
+     *     tags={"Pedidos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"pending","processing","shipped","delivered","cancelled"})
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Status atualizado com sucesso"),
+     *     @OA\Response(response=403, description="Acesso negado"),
+     *     @OA\Response(response=404, description="Pedido não encontrado")
+     * )
      */
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order): JsonResponse
     {

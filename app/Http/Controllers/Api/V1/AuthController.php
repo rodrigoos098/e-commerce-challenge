@@ -17,10 +17,29 @@ class AuthController extends Controller
 
     public function __construct(
         private readonly AuthService $authService,
-    ) {}
+    ) {
+    }
 
     /**
      * Register a new user.
+     *
+     * @OA\Post(
+     *     path="/auth/register",
+     *     summary="Registrar novo usuário",
+     *     tags={"Autenticação"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password","password_confirmation"},
+     *             @OA\Property(property="name", type="string", example="João Silva"),
+     *             @OA\Property(property="email", type="string", format="email", example="joao@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Usuário registrado com sucesso"),
+     *     @OA\Response(response=422, description="Dados inválidos", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
      */
     public function register(RegisterRequest $request): JsonResponse
     {
@@ -34,6 +53,22 @@ class AuthController extends Controller
 
     /**
      * Login and retrieve an API token.
+     *
+     * @OA\Post(
+     *     path="/auth/login",
+     *     summary="Autenticar usuário",
+     *     tags={"Autenticação"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Login realizado com sucesso — retorna token Bearer"),
+     *     @OA\Response(response=401, description="Credenciais inválidas", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
      */
     public function login(LoginRequest $request): JsonResponse
     {
@@ -47,6 +82,15 @@ class AuthController extends Controller
 
     /**
      * Logout and revoke the current token.
+     *
+     * @OA\Post(
+     *     path="/auth/logout",
+     *     summary="Revogar token (logout)",
+     *     tags={"Autenticação"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Logout realizado com sucesso"),
+     *     @OA\Response(response=401, description="Não autenticado")
+     * )
      */
     public function logout(Request $request): JsonResponse
     {
@@ -57,6 +101,15 @@ class AuthController extends Controller
 
     /**
      * Get the authenticated user.
+     *
+     * @OA\Get(
+     *     path="/auth/user",
+     *     summary="Obter usuário autenticado",
+     *     tags={"Autenticação"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Dados do usuário autenticado"),
+     *     @OA\Response(response=401, description="Não autenticado")
+     * )
      */
     public function me(Request $request): JsonResponse
     {

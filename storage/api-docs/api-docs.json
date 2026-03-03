@@ -1,0 +1,1173 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "E-commerce API",
+        "description": "API REST completa do sistema de e-commerce. Todos os endpoints requerem autenticação via Bearer token (Sanctum), exceto os de autenticação pública.",
+        "contact": {
+            "email": "admin@ecommerce.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api/v1",
+            "description": "API v1"
+        }
+    ],
+    "paths": {
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Registrar novo usuário",
+                "description": "Register a new user.",
+                "operationId": "8f20688904ee49d0d8739eeb08faf0b1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "João Silva"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "joao@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuário registrado com sucesso"
+                    },
+                    "422": {
+                        "description": "Dados inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Autenticar usuário",
+                "description": "Login and retrieve an API token.",
+                "operationId": "985cd5203e2d0a820e113f2f4fdb2847",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login realizado com sucesso — retorna token Bearer"
+                    },
+                    "401": {
+                        "description": "Credenciais inválidas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Revogar token (logout)",
+                "description": "Logout and revoke the current token.",
+                "operationId": "a05022a34eef599e04fb0a5254375b84",
+                "responses": {
+                    "200": {
+                        "description": "Logout realizado com sucesso"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/user": {
+            "get": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Obter usuário autenticado",
+                "description": "Get the authenticated user.",
+                "operationId": "41a762dc560143916d8a128f6497ea22",
+                "responses": {
+                    "200": {
+                        "description": "Dados do usuário autenticado"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/cart": {
+            "get": {
+                "tags": [
+                    "Carrinho"
+                ],
+                "summary": "Obter carrinho do usuário",
+                "description": "Get the authenticated user's cart.",
+                "operationId": "6b8e02358626c72cbf572b555a21b9f6",
+                "responses": {
+                    "200": {
+                        "description": "Carrinho com itens e totais"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Carrinho"
+                ],
+                "summary": "Limpar carrinho",
+                "description": "Clear all items from the cart.",
+                "operationId": "2ce37586344c0b5b4563f33c962dc273",
+                "responses": {
+                    "200": {
+                        "description": "Carrinho limpo com sucesso"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/cart/items": {
+            "post": {
+                "tags": [
+                    "Carrinho"
+                ],
+                "summary": "Adicionar item ao carrinho",
+                "description": "Add an item to the cart.",
+                "operationId": "e036af844498fff8d600d1deeb9436e6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "product_id",
+                                    "quantity"
+                                ],
+                                "properties": {
+                                    "product_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Item adicionado ao carrinho"
+                    },
+                    "422": {
+                        "description": "Dados inválidos ou estoque insuficiente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/cart/items/{id}": {
+            "put": {
+                "tags": [
+                    "Carrinho"
+                ],
+                "summary": "Atualizar quantidade de item no carrinho",
+                "description": "Update a cart item's quantity.",
+                "operationId": "ea94cd0b1a73da425dfeaddbed019f2d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "quantity"
+                                ],
+                                "properties": {
+                                    "quantity": {
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Item atualizado"
+                    },
+                    "404": {
+                        "description": "Item não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Carrinho"
+                ],
+                "summary": "Remover item do carrinho",
+                "description": "Remove an item from the cart.",
+                "operationId": "69b9d42c3cbeb43afa63cbda7a2b27ab",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item removido"
+                    },
+                    "404": {
+                        "description": "Item não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/categories": {
+            "get": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Listar categorias (hierarquia em árvore)",
+                "description": "List all categories as a hierarchical tree.",
+                "operationId": "2eb9088f8a869db09d83eaa9c605312f",
+                "responses": {
+                    "200": {
+                        "description": "Árvore de categorias"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Criar categoria (admin)",
+                "description": "Create a new category (admin only).",
+                "operationId": "7bdbe2d756cdbeeb0e8332a71bfde4a0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Eletrônicos"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "active": {
+                                        "type": "boolean",
+                                        "default": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Categoria criada com sucesso"
+                    },
+                    "403": {
+                        "description": "Acesso negado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Exibir categoria",
+                "description": "Display a specific category.",
+                "operationId": "4e846dc2578e3be376fef50f753a1859",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados da categoria"
+                    },
+                    "404": {
+                        "description": "Categoria não encontrada"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Atualizar categoria (admin)",
+                "description": "Update an existing category (admin only).",
+                "operationId": "1288a970d20e27471ee65193d80a7376",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categoria atualizada com sucesso"
+                    },
+                    "403": {
+                        "description": "Acesso negado"
+                    },
+                    "404": {
+                        "description": "Categoria não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Excluir categoria (admin)",
+                "description": "Delete a category (admin only).",
+                "operationId": "b44a8c51f51902cd21c41c92ba0076f2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categoria excluída"
+                    },
+                    "403": {
+                        "description": "Acesso negado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/categories/{id}/products": {
+            "get": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Listar produtos da categoria",
+                "description": "List products belonging to a category (paginated).",
+                "operationId": "422c706b86f70ddf5889d32aaf3dcfa0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de produtos da categoria"
+                    },
+                    "404": {
+                        "description": "Categoria não encontrada"
+                    }
+                }
+            }
+        },
+        "/orders": {
+            "get": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Listar pedidos",
+                "description": "List orders for the authenticated user (or all orders for admin).",
+                "operationId": "5894f7ae19272fefaf73e3a6f9d9782d",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "processing",
+                                "shipped",
+                                "delivered",
+                                "cancelled"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de pedidos"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Criar pedido a partir do carrinho",
+                "description": "Create a new order from the user's cart.",
+                "operationId": "fccc497d8bcac727afdc854cf0521698",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "shipping_address",
+                                    "billing_address"
+                                ],
+                                "properties": {
+                                    "shipping_address": {
+                                        "properties": {
+                                            "street": {
+                                                "type": "string"
+                                            },
+                                            "city": {
+                                                "type": "string"
+                                            },
+                                            "state": {
+                                                "type": "string"
+                                            },
+                                            "zip": {
+                                                "type": "string"
+                                            },
+                                            "country": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "billing_address": {
+                                        "type": "object"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pedido criado com sucesso"
+                    },
+                    "422": {
+                        "description": "Carrinho vazio ou estoque insuficiente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/orders/{id}": {
+            "get": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Exibir pedido",
+                "description": "Display a specific order.",
+                "operationId": "37b9054f8bb7c660ae6ee13bfb030a08",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes do pedido com itens"
+                    },
+                    "404": {
+                        "description": "Pedido não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/orders/{id}/status": {
+            "put": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Atualizar status do pedido (admin)",
+                "description": "Update the status of an order (admin only).",
+                "operationId": "3ece7afa565d732757595999b4244524",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "processing",
+                                            "shipped",
+                                            "delivered",
+                                            "cancelled"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status atualizado com sucesso"
+                    },
+                    "403": {
+                        "description": "Acesso negado"
+                    },
+                    "404": {
+                        "description": "Pedido não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/products": {
+            "get": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Listar produtos",
+                "description": "List products with filters, search, sorting and pagination.",
+                "operationId": "c821c7f9e41e08594ad4eae5a99e812e",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Busca por nome ou descrição",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Filtrar por categoria",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "description": "Filtrar por status ativo",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "in_stock",
+                        "in": "query",
+                        "description": "Filtrar com estoque disponível",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "max_price",
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "price",
+                                "created_at",
+                                "quantity"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_dir",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de produtos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Criar produto (admin)",
+                "description": "Store a new product (admin only).",
+                "operationId": "a59d7d76c37cb085c473698dba983938",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "price",
+                                    "quantity",
+                                    "category_id"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Playstation 5"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "example": 3550
+                                    },
+                                    "cost_price": {
+                                        "type": "number",
+                                        "example": 2800
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "min_quantity": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Produto criado com sucesso"
+                    },
+                    "403": {
+                        "description": "Acesso negado"
+                    },
+                    "422": {
+                        "description": "Dados inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Exibir produto",
+                "description": "Display a specific product.",
+                "operationId": "900da7e5cb549dc28cfd19d90d1f6710",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do produto"
+                    },
+                    "404": {
+                        "description": "Produto não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Atualizar produto (admin)",
+                "description": "Update a product (admin only).",
+                "operationId": "1ab61d88b4cfff271ad6afe7d8cf0388",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SuccessResponse"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Produto atualizado com sucesso"
+                    },
+                    "403": {
+                        "description": "Acesso negado"
+                    },
+                    "404": {
+                        "description": "Produto não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Excluir produto (admin, soft delete)",
+                "description": "Soft delete a product (admin only).",
+                "operationId": "9dcbacba304004f42c516998d50fe6fa",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Produto excluído com sucesso"
+                    },
+                    "403": {
+                        "description": "Acesso negado"
+                    },
+                    "404": {
+                        "description": "Produto não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/products/low-stock": {
+            "get": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Produtos com estoque baixo (admin)",
+                "description": "List products with low stock (admin only).",
+                "operationId": "14b71c1518717dad5bca33e7a87a95f5",
+                "responses": {
+                    "200": {
+                        "description": "Lista de produtos com estoque abaixo do mínimo"
+                    },
+                    "403": {
+                        "description": "Acesso negado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "SuccessResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Mensagem de erro"
+                    },
+                    "errors": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "PaginationMeta": {
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 7
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Autenticação",
+            "description": "Autenticação"
+        },
+        {
+            "name": "Carrinho",
+            "description": "Carrinho"
+        },
+        {
+            "name": "Categorias",
+            "description": "Categorias"
+        },
+        {
+            "name": "Pedidos",
+            "description": "Pedidos"
+        },
+        {
+            "name": "Produtos",
+            "description": "Produtos"
+        }
+    ]
+}

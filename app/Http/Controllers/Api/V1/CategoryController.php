@@ -21,10 +21,18 @@ class CategoryController extends Controller
     public function __construct(
         private readonly CategoryService $categoryService,
         private readonly ProductService $productService,
-    ) {}
+    ) {
+    }
 
     /**
      * List all categories as a hierarchical tree.
+     *
+     * @OA\Get(
+     *     path="/categories",
+     *     summary="Listar categorias (hierarquia em árvore)",
+     *     tags={"Categorias"},
+     *     @OA\Response(response=200, description="Árvore de categorias")
+     * )
      */
     public function index(): JsonResponse
     {
@@ -35,6 +43,15 @@ class CategoryController extends Controller
 
     /**
      * Display a specific category.
+     *
+     * @OA\Get(
+     *     path="/categories/{id}",
+     *     summary="Exibir categoria",
+     *     tags={"Categorias"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Dados da categoria"),
+     *     @OA\Response(response=404, description="Categoria não encontrada")
+     * )
      */
     public function show(int $id): JsonResponse
     {
@@ -49,6 +66,25 @@ class CategoryController extends Controller
 
     /**
      * Create a new category (admin only).
+     *
+     * @OA\Post(
+     *     path="/categories",
+     *     summary="Criar categoria (admin)",
+     *     tags={"Categorias"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Eletrônicos"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="parent_id", type="integer", nullable=true),
+     *             @OA\Property(property="active", type="boolean", default=true)
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Categoria criada com sucesso"),
+     *     @OA\Response(response=403, description="Acesso negado")
+     * )
      */
     public function store(StoreCategoryRequest $request): JsonResponse
     {
@@ -59,6 +95,17 @@ class CategoryController extends Controller
 
     /**
      * Update an existing category (admin only).
+     *
+     * @OA\Put(
+     *     path="/categories/{id}",
+     *     summary="Atualizar categoria (admin)",
+     *     tags={"Categorias"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Categoria atualizada com sucesso"),
+     *     @OA\Response(response=403, description="Acesso negado"),
+     *     @OA\Response(response=404, description="Categoria não encontrada")
+     * )
      */
     public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
     {
@@ -69,6 +116,16 @@ class CategoryController extends Controller
 
     /**
      * Delete a category (admin only).
+     *
+     * @OA\Delete(
+     *     path="/categories/{id}",
+     *     summary="Excluir categoria (admin)",
+     *     tags={"Categorias"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Categoria excluída"),
+     *     @OA\Response(response=403, description="Acesso negado")
+     * )
      */
     public function destroy(Category $category): JsonResponse
     {
@@ -79,6 +136,17 @@ class CategoryController extends Controller
 
     /**
      * List products belonging to a category (paginated).
+     *
+     * @OA\Get(
+     *     path="/categories/{id}/products",
+     *     summary="Listar produtos da categoria",
+     *     tags={"Categorias"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="search", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=15)),
+     *     @OA\Response(response=200, description="Lista paginada de produtos da categoria"),
+     *     @OA\Response(response=404, description="Categoria não encontrada")
+     * )
      */
     public function products(Request $request, Category $category): JsonResponse
     {
