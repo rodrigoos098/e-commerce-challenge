@@ -44,16 +44,16 @@
 - [x] Relatório de Estoque Baixo
 
 ### Agente 4: Frontend Público
-- [ ] Layout Público
-- [ ] Componentes compartilhados
-- [ ] Homepage
-- [ ] Listagem de Produtos com filtros
-- [ ] Detalhe do Produto
-- [ ] Login/Registro
-- [ ] Carrinho
-- [ ] Checkout
-- [ ] Histórico de Pedidos
-- [ ] Perfil do Usuário
+- [x] Layout Público
+- [x] Componentes compartilhados
+- [x] Homepage
+- [x] Listagem de Produtos com filtros
+- [x] Detalhe do Produto
+- [x] Login/Registro
+- [x] Carrinho
+- [x] Checkout
+- [x] Histórico de Pedidos
+- [x] Perfil do Usuário
 
 ### Agente 5: Documentação & DevOps
 - [ ] Swagger/OpenAPI
