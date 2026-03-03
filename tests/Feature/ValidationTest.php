@@ -174,6 +174,20 @@ class ValidationTest extends TestCase
             ->assertJsonStructure(['errors' => ['slug']]);
     }
 
+    public function test_unique_slug_rule_rejects_slug_of_soft_deleted_product(): void
+    {
+        // UniqueSlug uses withTrashed(), so soft-deleted product slugs must also be blocked.
+        $product = Product::factory()->create(['slug' => 'slug-deletado']);
+        $product->delete();
+
+        $data = array_merge($this->validProductData(), ['slug' => 'slug-deletado']);
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->postJson('/api/v1/products', $data)
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['slug']]);
+    }
+
     public function test_unique_slug_rule_accepts_unique_slug(): void
     {
         $data = array_merge($this->validProductData(), ['slug' => 'meu-slug-unico']);

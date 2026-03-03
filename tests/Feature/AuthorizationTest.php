@@ -6,8 +6,8 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\RateLimiter;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -225,67 +225,77 @@ class AuthorizationTest extends TestCase
 
     // ── Rate limiting ──────────────────────────────────────────────────────────────
 
+    public function test_api_rate_limiter_is_configured_correctly(): void
+    {
+        // Read the production closure registered in bootstrap/app.php without overriding it.
+        $closure = RateLimiter::limiter('api');
+
+        $guestRequest = HttpRequest::create('/api/v1/products');
+        $guestLimit = $closure($guestRequest);
+        $this->assertEquals(100, $guestLimit->maxAttempts);
+        $this->assertEquals(60, $guestLimit->decaySeconds);        // 1 minute
+        $this->assertEquals($guestRequest->ip(), $guestLimit->key); // keyed by IP for guests
+
+        $user = $this->createCustomer();
+        $authRequest = HttpRequest::create('/api/v1/orders');
+        $authRequest->setUserResolver(fn () => $user);
+        $authLimit = $closure($authRequest);
+        $this->assertEquals(100, $authLimit->maxAttempts);
+        $this->assertEquals($user->id, $authLimit->key); // keyed by user ID when authenticated
+    }
+
     public function test_api_rate_limiting_returns_429_when_limit_exceeded(): void
     {
-        Product::factory()->count(3)->create(['active' => true]);
+        // ThrottleRequests hashes keys as md5($limiterName . $rawKey).
+        // For a guest request with IP '10.0.0.1', the actual cache key is md5('api10.0.0.1').
+        $ip = '10.0.0.1';
+        $cacheKey = md5('api'.$ip);
+        RateLimiter::clear($cacheKey);
 
-        // Use a unique key per test so accumulated hits from other tests don't interfere
-        $uniqueKey = 'rate-limit-test-'.uniqid();
-        RateLimiter::for('api', fn ($request) => Limit::perMinute(3)->by($uniqueKey));
-
-        for ($i = 0; $i < 3; $i++) {
-            $this->getJson('/api/v1/products')->assertStatus(200);
+        for ($i = 0; $i < 100; $i++) {
+            RateLimiter::hit($cacheKey, 60);
         }
 
-        $this->getJson('/api/v1/products')->assertStatus(429);
+        $this->withServerVariables(['REMOTE_ADDR' => $ip])
+            ->getJson('/api/v1/products')
+            ->assertStatus(429);
 
-        // Restore using user-based key limit so other tests are not affected
-        RateLimiter::for('api', fn ($request) => Limit::perMinute(1000)->by(
-            $request->user()?->id ?: $request->ip()
-        ));
+        RateLimiter::clear($cacheKey);
     }
 
     public function test_authenticated_user_does_not_exceed_rate_limit_normally(): void
     {
         $customer = $this->createCustomer();
+        $cacheKey = md5('api'.$customer->id);
+        RateLimiter::clear($cacheKey);
 
-        // With a high per-user limit, authenticated users should not be rate limited
-        RateLimiter::for('api', fn ($request) => Limit::perMinute(100)->by(
-            $request->user()?->id ?: $request->ip()
-        ));
-
+        // 5 requests — well below the real 100/min limit — must all succeed.
         for ($i = 0; $i < 5; $i++) {
             $this->actingAs($customer, 'sanctum')
                 ->getJson('/api/v1/orders')
                 ->assertStatus(200);
         }
 
-        RateLimiter::for('api', fn ($request) => Limit::perMinute(1000)->by(
-            $request->user()?->id ?: $request->ip()
-        ));
+        RateLimiter::clear($cacheKey);
     }
 
     public function test_authenticated_user_rate_limit_uses_user_id_as_key(): void
     {
         $customer = $this->createCustomer();
 
-        // Set limit to 3 per minute scoped to user ID
-        RateLimiter::for('api', fn ($request) => Limit::perMinute(3)->by(
-            $request->user()?->id ?: $request->ip()
-        ));
+        // Authenticated requests are keyed by user ID (see bootstrap/app.php).
+        // The middleware hashes it as md5('api' . $userId).
+        $cacheKey = md5('api'.$customer->id);
+        RateLimiter::clear($cacheKey);
 
-        for ($i = 0; $i < 3; $i++) {
-            $this->actingAs($customer, 'sanctum')
-                ->getJson('/api/v1/orders')
-                ->assertStatus(200);
+        for ($i = 0; $i < 100; $i++) {
+            RateLimiter::hit($cacheKey, 60);
         }
 
         $this->actingAs($customer, 'sanctum')
             ->getJson('/api/v1/orders')
             ->assertStatus(429);
 
-        RateLimiter::for('api', fn ($request) => Limit::perMinute(1000)->by(
-            $request->user()?->id ?: $request->ip()
-        ));
+        RateLimiter::clear($cacheKey);
     }
 }

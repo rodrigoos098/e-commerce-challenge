@@ -65,10 +65,10 @@ Suíte de testes completa com ≥80% de cobertura. PHPUnit (não Pest).
 
 ## [Etapa 6] — Testes de Validação e Autorização
 
-### Status: ✅ Concluído — 35 testes, 83 assertions
+### Status: ✅ Concluído — 37 testes
 
-- `tests/Feature/ValidationTest.php` — campos obrigatórios, UniqueSlug, SufficientStock, custo < preço, endereço de pedido
-- `tests/Feature/AuthorizationTest.php` — guest bloqueado, customer sem acesso admin, admin acessa tudo, isolamento de recursos
+- `tests/Feature/ValidationTest.php` — campos obrigatórios, UniqueSlug (inclusive slug de produto soft-deletado), SufficientStock, custo < preço, endereço de pedido
+- `tests/Feature/AuthorizationTest.php` — guest bloqueado, customer sem acesso admin, admin acessa tudo, isolamento de recursos, rate limiting (exercita config real via pré-preenchimento com chave `md5('api'.$key)`)
 
 ---
 
@@ -76,6 +76,29 @@ Suíte de testes completa com ≥80% de cobertura. PHPUnit (não Pest).
 
 ### Status: ✅ Concluído
 
-**Suite completa:** 299 testes passando, 583 assertions
-**Cobertura de código:** 86.6% (supera o mínimo de 80%)
+**Suite completa:** 329 testes passando, 648 assertions
+**Cobertura de código:** 90.8% (supera o mínimo de 80%)
+
+---
+
+## [Pós-Review] — Revisões Aplicadas (Code Review #1 e #2)
+
+### Status: ✅ Concluído
+
+**Code Review #1 (7 achados — todos corrigidos):**
+- P1/P2: `UpdateStockAfterOrder` e `SendOrderConfirmationEmail` agora testados com comportamento real
+- P3: `ProductPolicy` — testes ajustados
+- P4: `StockFlowTest` — cobertura de edge case de evento StockLow
+- P5: `CartFlowTest` — acumulação de quantidade
+- P6: `CategoryApiTest` — filtro de inativas
+- P7: `StockServiceTest` — mock verificado
+
+**Code Review #2 (5 achados — todos corrigidos):**
+- P1: Testes de rate limiting reescritos para exercitar a config real de produção (sem `RateLimiter::for()` override). Chave correta: `md5('api'.$rawKey)` — descoberta lendo `ThrottleRequests::$shouldHashKeys = true`
+- P2: `PolicyTest` cobre código de produção real (policies são usadas indiretamente via API; relatório atualizado)
+- P3: Código de produção modificado durante fase de testes documentado (rules `UniqueSlug` e `SufficientStock` tiveram pequenos ajustes)
+- P4: Documentação atualizada (`progress-agent-2.md`, `relatorios/fase-2-testes.md`)
+- P5: Novo teste `test_unique_slug_rule_rejects_slug_of_soft_deleted_product` adicionado em `ValidationTest`
+
+**Suite final:** 329 testes, 648 assertions, 0 falhas
 **Pint:** Todos os arquivos formatados (`vendor/bin/pint --dirty`)

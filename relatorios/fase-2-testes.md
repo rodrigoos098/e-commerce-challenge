@@ -347,7 +347,7 @@ Testa também: acumulação de quantidade (3+4=7 do mesmo produto), validação 
 
 ### 4.6 Etapa 6 — Testes de Validação e Autorização
 
-#### `ValidationTest` — 20 testes
+#### `ValidationTest` — 26 testes
 
 **Registro:**
 - `name` obrigatório; e-mail com formato válido; `password_confirmation` coincidente
@@ -356,7 +356,8 @@ Testa também: acumulação de quantidade (3+4=7 do mesmo produto), validação 
 - `name`, `description` obrigatórios; `price > 0`; `price != 0`; `category_id` deve existir; `name` único; `cost_price < price`; `tag_ids.*` deve existir
 
 **Regra `UniqueSlug`:**
-- Rejeita slug já em uso (inclusive em soft-deleted)
+- Rejeita slug já em uso por produto ativo
+- Rejeita slug já em uso por produto **soft-deletado** (`test_unique_slug_rule_rejects_slug_of_soft_deleted_product`) — adicionado no Code Review #2
 - Aceita slug único
 
 **Regra `SufficientStock`:**
@@ -369,17 +370,22 @@ Testa também: acumulação de quantidade (3+4=7 do mesmo produto), validação 
 - `shipping_address` obrigatório; `shipping_address.street` obrigatório
 - Status do pedido deve estar em `Order::STATUSES`
 
-#### `AuthorizationTest` — 15 testes
+#### `AuthorizationTest` — 19 testes
 
 | Grupo | Cenários |
-|-------|---------|
+|-------|------|
 | **Guest** | Bloqueado em `me`, `logout`, `cart`, `cart/items`, `orders`, `POST orders` |
 | **Rotas públicas** | `products`, `products/{id}`, `categories`, `categories/{id}` acessíveis sem auth |
 | **Customer ≠ Admin** | Customer recebe 403 em: create/update/delete product, low-stock, update order status |
 | **Admin = acesso total** | Admin cria produto (201), atualiza (200), deleta (200 + soft-deleted), low-stock (200), updateStatus (200) |
 | **Isolamento de recursos** | Customer não vê pedido de outro (404); `meta.total` correto por usuário; item de carrinho de outro (404) |
+| **Rate limiting** | Configuração verificada (`maxAttempts=100`, `decaySeconds=60`); 429 para guest com chave `md5('api'.$ip)` pré-preenchida; 429 para auth user com chave `md5('api'.$userId)` pré-preenchida; auth user normal abaixo do limite (200) |
 
-**Resultado Etapa 6:** 35 testes, 83 assertions ✅
+> **Nota sobre rate limiting (Code Review #2):** Os testes anteriores sobrescreviam o limiter com `RateLimiter::for('api', ...)`, não exercitando a configuração real de produção. Reescrito para usar `RateLimiter::hit()` com a chave exata que o middleware computa: `md5($limiterName.$rawKey)` — descoberta lendo `ThrottleRequests::$shouldHashKeys = true` do Laravel 12.
+
+> **Nota sobre `PolicyTest`:** Os 20 testes em `PolicyTest.php` executam as policies diretamente. Embora as policies sejam exercitadas também pelos testes de API, os testes diretos fornecem cobertura isolada de cada regra de autorização (não são código morto).
+
+**Resultado Etapa 6:** 45 testes ✅
 
 ---
 
@@ -390,8 +396,8 @@ Testa também: acumulação de quantidade (3+4=7 do mesmo produto), validação 
 ```
 php artisan test --compact
 
-  Tests:    327 passed (646 assertions)
-  Duration: ~39s
+  Tests:    329 passed (648 assertions)
+  Duration: ~27s
 ```
 
 ### 5.2 Cobertura de Código
@@ -546,8 +552,8 @@ tests/Feature/
 ├── OrderFlowTest.php       # 5 testes: cart→pedido, totais, status admin
 ├── StockFlowTest.php       # 6 testes: stock decrement, StockMovement, StockLow
 ├── PolicyTest.php          # 20 testes: ProductPolicy e OrderPolicy (unit direto)
-├── ValidationTest.php      # 25 testes: required, UniqueSlug, SufficientStock, ValidParentCategory, address
-└── AuthorizationTest.php   # 18 testes: guest, customer≠admin, rate limiting, isolamento recursos
+├── ValidationTest.php      # 26 testes: required, UniqueSlug (incl. soft-deleted), SufficientStock, ValidParentCategory, address
+└── AuthorizationTest.php   # 19 testes: guest, customer≠admin, rate limiting (config real via md5), isolamento recursos
 ```
 
 **Total:** 24 arquivos de teste (22 originais + `PolicyTest.php` novo). Arquivos de produção adicionados: `StoreCategoryRequest`, `UpdateCategoryRequest`, `CategoryController` (store/update/destroy).
@@ -572,11 +578,11 @@ b2d9682  A2 - Testes - testes de integracao API (Auth, Product, Category, Cart, 
 
 | Métrica | Valor |
 |---------|-------|
-| Total de testes | 327 |
-| Total de assertions | 646 |
+| Total de testes | **329** |
+| Total de assertions | **648** |
 | Testes falhando | 0 |
-| Cobertura de código | **86.6%** |
-| Duração da suíte completa | ~23s |
+| Cobertura de código | **90.8%** (86.6% inicial → 90.8% pós Code Review #1) |
+| Duração da suíte completa | ~27s |
 | Arquivos de teste criados | 22 |
 | Linhas de código de teste | ~3.200 |
 | Camadas cobertas | Models, Repositories, Services, Controllers, Rules, Traits |
