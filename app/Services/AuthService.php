@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Traits\LogsActivity;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
+    use LogsActivity;
+
     /**
      * Register a new user and return user with token.
      *
@@ -26,6 +29,11 @@ class AuthService
 
         $token = $user->createToken('api-token')->plainTextToken;
 
+        $this->logActivity('auth', 'User registered', [
+            'registered_user_id' => $user->id,
+            'email' => $user->email,
+        ]);
+
         return ['user' => $user, 'token' => $token];
     }
 
@@ -42,12 +50,21 @@ class AuthService
         $user = User::query()->where('email', $credentials['email'])->first();
 
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+            $this->logWarning('auth', 'Authentication failed', [
+                'email' => $credentials['email'],
+            ]);
+
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
         $token = $user->createToken('api-token')->plainTextToken;
+
+        $this->logActivity('auth', 'User authenticated', [
+            'authenticated_user_id' => $user->id,
+            'email' => $user->email,
+        ]);
 
         return ['user' => $user, 'token' => $token];
     }
@@ -60,5 +77,10 @@ class AuthService
     public function logout(User $user): void
     {
         $user->currentAccessToken()?->delete();
+
+        $this->logActivity('auth', 'User logged out', [
+            'logout_user_id' => $user->id,
+            'email' => $user->email,
+        ]);
     }
 }

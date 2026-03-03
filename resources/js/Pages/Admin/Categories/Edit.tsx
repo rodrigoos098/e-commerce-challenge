@@ -50,7 +50,6 @@ export default function CategoriesEdit({ category = MOCK_CATEGORY, categories = 
         handleSubmit,
         formState: { errors },
     } = useForm<CategoryForm>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(categorySchema) as Resolver<CategoryForm>,
         defaultValues: {
             name: category.name,

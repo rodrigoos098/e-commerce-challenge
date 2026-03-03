@@ -95,7 +95,6 @@ export default function Profile({ user }: Partial<ProfilePageProps>) {
         handleSubmit: handleProfileSubmit,
         formState: { errors: profileErrors },
     } = useForm<ProfileFormData>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(profileSchema) as Resolver<ProfileFormData>,
         defaultValues: { name: u.name, email: u.email },
     });
@@ -116,7 +115,6 @@ export default function Profile({ user }: Partial<ProfilePageProps>) {
         formState: { errors: passwordErrors },
         reset: resetPassword,
     } = useForm<PasswordFormData>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(passwordSchema) as Resolver<PasswordFormData>,
         defaultValues: { current_password: '', password: '', password_confirmation: '' },
     });

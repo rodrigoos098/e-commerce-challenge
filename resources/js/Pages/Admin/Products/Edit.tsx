@@ -76,7 +76,6 @@ export default function ProductsEdit({
         handleSubmit,
         formState: { errors },
     } = useForm<ProductForm>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(productSchema) as Resolver<ProductForm>,
         defaultValues: {
             name: product.name,

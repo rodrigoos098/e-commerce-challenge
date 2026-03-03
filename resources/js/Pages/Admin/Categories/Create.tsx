@@ -41,7 +41,6 @@ export default function CategoriesCreate({ categories = MOCK_CATEGORIES }: Categ
         handleSubmit,
         formState: { errors },
     } = useForm<CategoryForm>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(categorySchema) as Resolver<CategoryForm>,
         defaultValues: {
             active: true,

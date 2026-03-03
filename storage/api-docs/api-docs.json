@@ -151,14 +151,14 @@
                 ]
             }
         },
-        "/auth/user": {
+        "/auth/me": {
             "get": {
                 "tags": [
                     "Autenticação"
                 ],
                 "summary": "Obter usuário autenticado",
                 "description": "Get the authenticated user.",
-                "operationId": "41a762dc560143916d8a128f6497ea22",
+                "operationId": "e339e0e74860c0647fd1d41bbbbc13b2",
                 "responses": {
                     "200": {
                         "description": "Dados do usuário autenticado"

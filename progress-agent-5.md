@@ -63,3 +63,13 @@
 1. **`ProductCollection::$collects` com tipo explícito** — bug pré-existente do Agente 1. Removida declaração de tipo para compatibilidade com `ResourceCollection` pai.
 2. **swagger-php v6 desativou DocBlock por padrão** — requer `doctrine/annotations` v1 (com `DocParser`). Instalado e configurado `analyser` customizado em `config/l5-swagger.php` com `DocBlockAnnotationFactory`.
 3. **l5-swagger não inclui `DocBlockAnnotationFactory`** — configurado analyser customizado no `scanOptions` para suportar tanto PHP Attributes quanto PHPDoc `@OA\...` docblocks.
+
+---
+
+## [18:35] — Correções pós-revisão da fase 5
+
+- Substituída a configuração legada `.eslintrc.json` por `eslint.config.js`, compatível com ESLint 9
+- Corrigidas as anotações Swagger e o `PROJECT.md` para documentar `GET /api/v1/auth/me`
+- Integrado `LogsActivity` em `AuthService`, `OrderService` e `StockService`
+- Adicionadas regressões automatizadas para Swagger e logging estruturado
+- Warnings do ESLint removidos do frontend para deixar `npm run lint` limpo

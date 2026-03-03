@@ -9,7 +9,7 @@
 
 ## 1. Objetivo
 
-Finalizar a camada de documentação, qualidade de código e observabilidade do sistema. O escopo abrangia: configuração de ferramentas de linting e formatação (PHP e JavaScript), logging estruturado com canais dedicados por domínio, arquivo PROJECT.md com guia completo de setup, e documentação Swagger/OpenAPI completa cobrindo todos os 16 endpoints da API REST.
+Finalizar a camada de documentação, qualidade de código e observabilidade do sistema. O escopo abrangia: configuração de ferramentas de linting e formatação (PHP e JavaScript), logging estruturado com canais dedicados por domínio, arquivo PROJECT.md com guia completo de setup, e documentação Swagger/OpenAPI completa cobrindo os 25 endpoints implementados da API REST (16 paths OpenAPI).
 
 ---
 
@@ -20,12 +20,12 @@ Finalizar a camada de documentação, qualidade de código e observabilidade do 
 | Tecnologia | Versão | Papel |
 |---|---|---|
 | Laravel Pint | ^1 | Formatador PHP com preset PSR-12 |
-| ESLint | ^8 | Linter JavaScript/TypeScript |
-| @typescript-eslint | ^6 | Parser e plugin TypeScript para ESLint |
+| ESLint | ^9 | Linter JavaScript/TypeScript |
+| @typescript-eslint | ^8 | Parser e plugin TypeScript para ESLint |
 | Prettier | ^3 | Formatador JavaScript/TypeScript |
-| eslint-config-prettier | ^9 | Desativa regras do ESLint que conflitam com Prettier |
+| eslint-config-prettier | ^10 | Desativa regras do ESLint que conflitam com Prettier |
 | eslint-plugin-react | ^7 | Regras específicas para React |
-| eslint-plugin-react-hooks | ^4 | Regras para uso correto de React Hooks |
+| eslint-plugin-react-hooks | ^7 | Regras para uso correto de React Hooks |
 | darkaonline/l5-swagger | ^10.1 | Integração do swagger-php com Laravel |
 | zircote/swagger-php | ^6 | Geração de spec OpenAPI a partir de anotações PHP |
 | doctrine/annotations | ^1.14 | Parser de docblocks — dependência do swagger-php v6 |
@@ -69,7 +69,7 @@ Optou-se por anotações docblock `@OA\` (não atributos PHP 8) por serem mais l
 ```
 .
 ├── pint.json                               # Config do Laravel Pint (PSR-12)
-├── .eslintrc.json                          # Config ESLint (TypeScript + React)
+├── eslint.config.js                        # Config ESLint 9 (flat config, TypeScript + React)
 ├── .prettierrc                             # Config Prettier
 ├── package.json                            # +4 scripts, +7 devDependencies
 ├── PROJECT.md                              # Guia completo do projeto
@@ -115,7 +115,7 @@ Optou-se por anotações docblock `@OA\` (não atributos PHP 8) por serem mais l
 }
 ```
 
-**`.eslintrc.json`** — Extends: `eslint:recommended`, `plugin:@typescript-eslint/recommended`, `plugin:react/recommended`, `prettier`. Regras críticas:
+**`eslint.config.js`** — Flat config compatível com ESLint 9 para `resources/js/**/*.ts(x)`, com parser TypeScript, plugins `react` e `react-hooks`, globals de browser e regras críticas:
 - `react/react-in-jsx-scope: off` — não precisa de `import React` no React 17+
 - `react-hooks/rules-of-hooks: error` — hooks apenas no topo de funções
 - `react-hooks/exhaustive-deps: warn` — warns para dependências faltando em `useEffect`
@@ -157,20 +157,25 @@ As tabelas de filas (`jobs`, `job_batches`, `failed_jobs`) já haviam sido criad
 
 Todos injetam automaticamente `user_id` (do usuário autenticado ou `null`) e `timestamp` ISO-8601 no contexto.
 
-**Uso nos services:**
+**Uso real nos services:**
 ```php
 use App\Traits\LogsActivity;
 
 class OrderService {
     use LogsActivity;
 
-    public function create(array $data): Order {
-        $order = Order::create($data);
+    public function createFromCart(OrderDTO $dto): Order {
+        $order = ...;
         $this->logActivity('orders', 'Order created', ['order_id' => $order->id]);
         return $order;
     }
 }
 ```
+
+Além disso:
+- `AuthService` registra falhas de autenticação no canal `auth`
+- `OrderService` registra criação e atualização de status no canal `orders`
+- `StockService` registra movimentações no canal `stock`
 
 ### 4.4 Etapa 4 — PROJECT.md
 
@@ -187,7 +192,7 @@ Documento completo com as seguintes seções:
 | Estrutura de pastas | Árvore comentada de `app/`, `resources/js/`, `routes/` |
 | Decisões arquiteturais | Repository Pattern, Service Layer, DTOs, Event-Driven Stock, Inertia SPA |
 | Bibliotecas utilizadas | Tabela backend + frontend + dev tools com versões |
-| Endpoints da API | Todos os 16 endpoints, grupos por domínio |
+| Endpoints da API | Resumo dos endpoints principais do desafio + referência para a documentação Swagger completa |
 | Formato de resposta padrão | Estrutura JSON de sucesso e erro |
 | Variáveis de ambiente | Tabela de todas as env vars com descrição |
 | Logging | Canais disponíveis e uso da trait |
@@ -206,7 +211,7 @@ Documento completo com as seguintes seções:
 
 | Controller | Endpoints |
 |---|---|
-| AuthController | `POST /register`, `POST /login`, `POST /logout`, `GET /user` |
+| AuthController | `POST /register`, `POST /login`, `POST /logout`, `GET /me` |
 | ProductController | `GET /products`, `GET /products/{id}`, `POST /products`, `PUT /products/{id}`, `DELETE /products/{id}`, `GET /products/low-stock` |
 | CategoryController | `GET /categories`, `GET /categories/{id}`, `POST /categories`, `PUT /categories/{id}`, `DELETE /categories/{id}`, `GET /categories/{id}/products` |
 | CartController | `GET /cart`, `POST /cart/items`, `PUT /cart/items/{id}`, `DELETE /cart/items/{id}`, `DELETE /cart` |
@@ -324,7 +329,7 @@ php artisan l5-swagger:generate
 
 # Acessar interface Swagger
 # GET /api/documentation
-# → 200 OK, interface SwaggerUI com 16 endpoints interativos
+# → documentação gerada com 16 paths e endpoint autenticado em `/auth/me`
 ```
 
 ---

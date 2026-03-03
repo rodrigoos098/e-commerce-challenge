@@ -103,7 +103,7 @@ class AuthController extends Controller
      * Get the authenticated user.
      *
      * @OA\Get(
-     *     path="/auth/user",
+     *     path="/auth/me",
      *     summary="Obter usuário autenticado",
      *     tags={"Autenticação"},
      *     security={{"bearerAuth":{}}},

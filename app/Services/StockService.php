@@ -8,15 +8,19 @@ use App\Models\Product;
 use App\Models\StockMovement;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Repositories\Contracts\StockMovementRepositoryInterface;
+use App\Traits\LogsActivity;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class StockService
 {
+    use LogsActivity;
+
     public function __construct(
         private readonly StockMovementRepositoryInterface $stockMovementRepository,
         private readonly ProductRepositoryInterface $productRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Get paginated stock movements for a product.
@@ -31,7 +35,7 @@ class StockService
      */
     public function recordMovement(StockMovementDTO $dto): StockMovement
     {
-        return DB::transaction(function () use ($dto): StockMovement {
+        $movement = DB::transaction(function () use ($dto): StockMovement {
             $movement = $this->stockMovementRepository->create($dto->toArray());
 
             $product = $this->productRepository->findById($dto->productId);
@@ -42,6 +46,18 @@ class StockService
 
             return $movement;
         });
+
+        $this->logActivity('stock', 'Stock movement recorded', [
+            'movement_id' => $movement->id,
+            'product_id' => $dto->productId,
+            'type' => $dto->type,
+            'quantity' => $dto->quantity,
+            'reason' => $dto->reason,
+            'reference_type' => $dto->referenceType,
+            'reference_id' => $dto->referenceId,
+        ]);
+
+        return $movement;
     }
 
     /**

@@ -10,16 +10,20 @@ use App\Models\Order;
 use App\Repositories\Contracts\CartRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
+use App\Traits\LogsActivity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
+    use LogsActivity;
+
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly ProductRepositoryInterface $productRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Get paginated orders for a user.
@@ -70,7 +74,7 @@ class OrderService
             ]);
         }
 
-        return DB::transaction(function () use ($dto, $cart): Order {
+        $order = DB::transaction(function () use ($dto, $cart): Order {
             $orderItems = [];
             $subtotal = 0;
 
@@ -129,6 +133,14 @@ class OrderService
 
             return $order;
         });
+
+        $this->logActivity('orders', 'Order created', [
+            'order_id' => $order->id,
+            'status' => $order->status,
+            'total' => $order->total,
+        ]);
+
+        return $order;
     }
 
     /**
@@ -136,6 +148,15 @@ class OrderService
      */
     public function updateStatus(Order $order, string $status): Order
     {
-        return $this->orderRepository->updateStatus($order, $status);
+        $previousStatus = $order->status;
+        $updatedOrder = $this->orderRepository->updateStatus($order, $status);
+
+        $this->logActivity('orders', 'Order status updated', [
+            'order_id' => $updatedOrder->id,
+            'previous_status' => $previousStatus,
+            'status' => $updatedOrder->status,
+        ]);
+
+        return $updatedOrder;
     }
 }

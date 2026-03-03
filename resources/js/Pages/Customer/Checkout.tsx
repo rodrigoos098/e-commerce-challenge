@@ -255,7 +255,6 @@ export default function Checkout({ cart }: Partial<CheckoutPageProps>) {
         getValues,
         formState: { errors },
     } = useForm<CheckoutFormData>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(checkoutSchema) as Resolver<CheckoutFormData>,
         defaultValues: {
             shipping_name: '',

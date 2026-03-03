@@ -3,7 +3,7 @@ import { Link, router } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
 import PublicLayout from '@/Layouts/PublicLayout';
 import CartItemComponent from '@/Components/Public/CartItem';
-import type { CartPageProps, Cart, CartItem } from '@/types/public';
+import type { CartPageProps, Cart } from '@/types/public';
 
 // ——— Mock ————————————————————————————————————————————————
 

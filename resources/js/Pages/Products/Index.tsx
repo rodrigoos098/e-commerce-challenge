@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { router, usePage } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import ProductGrid from '@/Components/Public/ProductGrid';
 import CategoryFilter from '@/Components/Public/CategoryFilter';
@@ -67,14 +67,6 @@ export default function ProductsIndex({ products, categories, filters }: Partial
     const [priceMax, setPriceMax] = useState(Number(currentFilters.price_max ?? 10000));
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    // Search debounce
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            applyFilters({ search });
-        }, 400);
-        return () => clearTimeout(timer);
-    }, [search]);
-
     const applyFilters = useCallback(
         (overrides: Record<string, unknown> = {}) => {
             router.get(
@@ -91,6 +83,15 @@ export default function ProductsIndex({ products, categories, filters }: Partial
         },
         [search, categoryId, priceMin, priceMax],
     );
+
+    // Search debounce
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            applyFilters({ search });
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [applyFilters, search]);
 
     const handleCategoryChange = (id: number | string | null) => {
         setCategoryId(id);
