@@ -71,8 +71,8 @@ export interface PaginatedResponse<T> {
         last_page: number;
     };
     links: {
-        first: string;
-        last: string;
+        first: string | null;
+        last: string | null;
         prev: string | null;
         next: string | null;
     };
