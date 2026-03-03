@@ -27,12 +27,12 @@
 - [x] Seeders & Factories
 
 ### Agente 2: Testes
-- [ ] Testes unitários de Models
-- [ ] Testes unitários de Services
-- [ ] Testes unitários de Repositories
-- [ ] Testes de integração (API endpoints)
-- [ ] Testes de feature (fluxos completos)
-- [ ] Testes de validação e autorização
+- [x] Testes unitários de Models
+- [x] Testes unitários de Services
+- [x] Testes unitários de Repositories
+- [x] Testes de integração (API endpoints)
+- [x] Testes de feature (fluxos completos)
+- [x] Testes de validação e autorização
 
 ### Agente 3: Frontend Admin
 - [ ] Layout Admin
@@ -67,8 +67,8 @@
 - [ ] Conectar público frontend com backend via Inertia
 - [ ] Ajustar autenticação Sanctum + Inertia
 - [ ] Rodar seeders
-- [ ] Suíte de testes completa
-- [ ] Verificar cobertura ≥80%
+- [x] Suíte de testes completa
+- [x] Verificar cobertura ≥80%
 
 ## Fase 3 — Verificação Final
 - [ ] Testes automatizados passando
