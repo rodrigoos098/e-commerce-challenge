@@ -1,8 +1,33 @@
 import React, { useState } from 'react';
-import { useForm } from '@inertiajs/react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { Resolver } from 'react-hook-form';
+import { router } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
+import { z } from 'zod';
 import PublicLayout from '@/Layouts/PublicLayout';
 import type { ProfilePageProps, User } from '@/types/public';
+
+// ——— Schemas ——————————————————————————————————————————————
+
+const profileSchema = z.object({
+    name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
+    email: z.string().email('E-mail inválido'),
+});
+
+const passwordSchema = z
+    .object({
+        current_password: z.string().min(1, 'Senha atual obrigatória'),
+        password: z.string().min(8, 'Nova senha deve ter ao menos 8 caracteres'),
+        password_confirmation: z.string().min(1, 'Confirmação obrigatória'),
+    })
+    .refine((d) => d.password === d.password_confirmation, {
+        message: 'As senhas não conferem',
+        path: ['password_confirmation'],
+    });
+
+type ProfileFormData = z.infer<typeof profileSchema>;
+type PasswordFormData = z.infer<typeof passwordSchema>;
 
 // ——— Mock ——————————————————————————————————————————————————
 
@@ -18,14 +43,13 @@ interface FieldProps {
     id: string;
     label: string;
     type?: string;
-    value: string;
-    onChange: (v: string) => void;
     error?: string;
     placeholder?: string;
     autoComplete?: string;
+    registration: ReturnType<ReturnType<typeof useForm>['register']>;
 }
 
-function Field({ id, label, type = 'text', value, onChange, error, placeholder, autoComplete }: FieldProps) {
+function Field({ id, label, type = 'text', error, placeholder, autoComplete, registration }: FieldProps) {
     return (
         <div>
             <label htmlFor={id} className="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -34,13 +58,12 @@ function Field({ id, label, type = 'text', value, onChange, error, placeholder, 
             <input
                 id={id}
                 type={type}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 autoComplete={autoComplete}
                 aria-describedby={error ? `${id}-error` : undefined}
                 className={`w-full rounded-xl border px-4 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
                     ${error ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                {...registration}
             />
             {error && (
                 <p id={`${id}-error`} role="alert" className="mt-1 text-xs text-red-600">{error}</p>
@@ -49,52 +72,64 @@ function Field({ id, label, type = 'text', value, onChange, error, placeholder, 
     );
 }
 
+function SpinnerIcon() {
+    return (
+        <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+    );
+}
+
 // ——— Page ————————————————————————————————————————————————
-
-interface ProfileFormData {
-    name: string;
-    email: string;
-}
-
-interface PasswordFormData {
-    current_password: string;
-    password: string;
-    password_confirmation: string;
-}
 
 export default function Profile({ user }: Partial<ProfilePageProps>) {
     const u = user ?? MOCK_USER;
     const [activeTab, setActiveTab] = useState<'profile' | 'password'>('profile');
+    const [profileSubmitting, setProfileSubmitting] = useState(false);
+    const [passwordSubmitting, setPasswordSubmitting] = useState(false);
 
     // Profile form
-    const profileForm = useForm<ProfileFormData>({
-        name: u.name,
-        email: u.email,
+    const {
+        register: registerProfile,
+        handleSubmit: handleProfileSubmit,
+        formState: { errors: profileErrors },
+    } = useForm<ProfileFormData>({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resolver: zodResolver(profileSchema) as Resolver<ProfileFormData>,
+        defaultValues: { name: u.name, email: u.email },
     });
 
-    const handleProfileSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        profileForm.put('/customer/profile', {
+    const onProfileSubmit = (data: ProfileFormData) => {
+        setProfileSubmitting(true);
+        router.put('/customer/profile', data, {
             onSuccess: () => toast.success('Perfil atualizado com sucesso!'),
             onError: () => toast.error('Erro ao atualizar perfil.'),
+            onFinish: () => setProfileSubmitting(false),
         });
     };
 
     // Password form
-    const passwordForm = useForm<PasswordFormData>({
-        current_password: '',
-        password: '',
-        password_confirmation: '',
+    const {
+        register: registerPassword,
+        handleSubmit: handlePasswordSubmit,
+        formState: { errors: passwordErrors },
+        reset: resetPassword,
+    } = useForm<PasswordFormData>({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resolver: zodResolver(passwordSchema) as Resolver<PasswordFormData>,
+        defaultValues: { current_password: '', password: '', password_confirmation: '' },
     });
 
-    const handlePasswordSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        passwordForm.put('/customer/profile/password', {
+    const onPasswordSubmit = (data: PasswordFormData) => {
+        setPasswordSubmitting(true);
+        router.put('/customer/profile/password', data, {
             onSuccess: () => {
                 toast.success('Senha alterada com sucesso!');
-                passwordForm.reset();
+                resetPassword();
             },
             onError: () => toast.error('Erro ao alterar senha.'),
+            onFinish: () => setPasswordSubmitting(false),
         });
     };
 
@@ -143,36 +178,29 @@ export default function Profile({ user }: Partial<ProfilePageProps>) {
                 {activeTab === 'profile' && (
                     <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sm:p-8">
                         <h2 className="text-base font-bold text-gray-900 mb-6">Informações Pessoais</h2>
-                        <form onSubmit={handleProfileSubmit} className="space-y-5">
+                        <form onSubmit={handleProfileSubmit(onProfileSubmit)} className="space-y-5">
                             <Field
                                 id="name"
                                 label="Nome completo"
-                                value={profileForm.data.name}
-                                onChange={(v) => profileForm.setData('name', v)}
-                                error={profileForm.errors.name}
+                                error={profileErrors.name?.message}
                                 autoComplete="name"
+                                registration={registerProfile('name')}
                             />
                             <Field
                                 id="email"
                                 label="E-mail"
                                 type="email"
-                                value={profileForm.data.email}
-                                onChange={(v) => profileForm.setData('email', v)}
-                                error={profileForm.errors.email}
+                                error={profileErrors.email?.message}
                                 autoComplete="email"
+                                registration={registerProfile('email')}
                             />
                             <div className="flex justify-end pt-2">
                                 <button
                                     type="submit"
-                                    disabled={profileForm.processing}
+                                    disabled={profileSubmitting}
                                     className="rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-violet-700 active:scale-[.98] transition-all shadow-md shadow-violet-200 disabled:opacity-60 flex items-center gap-2"
                                 >
-                                    {profileForm.processing && (
-                                        <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                        </svg>
-                                    )}
+                                    {profileSubmitting && <SpinnerIcon />}
                                     Salvar Alterações
                                 </button>
                             </div>
@@ -184,49 +212,41 @@ export default function Profile({ user }: Partial<ProfilePageProps>) {
                 {activeTab === 'password' && (
                     <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sm:p-8">
                         <h2 className="text-base font-bold text-gray-900 mb-6">Alterar Senha</h2>
-                        <form onSubmit={handlePasswordSubmit} className="space-y-5">
+                        <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="space-y-5">
                             <Field
                                 id="current_password"
                                 label="Senha atual"
                                 type="password"
-                                value={passwordForm.data.current_password}
-                                onChange={(v) => passwordForm.setData('current_password', v)}
-                                error={passwordForm.errors.current_password}
+                                error={passwordErrors.current_password?.message}
                                 autoComplete="current-password"
                                 placeholder="Digite sua senha atual"
+                                registration={registerPassword('current_password')}
                             />
                             <Field
                                 id="new_password"
                                 label="Nova senha"
                                 type="password"
-                                value={passwordForm.data.password}
-                                onChange={(v) => passwordForm.setData('password', v)}
-                                error={passwordForm.errors.password}
+                                error={passwordErrors.password?.message}
                                 autoComplete="new-password"
                                 placeholder="Mínimo 8 caracteres"
+                                registration={registerPassword('password')}
                             />
                             <Field
                                 id="password_confirmation"
                                 label="Confirmar nova senha"
                                 type="password"
-                                value={passwordForm.data.password_confirmation}
-                                onChange={(v) => passwordForm.setData('password_confirmation', v)}
-                                error={passwordForm.errors.password_confirmation}
+                                error={passwordErrors.password_confirmation?.message}
                                 autoComplete="new-password"
                                 placeholder="Repita a nova senha"
+                                registration={registerPassword('password_confirmation')}
                             />
                             <div className="flex justify-end pt-2">
                                 <button
                                     type="submit"
-                                    disabled={passwordForm.processing}
+                                    disabled={passwordSubmitting}
                                     className="rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-violet-700 active:scale-[.98] transition-all shadow-md shadow-violet-200 disabled:opacity-60 flex items-center gap-2"
                                 >
-                                    {passwordForm.processing && (
-                                        <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                        </svg>
-                                    )}
+                                    {passwordSubmitting && <SpinnerIcon />}
                                     Alterar Senha
                                 </button>
                             </div>

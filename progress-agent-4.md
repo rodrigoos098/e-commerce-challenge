@@ -67,3 +67,20 @@
 ### Etapa 11 — Perfil (`resources/js/Pages/Customer/Profile.tsx`)
 - Edição de nome e email
 - Alteração de senha
+
+### Etapa 12 — Revisões e Correções
+
+**Revisão 1 (correções menores):**
+- `Footer.tsx` extraído de `PublicLayout.tsx` como componente independente
+- `<Link>` substituindo `<a>` em `ProductCard.tsx`
+- Fonte Inter adicionada via Google Fonts em `app.css`
+- Validação Zod adicionada em `Login.tsx` e `Register.tsx`
+- Diretório `Pages/Produtos/` removido (vazio/duplicado)
+
+**Revisão 2 (correções críticas e importantes):**
+- `Checkout.tsx` reescrito como wizard de 3 etapas real (Entrega → Cobrança → Revisão) com barra de progresso, `react-hook-form + zodResolver`, cópia automática dos campos de entrega para cobrança via `setValue`, e `router.post` no submit final
+- `Orders/Index.tsx` — `window.location.href` substituído por `router.get()` com `preserveState`
+- `Profile.tsx` migrado para `react-hook-form + zodResolver` com schemas separados para perfil e senha
+- `PublicLayout.tsx` — link "Categorias" adicionado à navegação desktop e mobile
+- `SearchInput.tsx` — debounce interno de 300ms implementado via `useEffect` + `setTimeout`
+- Relatório `fase-4-frontend-publico.md` — seção 9.8 corrigida para descrever envio por campos separados

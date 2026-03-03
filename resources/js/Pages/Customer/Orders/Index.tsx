@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import Pagination from '@/Components/Public/Pagination';
 import type { OrdersPageProps, Order, OrderStatus, PaginatedResponse } from '@/types/public';
@@ -64,7 +64,7 @@ export default function OrdersIndex({ orders }: Partial<OrdersPageProps>) {
     const data = orders ?? MOCK_PAGINATED;
 
     const handlePageChange = (page: number) => {
-        window.location.href = `/customer/orders?page=${page}`;
+        router.get('/customer/orders', { page }, { preserveState: true, replace: true });
     };
 
     return (
