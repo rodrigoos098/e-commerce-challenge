@@ -197,6 +197,30 @@ class ValidationTest extends TestCase
             ->assertStatus(201);
     }
 
+    public function test_unique_slug_rule_allows_product_to_keep_its_own_slug_on_update(): void
+    {
+        // Regression: UniqueSlug($exceptId) must exclude the product being updated.
+        // Without $exceptId, updating a product would always 422 when slug is unchanged.
+        $product = Product::factory()->create(['slug' => 'slug-existente']);
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", ['slug' => 'slug-existente'])
+            ->assertStatus(200);
+    }
+
+    public function test_unique_slug_rule_rejects_update_with_slug_of_another_product(): void
+    {
+        // Regression: $exceptId only excludes the current product — another product's slug
+        // must still be rejected.
+        Product::factory()->create(['slug' => 'slug-do-outro']);
+        $product = Product::factory()->create(['slug' => 'slug-atual']);
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", ['slug' => 'slug-do-outro'])
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['slug']]);
+    }
+
     // ── SufficientStock rule ──────────────────────────────────────────────────
 
     public function test_sufficient_stock_rule_rejects_quantity_exceeding_stock(): void

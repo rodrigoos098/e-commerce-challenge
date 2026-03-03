@@ -266,7 +266,7 @@ protected function setUp(): void
 | **Admin — delete** | Guest (401), admin soft-deletes (200 + `assertSoftDeleted`) |
 | **Admin — low-stock** | Guest (401), admin vê lista (200 com apenas 1 produto low-stock) |
 
-#### `CategoryApiTest` — 8 testes
+#### `CategoryApiTest` — 21 testes
 
 | Cenário | Detalhe |
 |---------|---------|
@@ -276,6 +276,15 @@ protected function setUp(): void
 | Mostrar inexistente | 404 |
 | Produtos por categoria | Paginado, apenas da categoria, com busca, com `per_page` |
 | Categoria inexistente para produtos | 404 |
+| **Store — autorização** | Guest (401), customer (403) |
+| **Store — sucesso** | Admin cria categoria (201, `assertDatabaseHas`) |
+| **Store — parent_id** | Admin cria com `parent_id`; valor persiste no banco |
+| **Store — validação** | Sem `name` → 422 com `errors.name` |
+| **Update — autorização** | Guest (401), customer (403) |
+| **Update — sucesso** | Admin atualiza nome (200, `data.name` e `assertDatabaseHas`) |
+| **Update — parent_id** | Admin atualiza `parent_id`; valor persiste no banco |
+| **Destroy — autorização** | Guest (401), customer (403) |
+| **Destroy — sucesso** | Admin deleta (200, `assertDatabaseMissing`) |
 
 #### `CartApiTest` — 14 testes
 
@@ -347,7 +356,7 @@ Testa também: acumulação de quantidade (3+4=7 do mesmo produto), validação 
 
 ### 4.6 Etapa 6 — Testes de Validação e Autorização
 
-#### `ValidationTest` — 26 testes
+#### `ValidationTest` — 28 testes
 
 **Registro:**
 - `name` obrigatório; e-mail com formato válido; `password_confirmation` coincidente
@@ -357,8 +366,10 @@ Testa também: acumulação de quantidade (3+4=7 do mesmo produto), validação 
 
 **Regra `UniqueSlug`:**
 - Rejeita slug já em uso por produto ativo
-- Rejeita slug já em uso por produto **soft-deletado** (`test_unique_slug_rule_rejects_slug_of_soft_deleted_product`) — adicionado no Code Review #2
+- Rejeita slug já em uso por produto **soft-deletado** (`test_unique_slug_rule_rejects_slug_of_soft_deleted_product`)
 - Aceita slug único
+- **Atualização — mesmo slug:** produto pode manter seu próprio slug em update (`$exceptId` excluído corretamente) — regressão para `UniqueSlug($exceptId)`
+- **Atualização — slug alheio:** update com slug de outro produto → 422 (regressão: `$exceptId` exclui apenas o produto atual)
 
 **Regra `SufficientStock`:**
 - Rejeita quantidade > estoque disponível
@@ -385,7 +396,7 @@ Testa também: acumulação de quantidade (3+4=7 do mesmo produto), validação 
 
 > **Nota sobre `PolicyTest`:** Os 20 testes em `PolicyTest.php` executam as policies diretamente. Embora as policies sejam exercitadas também pelos testes de API, os testes diretos fornecem cobertura isolada de cada regra de autorização (não são código morto).
 
-**Resultado Etapa 6:** 45 testes ✅
+**Resultado Etapa 6:** 47 testes ✅ *(`ValidationTest` 28 + `AuthorizationTest` 19; `PolicyTest` 20 testes cobrindo policies isoladamente)*
 
 ---
 
@@ -396,8 +407,8 @@ Testa também: acumulação de quantidade (3+4=7 do mesmo produto), validação 
 ```
 php artisan test --compact
 
-  Tests:    329 passed (648 assertions)
-  Duration: ~27s
+  Tests:    343 passed (683 assertions)
+  Duration: ~28s
 ```
 
 ### 5.2 Cobertura de Código
@@ -543,7 +554,7 @@ tests/Unit/Services/
 tests/Feature/Api/V1/
 ├── AuthTest.php            # 13 testes: register, login, logout, me
 ├── ProductApiTest.php      # 19 testes: CRUD admin, gates, listagem pública
-├── CategoryApiTest.php     # 8 testes: árvore, show, produtos por categoria
+├── CategoryApiTest.php     # 21 testes: árvore, show, CRUD admin (store/update/destroy), autorização, parent_id, produtos por categoria
 ├── CartApiTest.php         # 14 testes: CRUD carrinho, validação estoque
 └── OrderApiTest.php        # 17 testes: isolamento user/admin, status, create
 
@@ -552,7 +563,7 @@ tests/Feature/
 ├── OrderFlowTest.php       # 5 testes: cart→pedido, totais, status admin
 ├── StockFlowTest.php       # 6 testes: stock decrement, StockMovement, StockLow
 ├── PolicyTest.php          # 20 testes: ProductPolicy e OrderPolicy (unit direto)
-├── ValidationTest.php      # 26 testes: required, UniqueSlug (incl. soft-deleted), SufficientStock, ValidParentCategory, address
+├── ValidationTest.php      # 28 testes: required, UniqueSlug (soft-deleted + exceptId em update), SufficientStock, ValidParentCategory, address
 └── AuthorizationTest.php   # 19 testes: guest, customer≠admin, rate limiting (config real via md5), isolamento recursos
 ```
 
@@ -578,13 +589,13 @@ b2d9682  A2 - Testes - testes de integracao API (Auth, Product, Category, Cart, 
 
 | Métrica | Valor |
 |---------|-------|
-| Total de testes | **329** |
-| Total de assertions | **648** |
+| Total de testes | **343** |
+| Total de assertions | **683** |
 | Testes falhando | 0 |
 | Cobertura de código | **90.8%** (86.6% inicial → 90.8% pós Code Review #1) |
-| Duração da suíte completa | ~27s |
+| Duração da suíte completa | ~28s |
 | Arquivos de teste criados | 22 |
-| Linhas de código de teste | ~3.200 |
+| Linhas de código de teste | ~3.500 |
 | Camadas cobertas | Models, Repositories, Services, Controllers, Rules, Traits |
 | Banco de dados nos testes | SQLite `:memory:` |
 | Jobs executados de forma síncrona | ✅ (`QUEUE_CONNECTION=sync`) |

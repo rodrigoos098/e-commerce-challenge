@@ -4,12 +4,38 @@ namespace Tests\Feature\Api\V1;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class CategoryApiTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+    }
+
+    private function createAdmin(): User
+    {
+        $user = User::factory()->create();
+        $user->assignRole('admin');
+
+        return $user;
+    }
+
+    private function createCustomer(): User
+    {
+        $user = User::factory()->create();
+        $user->assignRole('customer');
+
+        return $user;
+    }
 
     // ── Index ─────────────────────────────────────────────────────────────────
 
@@ -67,6 +93,166 @@ class CategoryApiTest extends TestCase
         $response->assertStatus(404)
             ->assertJsonPath('success', false)
             ->assertJsonStructure(['success', 'message']);
+    }
+
+    // ── Store (admin) ─────────────────────────────────────────────────────────
+
+    public function test_guest_cannot_create_category(): void
+    {
+        $response = $this->postJson('/api/v1/categories', ['name' => 'Nova Categoria']);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_customer_cannot_create_category(): void
+    {
+        $customer = $this->createCustomer();
+
+        $response = $this->actingAs($customer, 'sanctum')
+            ->postJson('/api/v1/categories', ['name' => 'Nova Categoria']);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_create_category(): void
+    {
+        $admin = $this->createAdmin();
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->postJson('/api/v1/categories', [
+                'name' => 'Eletrônicos',
+                'description' => 'Categoria de eletrônicos.',
+                'active' => true,
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure(['success', 'data' => ['id', 'name', 'slug']]);
+
+        $this->assertDatabaseHas('categories', ['name' => 'Eletrônicos']);
+    }
+
+    public function test_admin_can_create_category_with_parent_id(): void
+    {
+        $admin = $this->createAdmin();
+        $parent = Category::factory()->create();
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->postJson('/api/v1/categories', [
+                'name' => 'Subcategoria Filha',
+                'parent_id' => $parent->id,
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseHas('categories', [
+            'name' => 'Subcategoria Filha',
+            'parent_id' => $parent->id,
+        ]);
+    }
+
+    public function test_create_category_fails_without_name(): void
+    {
+        $admin = $this->createAdmin();
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->postJson('/api/v1/categories', ['description' => 'Sem nome']);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['errors' => ['name']]);
+    }
+
+    // ── Update (admin) ────────────────────────────────────────────────────────
+
+    public function test_guest_cannot_update_category(): void
+    {
+        $category = Category::factory()->create();
+
+        $response = $this->putJson("/api/v1/categories/{$category->id}", ['name' => 'Novo Nome']);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_customer_cannot_update_category(): void
+    {
+        $customer = $this->createCustomer();
+        $category = Category::factory()->create();
+
+        $response = $this->actingAs($customer, 'sanctum')
+            ->putJson("/api/v1/categories/{$category->id}", ['name' => 'Novo Nome']);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_update_category(): void
+    {
+        $admin = $this->createAdmin();
+        $category = Category::factory()->create(['name' => 'Antigo Nome']);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/categories/{$category->id}", ['name' => 'Novo Nome Atualizado']);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.name', 'Novo Nome Atualizado');
+
+        $this->assertDatabaseHas('categories', ['id' => $category->id, 'name' => 'Novo Nome Atualizado']);
+    }
+
+    public function test_admin_can_update_category_parent_id(): void
+    {
+        $admin = $this->createAdmin();
+        $parent = Category::factory()->create();
+        $child = Category::factory()->create(['parent_id' => null]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/categories/{$child->id}", ['parent_id' => $parent->id]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseHas('categories', [
+            'id' => $child->id,
+            'parent_id' => $parent->id,
+        ]);
+    }
+
+    // ── Destroy (admin) ───────────────────────────────────────────────────────
+
+    public function test_guest_cannot_delete_category(): void
+    {
+        $category = Category::factory()->create();
+
+        $response = $this->deleteJson("/api/v1/categories/{$category->id}");
+
+        $response->assertStatus(401);
+    }
+
+    public function test_customer_cannot_delete_category(): void
+    {
+        $customer = $this->createCustomer();
+        $category = Category::factory()->create();
+
+        $response = $this->actingAs($customer, 'sanctum')
+            ->deleteJson("/api/v1/categories/{$category->id}");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_delete_category(): void
+    {
+        $admin = $this->createAdmin();
+        $category = Category::factory()->create();
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->deleteJson("/api/v1/categories/{$category->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
     }
 
     // ── Products by Category ──────────────────────────────────────────────────

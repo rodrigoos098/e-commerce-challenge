@@ -65,10 +65,11 @@ Suíte de testes completa com ≥80% de cobertura. PHPUnit (não Pest).
 
 ## [Etapa 6] — Testes de Validação e Autorização
 
-### Status: ✅ Concluído — 37 testes
+### Status: ✅ Concluído — 49 testes
 
-- `tests/Feature/ValidationTest.php` — campos obrigatórios, UniqueSlug (inclusive slug de produto soft-deletado), SufficientStock, custo < preço, endereço de pedido
+- `tests/Feature/ValidationTest.php` — campos obrigatórios, UniqueSlug (inclusive slug de produto soft-deletado, e regressão `$exceptId` em update), SufficientStock, custo < preço, endereço de pedido
 - `tests/Feature/AuthorizationTest.php` — guest bloqueado, customer sem acesso admin, admin acessa tudo, isolamento de recursos, rate limiting (exercita config real via pré-preenchimento com chave `md5('api'.$key)`)
+- `tests/Feature/Api/V1/CategoryApiTest.php` — CRUD admin completo: `POST/PUT/DELETE /categories` com autorização (guest 401, customer 403, admin sucesso), persistência de `parent_id`, validação de campos
 
 ---
 
@@ -76,7 +77,7 @@ Suíte de testes completa com ≥80% de cobertura. PHPUnit (não Pest).
 
 ### Status: ✅ Concluído
 
-**Suite completa:** 329 testes passando, 648 assertions
+**Suite completa:** 343 testes passando, 683 assertions
 **Cobertura de código:** 90.8% (supera o mínimo de 80%)
 
 ---
@@ -100,5 +101,9 @@ Suíte de testes completa com ≥80% de cobertura. PHPUnit (não Pest).
 - P4: Documentação atualizada (`progress-agent-2.md`, `relatorios/fase-2-testes.md`)
 - P5: Novo teste `test_unique_slug_rule_rejects_slug_of_soft_deleted_product` adicionado em `ValidationTest`
 
-**Suite final:** 329 testes, 648 assertions, 0 falhas
+**Code Review #3 (2 achados — todos corrigidos):**
+- P1 [importante]: `CategoryApiTest` cobria apenas endpoints públicos. Adicionados 12 testes de admin CRUD (`POST/PUT/DELETE /api/v1/categories`) cobrindo autorização (guest/customer/admin), sucesso com persistência no banco, e persistência de `parent_id` em create e update.
+- P2 [importante]: `UniqueSlug($exceptId)` nunca era exercitada em testes. Adicionados 2 testes de regressão em `ValidationTest`: update com próprio slug (deve passar) e update com slug alheio (deve rejeitar 422).
+
+**Suite final:** 343 testes, 683 assertions, 0 falhas
 **Pint:** Todos os arquivos formatados (`vendor/bin/pint --dirty`)
