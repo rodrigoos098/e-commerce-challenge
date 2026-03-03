@@ -1,5 +1,5 @@
 import React from 'react';
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
 import type { Product } from '@/types/public';
 
@@ -44,7 +44,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     return (
         <article className="group relative flex flex-col rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
             {/* Image */}
-            <a href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-gray-100">
+            <Link href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-gray-100">
                 {product.category?.name && (
                     <span className="absolute top-3 left-3 z-10 rounded-full bg-white/80 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium text-gray-700 border border-gray-200">
                         {product.category.name}
@@ -61,7 +61,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                 />
-            </a>
+            </Link>
 
             {/* Content */}
             <div className="flex flex-1 flex-col p-4">
@@ -77,11 +77,11 @@ export default function ProductCard({ product }: ProductCardProps) {
                 )}
 
                 {/* Name */}
-                <a href={`/products/${product.slug}`} className="block">
+                <Link href={`/products/${product.slug}`} className="block">
                     <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug hover:text-violet-600 transition-colors">
                         {product.name}
                     </h3>
-                </a>
+                </Link>
 
                 {/* Stock */}
                 <div className="mt-1.5">

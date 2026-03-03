@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+    email: z.string().min(1, 'E-mail obrigatório').email('E-mail inválido'),
+    password: z.string().min(1, 'Senha obrigatória'),
+});
 
 interface LoginForm {
     email: string;
@@ -15,8 +21,24 @@ export default function Login() {
         remember: false,
     });
 
+    const [clientErrors, setClientErrors] = useState<Partial<Record<keyof LoginForm, string>>>({});
+    const mergedErrors = { ...clientErrors, ...errors };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const result = loginSchema.safeParse(data);
+        if (!result.success) {
+            const fieldErrors: Partial<Record<keyof LoginForm, string>> = {};
+            result.error.issues.forEach((issue: z.ZodIssue) => {
+                const field = issue.path[0] as keyof LoginForm;
+                if (!fieldErrors[field]) { fieldErrors[field] = issue.message; }
+            });
+            setClientErrors(fieldErrors);
+            return;
+        }
+
+        setClientErrors({});
         post('/login', {
             onError: () => toast.error('Credenciais inválidas. Tente novamente.'),
             onFinish: () => reset('password'),
@@ -52,17 +74,16 @@ export default function Login() {
                                 id="email"
                                 type="email"
                                 value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
+                                onChange={(e) => { setData('email', e.target.value); setClientErrors((p) => ({ ...p, email: undefined })); }}
                                 placeholder="seu@email.com"
                                 autoComplete="email"
-                                required
-                                aria-describedby={errors.email ? 'email-error' : undefined}
+                                aria-describedby={mergedErrors.email ? 'email-error' : undefined}
                                 className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                    ${mergedErrors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
                             />
-                            {errors.email && (
+                            {mergedErrors.email && (
                                 <p id="email-error" role="alert" className="mt-1.5 text-xs text-red-600">
-                                    {errors.email}
+                                    {mergedErrors.email}
                                 </p>
                             )}
                         </div>
@@ -81,17 +102,16 @@ export default function Login() {
                                 id="password"
                                 type="password"
                                 value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
+                                onChange={(e) => { setData('password', e.target.value); setClientErrors((p) => ({ ...p, password: undefined })); }}
                                 placeholder="••••••••"
                                 autoComplete="current-password"
-                                required
-                                aria-describedby={errors.password ? 'password-error' : undefined}
+                                aria-describedby={mergedErrors.password ? 'password-error' : undefined}
                                 className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                    ${mergedErrors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
                             />
-                            {errors.password && (
+                            {mergedErrors.password && (
                                 <p id="password-error" role="alert" className="mt-1.5 text-xs text-red-600">
-                                    {errors.password}
+                                    {mergedErrors.password}
                                 </p>
                             )}
                         </div>

@@ -1,8 +1,40 @@
 import React, { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
+import { z } from 'zod';
 import PublicLayout from '@/Layouts/PublicLayout';
 import type { CheckoutPageProps, Cart } from '@/types/public';
+
+const addressSchema = z.object({
+    name: z.string().min(1, 'Nome obrigatório'),
+    street: z.string().min(1, 'Endereço obrigatório'),
+    city: z.string().min(1, 'Cidade obrigatória'),
+    state: z.string().min(2, 'Estado obrigatório'),
+    zip: z.string().min(8, 'CEP inválido'),
+    country: z.string().min(1, 'País obrigatório'),
+});
+
+function buildCheckoutSchema(sameBilling: boolean) {
+    const shipping = z.object({
+        shipping_name: addressSchema.shape.name,
+        shipping_street: addressSchema.shape.street,
+        shipping_city: addressSchema.shape.city,
+        shipping_state: addressSchema.shape.state,
+        shipping_zip: addressSchema.shape.zip,
+        shipping_country: addressSchema.shape.country,
+    });
+    if (sameBilling) { return shipping; }
+    return shipping.merge(
+        z.object({
+            billing_name: addressSchema.shape.name,
+            billing_street: addressSchema.shape.street,
+            billing_city: addressSchema.shape.city,
+            billing_state: addressSchema.shape.state,
+            billing_zip: addressSchema.shape.zip,
+            billing_country: addressSchema.shape.country,
+        }),
+    );
+}
 
 // ——— Mock ————————————————————————————————————————————————
 
@@ -123,12 +155,31 @@ export default function Checkout({ cart }: Partial<CheckoutPageProps>) {
         notes: '',
     });
 
+    const [clientErrors, setClientErrors] = useState<Partial<Record<string, string>>>({});
+    const mergedErrors = { ...clientErrors, ...(errors as Partial<Record<string, string>>) };
+
     const handleChange = (field: string, value: string) => {
         setData(field as keyof CheckoutFormData, value);
+        setClientErrors((p) => ({ ...p, [field]: undefined }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const schema = buildCheckoutSchema(sameBilling);
+        const result = schema.safeParse(data);
+        if (!result.success) {
+            const fieldErrors: Partial<Record<string, string>> = {};
+            result.error.issues.forEach((issue: z.ZodIssue) => {
+                const field = String(issue.path[0]);
+                if (!fieldErrors[field]) { fieldErrors[field] = issue.message; }
+            });
+            setClientErrors(fieldErrors);
+            toast.error('Preencha todos os campos obrigatórios.');
+            return;
+        }
+
+        setClientErrors({});
         post('/customer/orders', {
             onSuccess: () => toast.success('Pedido realizado com sucesso!'),
             onError: () => toast.error('Erro ao finalizar pedido. Verifique os dados.'),
@@ -153,7 +204,7 @@ export default function Checkout({ cart }: Partial<CheckoutPageProps>) {
                                 <AddressSection
                                     prefix="shipping"
                                     values={data as unknown as Record<string, string>}
-                                    errors={errors as Partial<Record<string, string>>}
+                                    errors={mergedErrors}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -182,7 +233,7 @@ export default function Checkout({ cart }: Partial<CheckoutPageProps>) {
                                     <AddressSection
                                         prefix="billing"
                                         values={data as unknown as Record<string, string>}
-                                        errors={errors as Partial<Record<string, string>>}
+                                        errors={mergedErrors}
                                         onChange={handleChange}
                                     />
                                 )}

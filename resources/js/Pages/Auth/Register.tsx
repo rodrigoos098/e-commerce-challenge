@@ -1,6 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
+import { z } from 'zod';
+
+const registerSchema = z.object({
+    name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
+    email: z.string().min(1, 'E-mail obrigatório').email('E-mail inválido'),
+    password: z.string().min(8, 'Senha deve ter ao menos 8 caracteres'),
+    password_confirmation: z.string().min(1, 'Confirmação obrigatória'),
+}).refine((d) => d.password === d.password_confirmation, {
+    message: 'As senhas não conferem',
+    path: ['password_confirmation'],
+});
 
 interface RegisterForm {
     name: string;
@@ -17,8 +28,27 @@ export default function Register() {
         password_confirmation: '',
     });
 
+    const [clientErrors, setClientErrors] = useState<Partial<Record<keyof RegisterForm, string>>>({});
+    const mergedErrors = { ...clientErrors, ...errors };
+
+    const clearField = (field: keyof RegisterForm) =>
+        setClientErrors((p) => ({ ...p, [field]: undefined }));
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const result = registerSchema.safeParse(data);
+        if (!result.success) {
+            const fieldErrors: Partial<Record<keyof RegisterForm, string>> = {};
+            result.error.issues.forEach((issue: z.ZodIssue) => {
+                const field = issue.path[0] as keyof RegisterForm;
+                if (!fieldErrors[field]) { fieldErrors[field] = issue.message; }
+            });
+            setClientErrors(fieldErrors);
+            return;
+        }
+
+        setClientErrors({});
         post('/register', {
             onError: () => toast.error('Erro ao criar conta. Verifique os campos e tente novamente.'),
             onFinish: () => reset('password', 'password_confirmation'),
@@ -53,16 +83,15 @@ export default function Register() {
                                 id="name"
                                 type="text"
                                 value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
+                                onChange={(e) => { setData('name', e.target.value); clearField('name'); }}
                                 placeholder="João da Silva"
                                 autoComplete="name"
-                                required
-                                aria-describedby={errors.name ? 'name-error' : undefined}
+                                aria-describedby={mergedErrors.name ? 'name-error' : undefined}
                                 className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${errors.name ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                    ${mergedErrors.name ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
                             />
-                            {errors.name && (
-                                <p id="name-error" role="alert" className="mt-1.5 text-xs text-red-600">{errors.name}</p>
+                            {mergedErrors.name && (
+                                <p id="name-error" role="alert" className="mt-1.5 text-xs text-red-600">{mergedErrors.name}</p>
                             )}
                         </div>
 
@@ -75,16 +104,15 @@ export default function Register() {
                                 id="email"
                                 type="email"
                                 value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
+                                onChange={(e) => { setData('email', e.target.value); clearField('email'); }}
                                 placeholder="seu@email.com"
                                 autoComplete="email"
-                                required
-                                aria-describedby={errors.email ? 'email-error' : undefined}
+                                aria-describedby={mergedErrors.email ? 'email-error' : undefined}
                                 className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                    ${mergedErrors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
                             />
-                            {errors.email && (
-                                <p id="email-error" role="alert" className="mt-1.5 text-xs text-red-600">{errors.email}</p>
+                            {mergedErrors.email && (
+                                <p id="email-error" role="alert" className="mt-1.5 text-xs text-red-600">{mergedErrors.email}</p>
                             )}
                         </div>
 
@@ -97,17 +125,15 @@ export default function Register() {
                                 id="password"
                                 type="password"
                                 value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
+                                onChange={(e) => { setData('password', e.target.value); clearField('password'); }}
                                 placeholder="Mínimo 8 caracteres"
                                 autoComplete="new-password"
-                                required
-                                minLength={8}
-                                aria-describedby={errors.password ? 'password-error' : undefined}
+                                aria-describedby={mergedErrors.password ? 'password-error' : undefined}
                                 className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                    ${mergedErrors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
                             />
-                            {errors.password && (
-                                <p id="password-error" role="alert" className="mt-1.5 text-xs text-red-600">{errors.password}</p>
+                            {mergedErrors.password && (
+                                <p id="password-error" role="alert" className="mt-1.5 text-xs text-red-600">{mergedErrors.password}</p>
                             )}
                         </div>
 
@@ -120,16 +146,15 @@ export default function Register() {
                                 id="password_confirmation"
                                 type="password"
                                 value={data.password_confirmation}
-                                onChange={(e) => setData('password_confirmation', e.target.value)}
+                                onChange={(e) => { setData('password_confirmation', e.target.value); clearField('password_confirmation'); }}
                                 placeholder="Repita a senha"
                                 autoComplete="new-password"
-                                required
-                                aria-describedby={errors.password_confirmation ? 'pw-confirm-error' : undefined}
+                                aria-describedby={mergedErrors.password_confirmation ? 'pw-confirm-error' : undefined}
                                 className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${errors.password_confirmation ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                    ${mergedErrors.password_confirmation ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
                             />
-                            {errors.password_confirmation && (
-                                <p id="pw-confirm-error" role="alert" className="mt-1.5 text-xs text-red-600">{errors.password_confirmation}</p>
+                            {mergedErrors.password_confirmation && (
+                                <p id="pw-confirm-error" role="alert" className="mt-1.5 text-xs text-red-600">{mergedErrors.password_confirmation}</p>
                             )}
                         </div>
 
