@@ -56,10 +56,10 @@
 - [x] Perfil do Usuário
 
 ### Agente 5: Documentação & DevOps
-- [ ] Swagger/OpenAPI
-- [ ] PROJECT.md
-- [ ] Logging estruturado
-- [ ] Pint, ESLint, Prettier, TypeScript config
+- [x] Swagger/OpenAPI
+- [x] PROJECT.md
+- [x] Logging estruturado
+- [x] Pint, ESLint, Prettier, TypeScript config
 
 ## Fase 2 — Integração
 - [ ] Conectar rotas web Inertia com controllers
