@@ -65,7 +65,8 @@ class CategoryApiTest extends TestCase
         $response = $this->getJson('/api/v1/categories/9999');
 
         $response->assertStatus(404)
-            ->assertJsonPath('success', false);
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['success', 'message']);
     }
 
     // ── Products by Category ──────────────────────────────────────────────────

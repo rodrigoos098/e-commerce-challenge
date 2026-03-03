@@ -47,6 +47,11 @@ Route::prefix('v1')->group(function (): void {
             Route::delete('products/{product}', [ProductController::class, 'destroy']);
             Route::get('products/low-stock', [ProductController::class, 'lowStock']);
 
+            // Categories (admin CRUD)
+            Route::post('categories', [CategoryController::class, 'store']);
+            Route::put('categories/{category}', [CategoryController::class, 'update']);
+            Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
+
             // Orders (admin status update)
             Route::put('orders/{order}/status', [OrderController::class, 'updateStatus']);
         });

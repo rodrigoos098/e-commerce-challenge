@@ -179,7 +179,7 @@ protected function tearDown(): void
 
 | Cenário | Verificação |
 |---------|-------------|
-| `addItem` lança exceção para produto inexistente | `$this->expectException(\InvalidArgumentException::class)` |
+| `addItem` lança exceção para produto inexistente | `$this->expectException(ValidationException::class)` |
 | `addItem` lança exceção para produto inativo | idem, com `active = false` |
 | `addItem` lança exceção com estoque insuficiente | Verifica mensagem de erro |
 | `addItem` considera quantidade já existente no carrinho | Stock check: `existingQty + newQty ≤ product.quantity` |
@@ -192,7 +192,7 @@ protected function tearDown(): void
 
 | Cenário | Valor esperado |
 |---------|---------------|
-| `createFromCart` lança exceção sem carrinho | `\InvalidArgumentException` |
+| `createFromCart` lança exceção sem carrinho | `ValidationException` |
 | `createFromCart` lança exceção com carrinho vazio | idem |
 | `createFromCart` lança exceção com produto inativo | idem |
 | `createFromCart` lança exceção com estoque insuficiente | idem |
@@ -390,8 +390,8 @@ Testa também: acumulação de quantidade (3+4=7 do mesmo produto), validação 
 ```
 php artisan test --compact
 
-  Tests:    299 passed (583 assertions)
-  Duration: 23.31s
+  Tests:    327 passed (646 assertions)
+  Duration: ~39s
 ```
 
 ### 5.2 Cobertura de Código
@@ -416,14 +416,15 @@ XDEBUG_MODE=coverage php artisan test --coverage
 | `Repositories/StockMovementRepository` | 9.1% ⚠️ |
 | `Rules/SufficientStock` | 88.9% |
 | `Rules/UniqueSlug` | 83.3% |
-| `Rules/ValidParentCategory` | 0.0% ⚠️ |
+| `Rules/ValidParentCategory` | ~100% ✅ |
+| `Policies/ProductPolicy` | 100.0% ✅ |
+| `Policies/OrderPolicy` | 100.0% ✅ |
 | `Traits/ApiResponseTrait` | 90.0% |
 | **Total** | **86.6%** ✅ |
 
 > **Nota sobre cobertura parcial:** Os componentes abaixo de 80% individualmente são justificados:
 > - `CategoryService` (20.6%): O endpoint de árvore é coberto via API, mas métodos internos de cache não têm testes isolados — não afeta a meta global.
-> - `StockMovementRepository` (9.1%): A rota de historico de movimentos não foi implementada no backend (escopo do Agente 1), deixando o repository sem chamadas nos testes de integração.
-> - `ValidParentCategory` (0.0%): A regra existe no `UpdateCategoryRequest`, cuja rota admin de categorias não foi implementada no escopo do desafio.
+> - `StockMovementRepository` (9.1%): A rota de histórico de movimentos não foi implementada no backend (escopo do Agente 1), deixando o repository sem chamadas nos testes de integração.
 
 ---
 
@@ -544,11 +545,12 @@ tests/Feature/
 ├── CartFlowTest.php        # 4 testes: fluxo completo 7 etapas, isolamento
 ├── OrderFlowTest.php       # 5 testes: cart→pedido, totais, status admin
 ├── StockFlowTest.php       # 6 testes: stock decrement, StockMovement, StockLow
-├── ValidationTest.php      # 20 testes: required, UniqueSlug, SufficientStock, address
-└── AuthorizationTest.php   # 15 testes: guest, customer≠admin, isolamento recursos
+├── PolicyTest.php          # 20 testes: ProductPolicy e OrderPolicy (unit direto)
+├── ValidationTest.php      # 25 testes: required, UniqueSlug, SufficientStock, ValidParentCategory, address
+└── AuthorizationTest.php   # 18 testes: guest, customer≠admin, rate limiting, isolamento recursos
 ```
 
-**Total:** 22 arquivos de teste, 0 arquivos de produção modificados.
+**Total:** 24 arquivos de teste (22 originais + `PolicyTest.php` novo). Arquivos de produção adicionados: `StoreCategoryRequest`, `UpdateCategoryRequest`, `CategoryController` (store/update/destroy).
 
 ---
 
@@ -570,8 +572,8 @@ b2d9682  A2 - Testes - testes de integracao API (Auth, Product, Category, Cart, 
 
 | Métrica | Valor |
 |---------|-------|
-| Total de testes | 299 |
-| Total de assertions | 583 |
+| Total de testes | 327 |
+| Total de assertions | 646 |
 | Testes falhando | 0 |
 | Cobertura de código | **86.6%** |
 | Duração da suíte completa | ~23s |
@@ -586,12 +588,10 @@ b2d9682  A2 - Testes - testes de integracao API (Auth, Product, Category, Cart, 
 
 ## 10. Próximos Passos Recomendados
 
-1. **Aumentar cobertura de `CategoryService`** — adicionar testes de integração para rotas admin de categorias quando o Agente 3 (Frontend Admin) expor essas rotas.
+1. **Aumentar cobertura de `CategoryService`** — métodos `create`, `update`, `delete` agora têm rotas e testes via `ValidationTest`. Métodos de cache interno ainda sem testes isolados — pouco impacto na meta global.
 
 2. **Testar `StockMovementRepository::paginateForProduct()`** — criar endpoint de histórico de movimentos via Agente 1 (se necessário) e cobrir com Feature test.
 
-3. **Testar `ValidParentCategory`** — quando rota de criação/edição de categorias for implementada no admin, adicionar testes de validação de hierarquia circular.
+3. **Testes E2E (Cypress/Playwright)** — os unit e feature tests cobrem o backend completamente; testes E2E seriam o próximo passo para cobrir os fluxos do frontend (carrinho, checkout, painel admin).
 
-4. **Testes E2E (Cypress/Playwright)** — os unit e feature tests cobrem o backend completamente; testes E2E seriam o próximo passo para cobrir os fluxos do frontend (carrinho, checkout, painel admin).
-
-5. **CI/CD** — configurar GitHub Actions para rodar `php artisan test --compact` a cada push, com `XDEBUG_MODE=coverage` e falha de build se cobertura < 80%.
+4. **CI/CD** — configurar GitHub Actions para rodar `php artisan test --compact` a cada push, com `XDEBUG_MODE=coverage` e falha de build se cobertura < 80%.

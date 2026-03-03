@@ -6,7 +6,9 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\RateLimiter;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -219,5 +221,71 @@ class AuthorizationTest extends TestCase
         $this->actingAs($customer2, 'sanctum')
             ->putJson("/api/v1/cart/items/{$item->id}", ['quantity' => 5])
             ->assertStatus(404);
+    }
+
+    // ── Rate limiting ──────────────────────────────────────────────────────────────
+
+    public function test_api_rate_limiting_returns_429_when_limit_exceeded(): void
+    {
+        Product::factory()->count(3)->create(['active' => true]);
+
+        // Use a unique key per test so accumulated hits from other tests don't interfere
+        $uniqueKey = 'rate-limit-test-'.uniqid();
+        RateLimiter::for('api', fn ($request) => Limit::perMinute(3)->by($uniqueKey));
+
+        for ($i = 0; $i < 3; $i++) {
+            $this->getJson('/api/v1/products')->assertStatus(200);
+        }
+
+        $this->getJson('/api/v1/products')->assertStatus(429);
+
+        // Restore using user-based key limit so other tests are not affected
+        RateLimiter::for('api', fn ($request) => Limit::perMinute(1000)->by(
+            $request->user()?->id ?: $request->ip()
+        ));
+    }
+
+    public function test_authenticated_user_does_not_exceed_rate_limit_normally(): void
+    {
+        $customer = $this->createCustomer();
+
+        // With a high per-user limit, authenticated users should not be rate limited
+        RateLimiter::for('api', fn ($request) => Limit::perMinute(100)->by(
+            $request->user()?->id ?: $request->ip()
+        ));
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->actingAs($customer, 'sanctum')
+                ->getJson('/api/v1/orders')
+                ->assertStatus(200);
+        }
+
+        RateLimiter::for('api', fn ($request) => Limit::perMinute(1000)->by(
+            $request->user()?->id ?: $request->ip()
+        ));
+    }
+
+    public function test_authenticated_user_rate_limit_uses_user_id_as_key(): void
+    {
+        $customer = $this->createCustomer();
+
+        // Set limit to 3 per minute scoped to user ID
+        RateLimiter::for('api', fn ($request) => Limit::perMinute(3)->by(
+            $request->user()?->id ?: $request->ip()
+        ));
+
+        for ($i = 0; $i < 3; $i++) {
+            $this->actingAs($customer, 'sanctum')
+                ->getJson('/api/v1/orders')
+                ->assertStatus(200);
+        }
+
+        $this->actingAs($customer, 'sanctum')
+            ->getJson('/api/v1/orders')
+            ->assertStatus(429);
+
+        RateLimiter::for('api', fn ($request) => Limit::perMinute(1000)->by(
+            $request->user()?->id ?: $request->ip()
+        ));
     }
 }

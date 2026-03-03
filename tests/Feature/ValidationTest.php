@@ -264,4 +264,65 @@ class ValidationTest extends TestCase
             ->assertStatus(422)
             ->assertJsonStructure(['errors' => ['status']]);
     }
+
+    // ── ValidParentCategory rule ───────────────────────────────────────────────────
+
+    public function test_valid_parent_category_rule_rejects_nonexistent_parent(): void
+    {
+        $this->actingAs($this->admin, 'sanctum')
+            ->postJson('/api/v1/categories', [
+                'name' => 'Nova Categoria',
+                'parent_id' => 9999,
+            ])
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['parent_id']]);
+    }
+
+    public function test_valid_parent_category_rule_accepts_null_parent(): void
+    {
+        $this->actingAs($this->admin, 'sanctum')
+            ->postJson('/api/v1/categories', [
+                'name' => 'Categoria Raiz '.uniqid(),
+                'parent_id' => null,
+            ])
+            ->assertStatus(201);
+    }
+
+    public function test_valid_parent_category_rule_accepts_valid_parent(): void
+    {
+        $parent = Category::factory()->create();
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->postJson('/api/v1/categories', [
+                'name' => 'Categoria Filha '.uniqid(),
+                'parent_id' => $parent->id,
+            ])
+            ->assertStatus(201);
+    }
+
+    public function test_valid_parent_category_rule_rejects_self_as_parent(): void
+    {
+        $category = Category::factory()->create();
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/v1/categories/{$category->id}", [
+                'parent_id' => $category->id,
+            ])
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['parent_id']]);
+    }
+
+    public function test_valid_parent_category_rule_rejects_circular_reference(): void
+    {
+        $parent = Category::factory()->create();
+        $child = Category::factory()->create(['parent_id' => $parent->id]);
+
+        // Setting $parent's parent to $child would create a circle
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/v1/categories/{$parent->id}", [
+                'parent_id' => $child->id,
+            ])
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['parent_id']]);
+    }
 }

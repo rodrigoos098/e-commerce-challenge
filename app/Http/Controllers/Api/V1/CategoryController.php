@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreCategoryRequest;
+use App\Http\Requests\Api\V1\UpdateCategoryRequest;
 use App\Http\Resources\Api\V1\CategoryResource;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Category;
@@ -43,6 +45,36 @@ class CategoryController extends Controller
         }
 
         return $this->successResponse(new CategoryResource($category));
+    }
+
+    /**
+     * Create a new category (admin only).
+     */
+    public function store(StoreCategoryRequest $request): JsonResponse
+    {
+        $category = $this->categoryService->create($request->validated());
+
+        return $this->createdResponse(new CategoryResource($category));
+    }
+
+    /**
+     * Update an existing category (admin only).
+     */
+    public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
+    {
+        $updated = $this->categoryService->update($category, $request->validated());
+
+        return $this->successResponse(new CategoryResource($updated));
+    }
+
+    /**
+     * Delete a category (admin only).
+     */
+    public function destroy(Category $category): JsonResponse
+    {
+        $this->categoryService->delete($category);
+
+        return $this->successResponse(null);
     }
 
     /**

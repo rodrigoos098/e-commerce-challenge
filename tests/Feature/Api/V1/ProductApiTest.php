@@ -104,7 +104,8 @@ class ProductApiTest extends TestCase
         $response = $this->getJson('/api/v1/products/9999');
 
         $response->assertStatus(404)
-            ->assertJsonPath('success', false);
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['success', 'message']);
     }
 
     // ── Store (admin) ─────────────────────────────────────────────────────────
@@ -165,7 +166,8 @@ class ProductApiTest extends TestCase
             ->postJson('/api/v1/products', []);
 
         $response->assertStatus(422)
-            ->assertJsonPath('success', false);
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['success', 'errors' => ['name', 'description', 'price', 'quantity', 'category_id']]);
     }
 
     public function test_admin_can_create_product_with_tags(): void
@@ -260,7 +262,8 @@ class ProductApiTest extends TestCase
             ->getJson('/api/v1/products/low-stock');
 
         $response->assertStatus(200)
-            ->assertJsonPath('success', true);
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure(['success', 'data']);
 
         $this->assertCount(1, $response->json('data'));
     }

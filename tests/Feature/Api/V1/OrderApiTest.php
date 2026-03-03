@@ -194,7 +194,8 @@ class OrderApiTest extends TestCase
             ]);
 
         $response->assertStatus(422)
-            ->assertJsonPath('success', false);
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['success', 'errors']);
     }
 
     public function test_create_order_clears_cart(): void
@@ -221,7 +222,8 @@ class OrderApiTest extends TestCase
             ->postJson('/api/v1/orders', []);
 
         $response->assertStatus(422)
-            ->assertJsonPath('success', false);
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['success', 'errors']);
     }
 
     // ── UpdateStatus (admin) ──────────────────────────────────────────────────
