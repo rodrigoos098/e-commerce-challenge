@@ -4,7 +4,6 @@ namespace Tests\Unit\Services;
 
 use App\DTOs\OrderDTO;
 use App\Events\OrderCreated;
-use App\Jobs\ProcessOrderJob;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
@@ -13,8 +12,10 @@ use App\Repositories\Contracts\CartRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Services\OrderService;
+use App\Services\StockService;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use Mockery;
@@ -28,220 +29,214 @@ class OrderServiceTest extends TestCase
         ?OrderRepositoryInterface $orderRepo = null,
         ?CartRepositoryInterface $cartRepo = null,
         ?ProductRepositoryInterface $productRepo = null,
+        ?StockService $stockService = null,
     ): OrderService {
         $orderRepo ??= Mockery::mock(OrderRepositoryInterface::class);
         $cartRepo ??= Mockery::mock(CartRepositoryInterface::class);
         $productRepo ??= Mockery::mock(ProductRepositoryInterface::class);
+        $stockService ??= Mockery::mock(StockService::class);
 
-        return new OrderService($orderRepo, $cartRepo, $productRepo);
+        return new OrderService($orderRepo, $cartRepo, $productRepo, $stockService);
     }
 
-    // ── CreateFromCart — Validations ───────────────────────────────────────────
-
-    public function test_create_from_cart_throws_when_no_cart_found(): void
+    /**
+     * @param  Collection<int, CartItem>  $items
+     */
+    private function makeCart(Collection $items): Cart
     {
-        $dto = new OrderDTO(
+        $cart = Cart::factory()->make(['id' => 1]);
+        $cart->setRelation('items', $items);
+
+        return $cart;
+    }
+
+    private function makeCartItem(Product $product, int $quantity): CartItem
+    {
+        $cartItem = CartItem::factory()->make([
+            'product_id' => $product->id,
+            'quantity' => $quantity,
+        ]);
+        $cartItem->setRelation('product', $product);
+
+        return $cartItem;
+    }
+
+    private function makeDto(): OrderDTO
+    {
+        return new OrderDTO(
             userId: 1,
             shippingAddress: ['street' => '1 Main', 'city' => 'SP', 'state' => 'SP', 'zip_code' => '01234', 'country' => 'BR'],
             billingAddress: ['street' => '1 Main', 'city' => 'SP', 'state' => 'SP', 'zip_code' => '01234', 'country' => 'BR'],
         );
+    }
 
+    public function test_create_from_cart_throws_when_no_cart_found(): void
+    {
         $cartRepo = Mockery::mock(CartRepositoryInterface::class);
         $cartRepo->shouldReceive('findByUserId')->andReturn(null);
 
         $this->expectException(ValidationException::class);
 
-        $this->makeService(cartRepo: $cartRepo)->createFromCart($dto);
+        $this->makeService(cartRepo: $cartRepo)->createFromCart($this->makeDto());
     }
 
     public function test_create_from_cart_throws_when_cart_is_empty(): void
     {
-        $cart = Cart::factory()->make(['id' => 1]);
-        $cart->setRelation('items', collect());
-
-        $dto = new OrderDTO(
-            userId: 1,
-            shippingAddress: ['street' => '1 Main', 'city' => 'SP', 'state' => 'SP', 'zip_code' => '01234', 'country' => 'BR'],
-            billingAddress: ['street' => '1 Main', 'city' => 'SP', 'state' => 'SP', 'zip_code' => '01234', 'country' => 'BR'],
-        );
-
         $cartRepo = Mockery::mock(CartRepositoryInterface::class);
-        $cartRepo->shouldReceive('findByUserId')->andReturn($cart);
+        $cartRepo->shouldReceive('findByUserId')->andReturn($this->makeCart(collect()));
 
         $this->expectException(ValidationException::class);
 
-        $this->makeService(cartRepo: $cartRepo)->createFromCart($dto);
+        $this->makeService(cartRepo: $cartRepo)->createFromCart($this->makeDto());
     }
 
     public function test_create_from_cart_throws_when_product_inactive(): void
     {
-        $product = Product::factory()->make(['id' => 5, 'active' => false, 'quantity' => 10, 'price' => 50.0]);
-        $cartItem = CartItem::factory()->make(['product_id' => 5, 'quantity' => 1]);
-        $cartItem->setRelation('product', $product);
-
-        $cart = Cart::factory()->make(['id' => 1]);
-        $cart->setRelation('items', collect([$cartItem]));
-
-        $dto = new OrderDTO(userId: 1, shippingAddress: [], billingAddress: []);
+        $product = Product::factory()->make([
+            'id' => 5,
+            'active' => false,
+            'quantity' => 10,
+            'price' => 50.0,
+        ]);
+        $cart = $this->makeCart(collect([$this->makeCartItem($product, 1)]));
 
         $cartRepo = Mockery::mock(CartRepositoryInterface::class);
         $cartRepo->shouldReceive('findByUserId')->andReturn($cart);
 
         $productRepo = Mockery::mock(ProductRepositoryInterface::class);
-        $productRepo->shouldReceive('findById')->with(5)->andReturn($product);
+        $productRepo->shouldReceive('findByIdsForUpdate')->with([5])->andReturn(new EloquentCollection([$product]));
 
         $this->expectException(ValidationException::class);
 
-        $this->makeService(cartRepo: $cartRepo, productRepo: $productRepo)->createFromCart($dto);
+        $this->makeService(cartRepo: $cartRepo, productRepo: $productRepo)->createFromCart($this->makeDto());
     }
 
     public function test_create_from_cart_throws_when_insufficient_stock(): void
     {
-        $product = Product::factory()->make(['id' => 5, 'active' => true, 'quantity' => 1, 'price' => 50.0, 'name' => 'Produto X']);
-        $cartItem = CartItem::factory()->make(['product_id' => 5, 'quantity' => 5]);
-        $cartItem->setRelation('product', $product);
-
-        $cart = Cart::factory()->make(['id' => 1]);
-        $cart->setRelation('items', collect([$cartItem]));
-
-        $dto = new OrderDTO(userId: 1, shippingAddress: [], billingAddress: []);
+        $product = Product::factory()->make([
+            'id' => 5,
+            'active' => true,
+            'quantity' => 1,
+            'price' => 50.0,
+            'name' => 'Produto X',
+        ]);
+        $cart = $this->makeCart(collect([$this->makeCartItem($product, 5)]));
 
         $cartRepo = Mockery::mock(CartRepositoryInterface::class);
         $cartRepo->shouldReceive('findByUserId')->andReturn($cart);
 
         $productRepo = Mockery::mock(ProductRepositoryInterface::class);
-        $productRepo->shouldReceive('findById')->with(5)->andReturn($product);
+        $productRepo->shouldReceive('findByIdsForUpdate')->with([5])->andReturn(new EloquentCollection([$product]));
 
         $this->expectException(ValidationException::class);
 
-        $this->makeService(cartRepo: $cartRepo, productRepo: $productRepo)->createFromCart($dto);
+        $this->makeService(cartRepo: $cartRepo, productRepo: $productRepo)->createFromCart($this->makeDto());
     }
-
-    // ── CreateFromCart — Success ───────────────────────────────────────────────
 
     public function test_create_from_cart_fires_order_created_event(): void
     {
         Event::fake();
-        Bus::fake();
 
         $product = Product::factory()->make([
-            'id' => 5, 'active' => true, 'quantity' => 10,
-            'price' => 50.0, 'min_quantity' => 2,
+            'id' => 5,
+            'active' => true,
+            'quantity' => 10,
+            'price' => 50.0,
+            'min_quantity' => 2,
         ]);
-
-        $cartItem = CartItem::factory()->make(['product_id' => 5, 'quantity' => 2]);
-        $cartItem->setRelation('product', $product);
-
-        $cart = Cart::factory()->make(['id' => 1]);
-        $cart->setRelation('items', collect([$cartItem]));
-
+        $cart = $this->makeCart(collect([$this->makeCartItem($product, 2)]));
         $order = Order::factory()->make(['id' => 100]);
-        $order->setRelation('items', collect([$cartItem]));
-
-        $dto = new OrderDTO(
-            userId: 1,
-            shippingAddress: ['street' => '1St', 'city' => 'SP', 'state' => 'SP', 'zip_code' => '01234', 'country' => 'BR'],
-            billingAddress: ['street' => '1St', 'city' => 'SP', 'state' => 'SP', 'zip_code' => '01234', 'country' => 'BR'],
-        );
 
         $cartRepo = Mockery::mock(CartRepositoryInterface::class);
         $cartRepo->shouldReceive('findByUserId')->andReturn($cart);
-        $cartRepo->shouldReceive('clear')->andReturn(true);
+        $cartRepo->shouldReceive('clear')->once()->andReturn(true);
 
         $productRepo = Mockery::mock(ProductRepositoryInterface::class);
-        $productRepo->shouldReceive('findById')->andReturn($product);
+        $productRepo->shouldReceive('findByIdsForUpdate')->with([5])->andReturn(new EloquentCollection([$product]));
 
         $orderRepo = Mockery::mock(OrderRepositoryInterface::class);
         $orderRepo->shouldReceive('create')->andReturn($order);
 
-        $this->makeService($orderRepo, $cartRepo, $productRepo)->createFromCart($dto);
+        $stockService = Mockery::mock(StockService::class);
+        $stockService->shouldReceive('decreaseStockForLockedProduct')->once()->with($product, 2, 100);
+
+        $this->makeService($orderRepo, $cartRepo, $productRepo, $stockService)->createFromCart($this->makeDto());
 
         Event::assertDispatched(OrderCreated::class);
     }
 
-    public function test_create_from_cart_dispatches_process_order_job(): void
+    public function test_create_from_cart_decreases_stock_synchronously(): void
     {
         Event::fake();
-        Bus::fake();
 
         $product = Product::factory()->make([
-            'id' => 5, 'active' => true, 'quantity' => 10, 'price' => 50.0, 'min_quantity' => 2,
+            'id' => 5,
+            'active' => true,
+            'quantity' => 10,
+            'price' => 50.0,
+            'min_quantity' => 2,
         ]);
-
-        $cartItem = CartItem::factory()->make(['product_id' => 5, 'quantity' => 1]);
-        $cartItem->setRelation('product', $product);
-
-        $cart = Cart::factory()->make(['id' => 1]);
-        $cart->setRelation('items', collect([$cartItem]));
-
+        $cart = $this->makeCart(collect([$this->makeCartItem($product, 3)]));
         $order = Order::factory()->make(['id' => 100]);
-        $order->setRelation('items', collect([$cartItem]));
-
-        $dto = new OrderDTO(userId: 1, shippingAddress: [], billingAddress: []);
 
         $cartRepo = Mockery::mock(CartRepositoryInterface::class);
         $cartRepo->shouldReceive('findByUserId')->andReturn($cart);
-        $cartRepo->shouldReceive('clear')->andReturn(true);
+        $cartRepo->shouldReceive('clear')->once()->andReturn(true);
 
         $productRepo = Mockery::mock(ProductRepositoryInterface::class);
-        $productRepo->shouldReceive('findById')->andReturn($product);
+        $productRepo->shouldReceive('findByIdsForUpdate')->with([5])->andReturn(new EloquentCollection([$product]));
 
         $orderRepo = Mockery::mock(OrderRepositoryInterface::class);
         $orderRepo->shouldReceive('create')->andReturn($order);
 
-        $this->makeService($orderRepo, $cartRepo, $productRepo)->createFromCart($dto);
+        $stockService = Mockery::mock(StockService::class);
+        $stockService->shouldReceive('decreaseStockForLockedProduct')->once()->with($product, 3, 100);
 
-        Bus::assertDispatched(ProcessOrderJob::class);
+        $this->makeService($orderRepo, $cartRepo, $productRepo, $stockService)->createFromCart($this->makeDto());
     }
 
     public function test_create_from_cart_calculates_totals_correctly(): void
     {
         Event::fake();
-        Bus::fake();
 
         $product = Product::factory()->make([
-            'id' => 5, 'active' => true, 'quantity' => 10, 'price' => 100.0, 'min_quantity' => 2,
+            'id' => 5,
+            'active' => true,
+            'quantity' => 10,
+            'price' => 100.0,
+            'min_quantity' => 2,
         ]);
-
-        $cartItem = CartItem::factory()->make(['product_id' => 5, 'quantity' => 3]);
-        $cartItem->setRelation('product', $product);
-
-        $cart = Cart::factory()->make(['id' => 1]);
-        $cart->setRelation('items', collect([$cartItem]));
-
+        $cart = $this->makeCart(collect([$this->makeCartItem($product, 3)]));
         $capturedOrderData = null;
         $order = Order::factory()->make(['id' => 100]);
-        $order->setRelation('items', collect());
-
-        $dto = new OrderDTO(userId: 1, shippingAddress: [], billingAddress: []);
 
         $cartRepo = Mockery::mock(CartRepositoryInterface::class);
         $cartRepo->shouldReceive('findByUserId')->andReturn($cart);
-        $cartRepo->shouldReceive('clear')->andReturn(true);
+        $cartRepo->shouldReceive('clear')->once()->andReturn(true);
 
         $productRepo = Mockery::mock(ProductRepositoryInterface::class);
-        $productRepo->shouldReceive('findById')->andReturn($product);
+        $productRepo->shouldReceive('findByIdsForUpdate')->with([5])->andReturn(new EloquentCollection([$product]));
 
         $orderRepo = Mockery::mock(OrderRepositoryInterface::class);
         $orderRepo->shouldReceive('create')
             ->once()
-            ->withArgs(function ($orderData, $items) use (&$capturedOrderData) {
+            ->withArgs(function (array $orderData, array $items) use (&$capturedOrderData): bool {
                 $capturedOrderData = $orderData;
 
-                return true;
+                return count($items) === 1;
             })
             ->andReturn($order);
 
-        $this->makeService($orderRepo, $cartRepo, $productRepo)->createFromCart($dto);
+        $stockService = Mockery::mock(StockService::class);
+        $stockService->shouldReceive('decreaseStockForLockedProduct')->once()->with($product, 3, 100);
 
-        // subtotal = 3 * 100 = 300, tax = 30, total = 330
+        $this->makeService($orderRepo, $cartRepo, $productRepo, $stockService)->createFromCart($this->makeDto());
+
         $this->assertEquals(300.0, $capturedOrderData['subtotal']);
         $this->assertEquals(30.0, $capturedOrderData['tax']);
         $this->assertEquals(330.0, $capturedOrderData['total']);
         $this->assertEquals('pending', $capturedOrderData['status']);
     }
-
-    // ── UpdateStatus ─────────────────────────────────────────────────────────
 
     public function test_update_status_delegates_to_repository(): void
     {

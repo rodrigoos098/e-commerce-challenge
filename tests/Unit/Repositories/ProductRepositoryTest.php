@@ -5,6 +5,7 @@ namespace Tests\Unit\Repositories;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Tag;
+use App\Repositories\ProductQueryBuilder;
 use App\Repositories\ProductRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -18,7 +19,7 @@ class ProductRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = new ProductRepository;
+        $this->repository = new ProductRepository(new ProductQueryBuilder());
     }
 
     // ── Paginate ──────────────────────────────────────────────────────────────
@@ -155,6 +156,16 @@ class ProductRepositoryTest extends TestCase
         $found = $this->repository->findBySlug('nao-existe');
 
         $this->assertNull($found);
+    }
+
+    public function test_find_by_ids_for_update_returns_locked_products_in_stable_order(): void
+    {
+        $productA = Product::factory()->create();
+        $productB = Product::factory()->create();
+
+        $products = $this->repository->findByIdsForUpdate([$productB->id, $productA->id]);
+
+        $this->assertSame([$productA->id, $productB->id], $products->pluck('id')->all());
     }
 
     // ── Create ────────────────────────────────────────────────────────────────

@@ -8,8 +8,12 @@ use App\Models\Product;
 use App\Models\StockMovement;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Repositories\Contracts\StockMovementRepositoryInterface;
+use App\Repositories\ProductQueryBuilder;
+use App\Repositories\ProductRepository;
+use App\Repositories\StockMovementRepository;
 use App\Services\StockService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 use Tests\TestCase;
@@ -253,5 +257,32 @@ class StockServiceTest extends TestCase
         $productRepo->shouldReceive('findById')->andReturn($product);
 
         $this->makeService($movementRepo, $productRepo)->increaseStock(1, 20, 'Restocking');
+    }
+
+    public function test_record_movement_invalidates_products_cache(): void
+    {
+        Event::fake();
+
+        $product = Product::factory()->create([
+            'quantity' => 10,
+            'min_quantity' => 3,
+        ]);
+
+        Cache::tags(['products'])->put("products.{$product->id}", ['cached' => true], now()->addHour());
+        $this->assertTrue(Cache::tags(['products'])->has("products.{$product->id}"));
+
+        $service = new StockService(
+            new StockMovementRepository(),
+            new ProductRepository(new ProductQueryBuilder()),
+        );
+
+        $service->recordMovement(new StockMovementDTO(
+            productId: $product->id,
+            type: 'saida',
+            quantity: 2,
+            reason: 'Cache invalidation test',
+        ));
+
+        $this->assertFalse(Cache::tags(['products'])->has("products.{$product->id}"));
     }
 }

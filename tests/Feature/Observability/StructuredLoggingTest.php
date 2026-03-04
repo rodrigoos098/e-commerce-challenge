@@ -88,6 +88,21 @@ class StructuredLoggingTest extends TestCase
 
         Log::shouldReceive('channel')
             ->once()
+            ->with('stock')
+            ->andReturnSelf();
+
+        Log::shouldReceive('info')
+            ->once()
+            ->withArgs(function (string $message, array $context) use ($product): bool {
+                return $message === 'Stock movement recorded'
+                    && $context['product_id'] === $product->id
+                    && $context['type'] === 'venda'
+                    && $context['quantity'] === 2
+                    && array_key_exists('timestamp', $context);
+            });
+
+        Log::shouldReceive('channel')
+            ->once()
             ->with('orders')
             ->andReturnSelf();
 

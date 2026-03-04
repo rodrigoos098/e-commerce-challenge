@@ -5,7 +5,6 @@ namespace App\Services;
 use App\DTOs\OrderDTO;
 use App\Events\OrderCreated;
 use App\Events\StockLow;
-use App\Jobs\ProcessOrderJob;
 use App\Models\Order;
 use App\Repositories\Contracts\CartRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
@@ -22,6 +21,7 @@ class OrderService
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly ProductRepositoryInterface $productRepository,
+        private readonly StockService $stockService,
     ) {
     }
 
@@ -77,9 +77,15 @@ class OrderService
         $order = DB::transaction(function () use ($dto, $cart): Order {
             $orderItems = [];
             $subtotal = 0;
+            $requiredQuantities = $cart->items
+                ->groupBy('product_id')
+                ->map(fn ($items): int => (int) $items->sum('quantity'));
+            $lockedProducts = $this->productRepository
+                ->findByIdsForUpdate($requiredQuantities->keys()->map(fn ($id): int => (int) $id)->all())
+                ->keyBy('id');
 
             foreach ($cart->items as $cartItem) {
-                $product = $this->productRepository->findById($cartItem->product_id);
+                $product = $lockedProducts->get($cartItem->product_id);
 
                 if (! $product || ! $product->active) {
                     throw ValidationException::withMessages([
@@ -87,7 +93,7 @@ class OrderService
                     ]);
                 }
 
-                if ($product->quantity < $cartItem->quantity) {
+                if ($product->quantity < $requiredQuantities->get($product->id, 0)) {
                     throw ValidationException::withMessages([
                         'cart' => ["Insufficient stock for product '{$product->name}'. Available: {$product->quantity}."],
                     ]);
@@ -118,14 +124,27 @@ class OrderService
 
             $order = $this->orderRepository->create($orderData, $orderItems);
 
+            foreach ($cart->items as $item) {
+                /** @var \App\Models\Product|null $product */
+                $product = $lockedProducts->get($item->product_id);
+
+                if (! $product) {
+                    continue;
+                }
+
+                $this->stockService->decreaseStockForLockedProduct(
+                    product: $product,
+                    quantity: $item->quantity,
+                    orderId: $order->id,
+                );
+            }
+
             $this->cartRepository->clear($cart);
 
             event(new OrderCreated($order));
 
-            ProcessOrderJob::dispatch($order);
-
             foreach ($order->items as $item) {
-                $product = $this->productRepository->findById($item->product_id);
+                $product = $lockedProducts->get($item->product_id);
                 if ($product && $product->quantity <= $product->min_quantity) {
                     event(new StockLow($product));
                 }
@@ -182,5 +201,15 @@ class OrderService
     public function recent(int $limit = 5): \Illuminate\Database\Eloquent\Collection
     {
         return $this->orderRepository->recent($limit);
+    }
+
+    /**
+     * Get a daily order summary for the admin dashboard.
+     *
+     * @return array<int, array{date: string, orders: int, revenue: float}>
+     */
+    public function dailySummary(int $days = 7): array
+    {
+        return $this->orderRepository->dailySummary($days);
     }
 }

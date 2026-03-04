@@ -165,4 +165,30 @@ class StockFlowTest extends TestCase
         $this->assertTrue($movements->contains('product_id', $product1->id));
         $this->assertTrue($movements->contains('product_id', $product2->id));
     }
+
+    public function test_failed_follow_up_order_does_not_create_extra_stock_movements(): void
+    {
+        $secondCustomer = User::factory()->create();
+        $secondCustomer->assignRole('customer');
+        $product = Product::factory()->create(['price' => 50.0, 'quantity' => 2, 'active' => true]);
+        $address = $this->validAddress();
+
+        $this->actingAs($this->customer, 'sanctum')
+            ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 2]);
+        $this->actingAs($secondCustomer, 'sanctum')
+            ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 2]);
+
+        $this->actingAs($this->customer, 'sanctum')
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address])
+            ->assertStatus(201);
+
+        $this->actingAs($secondCustomer, 'sanctum')
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address])
+            ->assertStatus(422);
+
+        $product->refresh();
+
+        $this->assertSame(0, $product->quantity);
+        $this->assertSame(1, StockMovement::query()->where('product_id', $product->id)->where('type', 'venda')->count());
+    }
 }

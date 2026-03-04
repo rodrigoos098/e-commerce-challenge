@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ProductRepository implements ProductRepositoryInterface
 {
+    public function __construct(
+        private readonly ProductQueryBuilder $productQueryBuilder,
+    ) {
+    }
+
     /**
      * Get paginated products with optional filters.
      *
@@ -16,48 +21,7 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = Product::query()->with(['category', 'tags']);
-
-        if (isset($filters['search'])) {
-            $query->where(function ($q) use ($filters): void {
-                $q->where('name', 'like', "%{$filters['search']}%")
-                    ->orWhere('description', 'like', "%{$filters['search']}%");
-            });
-        }
-
-        if (isset($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
-        }
-
-        if (isset($filters['active'])) {
-            $query->where('active', $filters['active']);
-        }
-
-        if (isset($filters['in_stock']) && $filters['in_stock']) {
-            $query->inStock();
-        }
-
-        if (isset($filters['low_stock']) && $filters['low_stock']) {
-            $query->lowStock();
-        }
-
-        if (isset($filters['min_price'])) {
-            $query->where('price', '>=', $filters['min_price']);
-        }
-
-        if (isset($filters['max_price'])) {
-            $query->where('price', '<=', $filters['max_price']);
-        }
-
-        $sortBy = $filters['sort_by'] ?? 'created_at';
-        $sortDir = $filters['sort_dir'] ?? 'desc';
-        $allowedSorts = ['name', 'price', 'quantity', 'created_at'];
-
-        if (in_array($sortBy, $allowedSorts, true)) {
-            $query->orderBy($sortBy, $sortDir === 'asc' ? 'asc' : 'desc');
-        }
-
-        return $query->paginate($perPage);
+        return $this->productQueryBuilder->build($filters)->paginate($perPage);
     }
 
     /**
@@ -74,6 +38,21 @@ class ProductRepository implements ProductRepositoryInterface
     public function findBySlug(string $slug): ?Product
     {
         return Product::query()->with(['category', 'tags'])->where('slug', $slug)->first();
+    }
+
+    /**
+     * Find products by ID with row-level locks for checkout processing.
+     *
+     * @param  array<int>  $ids
+     * @return Collection<int, Product>
+     */
+    public function findByIdsForUpdate(array $ids): Collection
+    {
+        return Product::query()
+            ->whereIn('id', $ids)
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
     }
 
     /**

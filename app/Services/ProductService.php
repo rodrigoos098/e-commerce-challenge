@@ -137,6 +137,14 @@ class ProductService
     }
 
     /**
+     * Flush all cached product payloads.
+     */
+    public function flushCache(): void
+    {
+        $this->invalidateCache();
+    }
+
+    /**
      * Generate a unique slug for a product.
      */
     private function generateUniqueSlug(string $name, ?int $exceptId = null): string

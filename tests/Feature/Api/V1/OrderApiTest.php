@@ -213,6 +213,32 @@ class OrderApiTest extends TestCase
         $this->assertDatabaseMissing('cart_items', ['cart_id' => $cart->id]);
     }
 
+    public function test_second_order_is_rejected_after_stock_is_consumed(): void
+    {
+        $firstCustomer = $this->createCustomer();
+        $secondCustomer = $this->createCustomer();
+        $product = Product::factory()->create(['quantity' => 2, 'active' => true, 'price' => 50.0]);
+        $address = $this->validAddress();
+
+        $this->setupCartWithProduct($firstCustomer, $product);
+        $this->setupCartWithProduct($secondCustomer, $product);
+
+        $this->actingAs($firstCustomer, 'sanctum')
+            ->postJson('/api/v1/orders', [
+                'shipping_address' => $address,
+                'billing_address' => $address,
+            ])
+            ->assertStatus(201);
+
+        $this->actingAs($secondCustomer, 'sanctum')
+            ->postJson('/api/v1/orders', [
+                'shipping_address' => $address,
+                'billing_address' => $address,
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false);
+    }
+
     public function test_create_order_fails_with_missing_address(): void
     {
         $customer = $this->createCustomer();

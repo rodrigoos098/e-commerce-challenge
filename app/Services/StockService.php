@@ -10,6 +10,7 @@ use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Repositories\Contracts\StockMovementRepositoryInterface;
 use App\Traits\LogsActivity;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class StockService
@@ -78,6 +79,46 @@ class StockService
     }
 
     /**
+     * Decrease stock for a locked product inside the checkout transaction.
+     */
+    public function decreaseStockForLockedProduct(Product $product, int $quantity, int $orderId): StockMovement
+    {
+        $movement = $this->stockMovementRepository->create([
+            'product_id' => $product->id,
+            'type' => 'venda',
+            'quantity' => $quantity,
+            'reason' => 'Stock decreased by order',
+            'reference_type' => 'order',
+            'reference_id' => $orderId,
+        ]);
+
+        $newQuantity = max(0, $product->quantity - $quantity);
+        $this->productRepository->update($product, ['quantity' => $newQuantity]);
+        $product->quantity = $newQuantity;
+        $this->invalidateProductCache();
+
+        if ($newQuantity <= $product->min_quantity) {
+            $freshProduct = $this->productRepository->findById($product->id);
+
+            if ($freshProduct) {
+                event(new StockLow($freshProduct));
+            }
+        }
+
+        $this->logActivity('stock', 'Stock movement recorded', [
+            'movement_id' => $movement->id,
+            'product_id' => $product->id,
+            'type' => 'venda',
+            'quantity' => $quantity,
+            'reason' => 'Stock decreased by order',
+            'reference_type' => 'order',
+            'reference_id' => $orderId,
+        ]);
+
+        return $movement;
+    }
+
+    /**
      * Increase product stock (entrada type).
      */
     public function increaseStock(int $productId, int $quantity, string $reason): StockMovement
@@ -105,6 +146,7 @@ class StockService
         };
 
         $this->productRepository->update($product, ['quantity' => $newQuantity]);
+        $this->invalidateProductCache();
 
         if ($newQuantity <= $product->min_quantity) {
             $freshProduct = $this->productRepository->findById($product->id);
@@ -113,5 +155,13 @@ class StockService
                 event(new StockLow($freshProduct));
             }
         }
+    }
+
+    /**
+     * Flush cached product payloads after stock changes.
+     */
+    private function invalidateProductCache(): void
+    {
+        Cache::tags(['products'])->flush();
     }
 }

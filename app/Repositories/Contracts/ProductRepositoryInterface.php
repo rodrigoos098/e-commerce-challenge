@@ -26,6 +26,14 @@ interface ProductRepositoryInterface
     public function findBySlug(string $slug): ?Product;
 
     /**
+     * Find products by ID with row-level locks for checkout processing.
+     *
+     * @param  array<int>  $ids
+     * @return Collection<int, Product>
+     */
+    public function findByIdsForUpdate(array $ids): Collection;
+
+    /**
      * Create a new product.
      *
      * @param  array<string, mixed>  $data
