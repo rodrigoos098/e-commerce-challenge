@@ -56,4 +56,11 @@ interface OrderRepositoryInterface
      * Get the most recent orders.
      */
     public function recent(int $limit = 5): \Illuminate\Database\Eloquent\Collection;
+
+    /**
+     * Get a daily order summary for the last N days.
+     *
+     * @return array<int, array{date: string, orders: int, revenue: float}>
+     */
+    public function dailySummary(int $days = 7): array;
 }

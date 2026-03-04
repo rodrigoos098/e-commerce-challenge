@@ -23,6 +23,7 @@ class AdminDashboardController extends Controller
         $totalRevenue = $this->orderService->totalRevenue();
         $lowStockProducts = $this->productService->lowStock();
         $recentOrders = $this->orderService->recent(5);
+        $ordersByDay = $this->orderService->dailySummary();
 
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
@@ -30,6 +31,7 @@ class AdminDashboardController extends Controller
                 'total_orders' => $totalOrders,
                 'total_revenue' => $totalRevenue,
                 'low_stock_count' => $lowStockProducts->count(),
+                'orders_by_day' => $ordersByDay,
                 'recent_orders' => $recentOrders->map(fn ($order) => [
                     'id' => $order->id,
                     'status' => $order->status,

@@ -22,6 +22,15 @@ class UserSeeder extends Seeder
         );
         $admin->assignRole('admin');
 
+        $customer = User::firstOrCreate(
+            ['email' => 'customer@example.com'],
+            [
+                'name' => 'Customer',
+                'password' => Hash::make('password'),
+            ]
+        );
+        $customer->assignRole('customer');
+
         $customers = User::factory()->count(5)->create();
         $customers->each(fn (User $user) => $user->assignRole('customer'));
     }

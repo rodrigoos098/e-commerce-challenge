@@ -19,7 +19,7 @@ class OrderRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = new OrderRepository;
+        $this->repository = new OrderRepository();
     }
 
     // ── PaginateForUser ───────────────────────────────────────────────────────
@@ -78,6 +78,27 @@ class OrderRepositoryTest extends TestCase
         $result = $this->repository->paginate(['user_id' => $user->id]);
 
         $this->assertCount(1, $result->items());
+    }
+
+    public function test_paginate_with_search_matches_order_id_name_and_email(): void
+    {
+        $matchingUser = User::factory()->create([
+            'name' => 'Alice Search',
+            'email' => 'alice@example.com',
+        ]);
+        $matchingOrder = Order::factory()->create(['user_id' => $matchingUser->id]);
+        Order::factory()->create();
+
+        $byId = $this->repository->paginate(['search' => (string) $matchingOrder->id]);
+        $byName = $this->repository->paginate(['search' => 'Alice']);
+        $byEmail = $this->repository->paginate(['search' => 'alice@example.com']);
+
+        $this->assertCount(1, $byId->items());
+        $this->assertSame($matchingOrder->id, $byId->items()[0]->id);
+        $this->assertCount(1, $byName->items());
+        $this->assertSame($matchingOrder->id, $byName->items()[0]->id);
+        $this->assertCount(1, $byEmail->items());
+        $this->assertSame($matchingOrder->id, $byEmail->items()[0]->id);
     }
 
     // ── FindById ──────────────────────────────────────────────────────────────
@@ -205,5 +226,27 @@ class OrderRepositoryTest extends TestCase
 
         $this->assertEquals('shipped', $updated->status);
         $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'shipped']);
+    }
+
+    public function test_daily_summary_returns_each_day_with_counts_and_revenue(): void
+    {
+        Order::factory()->create([
+            'status' => 'delivered',
+            'total' => 100,
+            'created_at' => now()->subDays(1),
+        ]);
+        Order::factory()->create([
+            'status' => 'cancelled',
+            'total' => 999,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        $summary = $this->repository->dailySummary(2);
+
+        $this->assertCount(2, $summary);
+        $this->assertSame(now()->subDay()->toDateString(), $summary[0]['date']);
+        $this->assertSame(1, $summary[0]['orders']);
+        $this->assertSame(100.0, $summary[0]['revenue']);
+        $this->assertSame(now()->toDateString(), $summary[1]['date']);
     }
 }
