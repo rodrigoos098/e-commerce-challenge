@@ -1,338 +1,252 @@
-# E-commerce System — Documentação do Projeto
+# E-commerce System - Documentacao do Projeto
 
-> Sistema de e-commerce completo desenvolvido como desafio técnico full-stack, utilizando Laravel 12 + React + TypeScript + Inertia.js.
+> Sistema de e-commerce desenvolvido para o desafio tecnico com Laravel 12, Inertia.js, React 19 e TypeScript.
 
 ---
 
-## Pré-requisitos
+## Pre-requisitos
 
 - PHP 8.2+
 - Composer 2+
 - Node.js 18+
-- MySQL 8.0+
-- Redis (opcional, para cache e filas em produção)
+- MySQL 8.0+ ou SQLite para uso local
+- Redis para reproduzir o comportamento oficial de cache tags e filas
 
 ---
 
-## Setup Rápido
+## Setup rapido
 
 ```bash
-# 1. Clone o repositório
 git clone <repo-url>
 cd e-commerce-challenge
-
-# 2. Setup automático (instala deps, configura .env, migra e builda)
 composer run setup
 ```
 
-Ou passo a passo:
+O script `composer run setup` faz:
 
 ```bash
-# Dependências PHP
 composer install
+copy .env.example .env   # ou cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed --force
+npm install
+npm run build
+```
 
-# Copiar e configurar variáveis de ambiente
-cp .env.example .env
+Setup manual:
+
+```bash
+composer install
+copy .env.example .env
 php artisan key:generate
 
-# Configurar banco de dados no .env:
+# Ajuste o banco no .env
 # DB_CONNECTION=mysql
 # DB_DATABASE=ecommerce
 # DB_USERNAME=root
 # DB_PASSWORD=secret
 
-# Criar banco de dados
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS ecommerce;"
+# Redis e obrigatorio para cache tags
+# CACHE_STORE=redis
+# QUEUE_CONNECTION=database
+# REDIS_HOST=127.0.0.1
+# REDIS_PORT=6379
 
-# Migrations + Seeders
 php artisan migrate --seed
-
-# Dependências NPM e build
 npm install
 npm run build
 ```
 
 ---
 
-## Rodar em Desenvolvimento
+## Desenvolvimento
 
 ```bash
-# Inicia servidor PHP, fila e Vite simultaneamente
 composer run dev
 ```
 
-Isso roda em paralelo:
-- `php artisan serve` — servidor Laravel na porta 8000
-- `php artisan queue:listen` — processamento de filas
-- `npm run dev` — Vite com HMR
+Esse comando sobe em paralelo:
+
+- `php artisan serve`
+- `php artisan queue:listen --tries=1 --timeout=0`
+- `npm run dev`
 
 ---
 
-## Credenciais de Teste
+## Credenciais seedadas
 
-Após `php artisan migrate --seed`:
+Depois de `php artisan migrate --seed`:
 
 | Papel | Email | Senha |
-|-------|-------|-------|
+|---|---|---|
 | Admin | admin@example.com | password |
 | Cliente | customer@example.com | password |
 
+O seeder tambem cria clientes adicionais com dados fake.
+
 ---
 
-## Executar Testes
+## Testes e qualidade
 
 ```bash
-# Rodar todos os testes
 php artisan test --compact
-
-# Rodar com cobertura (mínimo 80%)
-php artisan test --coverage --min=80
-
-# Filtrar por arquivo
 php artisan test --compact tests/Feature/Api/V1/ProductApiTest.php
-
-# Filtrar por nome de teste
 php artisan test --compact --filter=testCreateProduct
-```
 
----
-
-## Qualidade de Código
-
-```bash
-# PHP: formatar com Pint (PSR-12)
-vendor/bin/pint
-
-# TypeScript/React: verificar tipos
+vendor/bin/pint --dirty --format agent
 npm run type-check
-
-# ESLint
 npm run lint
-
-# ESLint com correção automática
-npm run lint:fix
-
-# Prettier
-npm run format
-```
-
----
-
-## Documentação da API (Swagger/OpenAPI)
-
-```bash
-# Gerar documentação
 php artisan l5-swagger:generate
 ```
 
-Acesse: [http://localhost:8000/api/documentation](http://localhost:8000/api/documentation)
+Cobertura minima de 80% continua sendo requisito do desafio, mas depende de driver de coverage habilitado no ambiente.
 
 ---
 
-## Estrutura de Pastas
+## Documentacao da API
 
-```
-app/
-├── DTOs/                    # Data Transfer Objects (transferência entre camadas)
-├── Events/                  # Eventos do domínio (OrderCreated, StockLow, etc.)
-├── Http/
-│   ├── Controllers/
-│   │   └── Api/V1/         # Controllers da API REST versionada
-│   ├── Requests/            # Form Requests (validação de entrada)
-│   └── Resources/          # API Resources (formatação JSON de saída)
-├── Jobs/                   # Jobs para filas (ProcessOrder, SendEmail, etc.)
-├── Listeners/              # Listeners de eventos
-├── Mail/                   # Mailable classes para emails
-├── Models/                 # Eloquent Models com relacionamentos e scopes
-├── Policies/               # Autorização por recurso (ProductPolicy, OrderPolicy)
-├── Repositories/           # Repository Pattern com Contracts + Implementations
-├── Rules/                  # Regras de validação customizadas
-├── Services/               # Camada de lógica de negócio
-└── Traits/                 # Traits reutilizáveis (LogsActivity)
-
-resources/js/
-├── Components/
-│   ├── Admin/              # Componentes do painel administrativo
-│   ├── Public/             # Componentes da loja pública
-│   └── Shared/             # Componentes compartilhados (SkeletonLoader, etc.)
-├── Layouts/
-│   ├── AdminLayout.tsx     # Layout do painel admin
-│   └── PublicLayout.tsx    # Layout da loja pública
-├── Pages/
-│   ├── Admin/              # Páginas do painel admin (Dashboard, CRUD)
-│   ├── Auth/               # Login e Registro
-│   ├── Customer/           # Carrinho, Checkout, Pedidos, Perfil
-│   └── Products/           # Listagem e detalhe de produtos
-└── types/                  # TypeScript types compartilhados
+```bash
+php artisan l5-swagger:generate
 ```
 
----
+Acesse:
 
-## Decisões Arquiteturais
-
-### Service Layer + Repository Pattern
-A lógica de negócio reside exclusivamente nos **Services** (`app/Services/`). Os **Repositories** (`app/Repositories/`) abstraem o acesso a dados via interfaces (Contracts), facilitando testes com mocks e desacoplando a lógica de negócio do Eloquent.
-
-### DTOs (Data Transfer Objects)
-Os DTOs (`app/DTOs/`) garantem tipagem forte na transferência de dados entre camadas (Controller → Service → Repository), evitando dependência de arrays anônimos e documentando explicitamente a forma dos dados.
-
-### Inertia.js + React — Frontend 100% Inertia
-O frontend utiliza Inertia.js para toda a comunicação com o servidor:
-- **Dados de página:** Chegam via `Inertia::render()` (props do servidor)
-- **Mutações:** Enviadas via `router.post/put/delete` do `@inertiajs/react`
-- **Filtros e paginação:** Via `router.get()` com query params
-
-Isso elimina duplicação de controllers, simplifica autenticação (cookies nativos do Laravel, sem tokens no frontend) e oferece UX superior (sem flash de conteúdo vazio). A API REST existe como interface independente para clientes externos.
-
-### API REST Versionada (`/api/v1/`)
-A API REST é completamente independente do frontend Inertia. Ambas as camadas consomem os mesmos **Services** e **Repositories**. A API é protegida por Laravel Sanctum (tokens) e documentada via Swagger.
-
-### Autorização com Roles e Policies
-- **Roles** gerenciados via `spatie/laravel-permission`: `admin`, `customer`
-- **Policies** (`ProductPolicy`, `OrderPolicy`) para autorização de recursos
-- Rate limiting: 100 requisições/minuto por IP via middleware do Laravel
-
-### Cache com Tags
-- Produtos: TTL 1 hora (`cache()->tags(['products'])`)
-- Categorias: TTL 24 horas (`cache()->tags(['categories'])`)
-- Invalidação automática nas operações de escrita
-
-### Filas e Jobs
-Operações assíncronas via `database` queue driver (configurável para Redis em produção):
-- `ProcessOrderJob` — Processamento do pedido em background
-- `SendOrderConfirmationEmail` — Email de confirmação
-- `UpdateStockAfterOrder` — Atualização de estoque + criação de StockMovement
+- `http://localhost:8000/api/documentation`
 
 ---
 
-## Bibliotecas Utilizadas
+## Arquitetura
 
-### Backend (PHP/Laravel)
+### Backend
 
-| Biblioteca | Versão | Justificativa |
-|-----------|--------|---------------|
-| `laravel/framework` | ^12.0 | Base do projeto |
-| `laravel/sanctum` | ^4.3 | Autenticação API via tokens |
-| `spatie/laravel-permission` | ^6.24 | Roles e permissions (admin, customer) |
-| `darkaonline/l5-swagger` | ^10.1 | Geração de documentação OpenAPI/Swagger |
-| `inertiajs/inertia-laravel` | ^2.0 | Adaptador Inertia para Laravel (SPA sem API separada) |
-| `predis/predis` | ^3.0 | Cliente Redis para cache e filas em produção |
-| `opcodesio/log-viewer` | ^3.21 | Visualizador de logs em `/log-viewer` |
+- `app/Services`: regra de negocio
+- `app/Repositories`: acesso a dados via contracts
+- `app/DTOs`: transferencia de dados entre camadas
+- `app/Http/Requests`: validacao de entrada
+- `app/Http/Resources`: padronizacao de respostas JSON
 
-### Frontend (TypeScript/React)
+### Frontend
 
-| Biblioteca | Versão | Justificativa |
-|-----------|--------|---------------|
-| `react` | ^19 | UI framework |
-| `@inertiajs/react` | ^2.3 | Adaptador Inertia para React |
-| `tailwindcss` | ^4.0 | Utility-first CSS (design system consistente) |
-| `react-hook-form` | ^7.71 | Formulários performáticos com menor re-render |
-| `@hookform/resolvers` | ^5.2 | Integração react-hook-form com Zod |
-| `zod` | ^4.3 | Validação de schema TypeScript-first |
-| `react-hot-toast` | ^2.6 | Toast notifications leves e customizáveis |
-| `typescript` | ^5.9 | Type safety em todo o frontend |
+- `resources/js/Pages`: paginas Inertia
+- `resources/js/Components`: componentes publicos e administrativos
+- `resources/js/types`: contratos compartilhados TypeScript
 
-### Dev / Qualidade
+### Autenticacao e autorizacao
 
-| Ferramenta | Justificativa |
-|-----------|---------------|
-| `laravel/pint` | Formatter PHP (preset PSR-12) |
-| `eslint` + `@typescript-eslint` | Linting TypeScript/React |
-| `prettier` | Formatação JavaScript/TypeScript |
-| `phpunit/phpunit` | Testes unitários e de integração |
-| `laravel/telescope` | Debug e profiling em desenvolvimento |
-| `laravel/pail` | Tail de logs em tempo real |
+- Sanctum para API tokens
+- Spatie Permission para roles `admin` e `customer`
+- Policies e middleware de role nas rotas protegidas
+
+### Cache
+
+- Produtos: TTL de 1 hora com `Cache::tags(['products'])`
+- Categorias: TTL de 24 horas com `Cache::tags(['categories'])`
+- Mutacoes de produto e estoque invalidam o cache de produtos
+
+### Pedidos e estoque
+
+- Criacao de pedido e baixa de estoque acontecem na mesma transacao
+- `stock_movements` sao gravados durante a criacao do pedido
+- O fluxo nao depende de job assincrono para atualizar estoque
+
+### Filas
+
+- `SendOrderConfirmationEmail`: envio assincrono do email de confirmacao
+- O listener de `OrderCreated` despacha o job de email
 
 ---
 
-## Endpoints da API
+## Endpoints principais
 
-Documentação completa em `/api/documentation`. Resumo:
+### Autenticacao
 
-### Autenticação
-```
-POST   /api/v1/auth/register
-POST   /api/v1/auth/login
-POST   /api/v1/auth/logout
-GET    /api/v1/auth/me
+```text
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+POST /api/v1/auth/logout
+GET  /api/v1/auth/me
 ```
 
 ### Produtos
-```
-GET    /api/v1/products              # Listagem com filtros, busca, paginação
-GET    /api/v1/products/{id}         # Detalhes
-POST   /api/v1/products              # Criar (admin)
-PUT    /api/v1/products/{id}         # Atualizar (admin)
-DELETE /api/v1/products/{id}         # Excluir soft delete (admin)
+
+```text
+GET    /api/v1/products
+GET    /api/v1/products/{id}
+POST   /api/v1/products
+PUT    /api/v1/products/{id}
+DELETE /api/v1/products/{id}
+GET    /api/v1/products/low-stock
 ```
 
 ### Categorias
-```
-GET    /api/v1/categories            # Árvore hierárquica
-GET    /api/v1/categories/{id}/products  # Produtos da categoria
+
+```text
+GET    /api/v1/categories
+GET    /api/v1/categories/{id}
+GET    /api/v1/categories/{id}/products
+POST   /api/v1/categories
+PUT    /api/v1/categories/{id}
+DELETE /api/v1/categories/{id}
 ```
 
 ### Carrinho
-```
-GET    /api/v1/cart                  # Carrinho do usuário
-POST   /api/v1/cart/items            # Adicionar item
-PUT    /api/v1/cart/items/{id}       # Atualizar quantidade
-DELETE /api/v1/cart/items/{id}       # Remover item
-DELETE /api/v1/cart                  # Limpar carrinho
+
+```text
+GET    /api/v1/cart
+POST   /api/v1/cart/items
+PUT    /api/v1/cart/items/{id}
+DELETE /api/v1/cart/items/{id}
+DELETE /api/v1/cart
 ```
 
 ### Pedidos
-```
-GET    /api/v1/orders                # Listar pedidos do usuário
-GET    /api/v1/orders/{id}           # Detalhes do pedido
-POST   /api/v1/orders                # Criar pedido a partir do carrinho
-PUT    /api/v1/orders/{id}/status    # Atualizar status (admin)
+
+```text
+GET    /api/v1/orders
+GET    /api/v1/orders/{id}
+POST   /api/v1/orders
+PUT    /api/v1/orders/{id}/status
 ```
 
-### Formato de Resposta Padrão
+---
+
+## Resposta JSON
+
+Sucesso:
+
 ```json
-// Sucesso (recurso único)
-{ "success": true, "data": { ... } }
-
-// Sucesso (listagem com paginação)
-{ "success": true, "data": [...], "meta": { "current_page": 1, "per_page": 15, "total": 100, "last_page": 7 }, "links": { ... } }
-
-// Erro
-{ "success": false, "message": "...", "errors": { "field": ["..."] } }
+{ "success": true, "data": { } }
 ```
 
----
+Listagem paginada:
 
-## Variáveis de Ambiente Importantes
-
-```dotenv
-APP_ENV=local
-APP_URL=http://localhost:8000
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=ecommerce
-DB_USERNAME=root
-DB_PASSWORD=
-
-QUEUE_CONNECTION=database   # Em produção: redis
-
-CACHE_STORE=redis           # Em produção: redis
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
-
-MAIL_MAILER=log             # Em produção: smtp/mailgun/ses
+```json
+{
+  "success": true,
+  "data": [],
+  "meta": {
+    "current_page": 1,
+    "per_page": 15,
+    "total": 100,
+    "last_page": 7
+  },
+  "links": {
+    "first": "...",
+    "last": "...",
+    "prev": null,
+    "next": "..."
+  }
+}
 ```
 
----
+Erro:
 
-## Logging
-
-Os logs são segmentados por canal em `storage/logs/`:
-- `laravel.log` — log geral da aplicação
-- `orders.log` — operações de pedidos
-- `stock.log` — movimentações de estoque
-- `auth.log` — eventos de autenticação
-
-Visualização visual em: [http://localhost:8000/log-viewer](http://localhost:8000/log-viewer)
+```json
+{
+  "success": false,
+  "message": "Mensagem de erro",
+  "errors": {
+    "field": ["Mensagem de validacao"]
+  }
+}
+```

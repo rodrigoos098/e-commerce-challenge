@@ -16,7 +16,8 @@ namespace App\Http\Controllers;
  *     securityScheme="bearerAuth",
  *     type="http",
  *     scheme="bearer",
- *     bearerFormat="JWT"
+ *     bearerFormat="Sanctum API Token",
+ *     description="Use a Laravel Sanctum personal access token in the Authorization header."
  * )
  *
  * @OA\Schema(

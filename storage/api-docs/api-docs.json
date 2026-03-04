@@ -623,6 +623,9 @@
                                 "properties": {
                                     "shipping_address": {
                                         "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
                                             "street": {
                                                 "type": "string"
                                             },
@@ -632,7 +635,7 @@
                                             "state": {
                                                 "type": "string"
                                             },
-                                            "zip": {
+                                            "zip_code": {
                                                 "type": "string"
                                             },
                                             "country": {
@@ -642,6 +645,26 @@
                                         "type": "object"
                                     },
                                     "billing_address": {
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "street": {
+                                                "type": "string"
+                                            },
+                                            "city": {
+                                                "type": "string"
+                                            },
+                                            "state": {
+                                                "type": "string"
+                                            },
+                                            "zip_code": {
+                                                "type": "string"
+                                            },
+                                            "country": {
+                                                "type": "string"
+                                            }
+                                        },
                                         "type": "object"
                                     },
                                     "notes": {
@@ -914,7 +937,7 @@
                                         "type": "boolean",
                                         "example": true
                                     },
-                                    "tags": {
+                                    "tag_ids": {
                                         "type": "array",
                                         "items": {
                                             "type": "integer"
@@ -1143,7 +1166,8 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "bearerFormat": "JWT",
+                "description": "Use a Laravel Sanctum personal access token in the Authorization header.",
+                "bearerFormat": "Sanctum API Token",
                 "scheme": "bearer"
             }
         }

@@ -91,13 +91,21 @@ class OrderController extends Controller
      *         @OA\JsonContent(
      *             required={"shipping_address","billing_address"},
      *             @OA\Property(property="shipping_address", type="object",
+     *                 @OA\Property(property="name", type="string"),
      *                 @OA\Property(property="street", type="string"),
      *                 @OA\Property(property="city", type="string"),
      *                 @OA\Property(property="state", type="string"),
-     *                 @OA\Property(property="zip", type="string"),
+     *                 @OA\Property(property="zip_code", type="string"),
      *                 @OA\Property(property="country", type="string")
      *             ),
-     *             @OA\Property(property="billing_address", type="object"),
+     *             @OA\Property(property="billing_address", type="object",
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="street", type="string"),
+     *                 @OA\Property(property="city", type="string"),
+     *                 @OA\Property(property="state", type="string"),
+     *                 @OA\Property(property="zip_code", type="string"),
+     *                 @OA\Property(property="country", type="string")
+     *             ),
      *             @OA\Property(property="notes", type="string", nullable=true)
      *         )
      *     ),

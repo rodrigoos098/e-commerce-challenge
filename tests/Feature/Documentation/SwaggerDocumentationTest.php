@@ -11,10 +11,23 @@ class SwaggerDocumentationTest extends TestCase
     {
         Artisan::call('l5-swagger:generate');
 
-        /** @var array{paths: array<string, mixed>} $spec */
+        /** @var array{paths: array<string, mixed>, components: array<string, mixed>} $spec */
         $spec = json_decode((string) file_get_contents(storage_path('api-docs/api-docs.json')), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('/auth/me', $spec['paths']);
         $this->assertArrayNotHasKey('/auth/user', $spec['paths']);
+        $this->assertSame('Sanctum API Token', $spec['components']['securitySchemes']['bearerAuth']['bearerFormat']);
+        $this->assertArrayHasKey(
+            'tag_ids',
+            $spec['paths']['/products']['post']['requestBody']['content']['application/json']['schema']['properties'],
+        );
+        $this->assertArrayHasKey(
+            'zip_code',
+            $spec['paths']['/orders']['post']['requestBody']['content']['application/json']['schema']['properties']['shipping_address']['properties'],
+        );
+        $this->assertArrayHasKey(
+            'zip_code',
+            $spec['paths']['/orders']['post']['requestBody']['content']['application/json']['schema']['properties']['billing_address']['properties'],
+        );
     }
 }
