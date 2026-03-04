@@ -47,6 +47,7 @@ class ProductController extends Controller
             'search', 'category_id', 'active', 'in_stock', 'low_stock',
             'min_price', 'max_price', 'sort_by', 'sort_dir',
         ]);
+        $filters['active'] = true;
 
         $perPage = (int) $request->input('per_page', 15);
         $products = $this->productService->paginate($filters, $perPage);
@@ -70,7 +71,7 @@ class ProductController extends Controller
     {
         $product = $this->productService->findById($id);
 
-        if (! $product) {
+        if (! $product || ! $product->active) {
             return $this->notFoundResponse('Product not found.');
         }
 
@@ -97,7 +98,7 @@ class ProductController extends Controller
      *             @OA\Property(property="min_quantity", type="integer", example=10),
      *             @OA\Property(property="category_id", type="integer", example=1),
      *             @OA\Property(property="active", type="boolean", example=true),
-     *             @OA\Property(property="tags", type="array", @OA\Items(type="integer"))
+     *             @OA\Property(property="tag_ids", type="array", @OA\Items(type="integer"))
      *         )
      *     ),
      *     @OA\Response(response=201, description="Produto criado com sucesso"),

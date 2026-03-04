@@ -86,6 +86,18 @@ class ProductApiTest extends TestCase
         $this->assertEquals('Smartphone Samsung', $response->json('data.0.name'));
     }
 
+    public function test_public_product_listing_hides_inactive_products(): void
+    {
+        Product::factory()->create(['active' => true, 'name' => 'Produto Ativo']);
+        Product::factory()->inactive()->create(['name' => 'Produto Inativo']);
+
+        $response = $this->getJson('/api/v1/products?active=0');
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->json('data'));
+        $this->assertSame('Produto Ativo', $response->json('data.0.name'));
+    }
+
     // ── Show (public) ─────────────────────────────────────────────────────────
 
     public function test_guest_can_view_single_product(): void
@@ -106,6 +118,16 @@ class ProductApiTest extends TestCase
         $response->assertStatus(404)
             ->assertJsonPath('success', false)
             ->assertJsonStructure(['success', 'message']);
+    }
+
+    public function test_public_product_show_returns_404_for_inactive_product(): void
+    {
+        $product = Product::factory()->inactive()->create();
+
+        $response = $this->getJson("/api/v1/products/{$product->id}");
+
+        $response->assertStatus(404)
+            ->assertJsonPath('success', false);
     }
 
     // ── Store (admin) ─────────────────────────────────────────────────────────

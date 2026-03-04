@@ -23,6 +23,7 @@ class ProductPageController extends Controller
     {
         $filters = $request->only(['search', 'category_id', 'price_min', 'price_max', 'min_price', 'max_price', 'active', 'in_stock']);
         $perPage = (int) $request->input('per_page', 15);
+        $filters['active'] = true;
 
         // Map frontend filter names to backend filter names
         if (isset($filters['price_min'])) {
@@ -48,7 +49,7 @@ class ProductPageController extends Controller
     {
         $product = $this->productService->findBySlug($slug);
 
-        if (! $product) {
+        if (! $product || ! $product->active) {
             abort(404);
         }
 
@@ -60,8 +61,8 @@ class ProductPageController extends Controller
         $related = collect($relatedProducts->items())->filter(fn ($p) => $p->id !== $product->id)->take(4)->values();
 
         return Inertia::render('Products/Show', [
-            'product' => (new ProductResource($product))->toArray($request),
-            'related_products' => ProductResource::collection($related)->toArray($request),
+            'product' => (new ProductResource($product))->resolve($request),
+            'related_products' => ProductResource::collection($related)->resolve($request),
         ]);
     }
 }
