@@ -15,7 +15,8 @@ readonly class OrderDTO
         public array $shippingAddress,
         public array $billingAddress,
         public ?string $notes = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Create an OrderDTO from a Form Request.
@@ -24,10 +25,24 @@ readonly class OrderDTO
     {
         return new self(
             userId: $request->user()->id,
-            shippingAddress: $request->input('shipping_address', []),
-            billingAddress: $request->input('billing_address', []),
+            shippingAddress: self::normalizeAddress($request->input('shipping_address', [])),
+            billingAddress: self::normalizeAddress($request->input('billing_address', [])),
             notes: $request->input('notes'),
         );
+    }
+
+    /**
+     * @param  array<string, mixed>  $address
+     * @return array<string, mixed>
+     */
+    private static function normalizeAddress(array $address): array
+    {
+        if (isset($address['zip']) && ! isset($address['zip_code'])) {
+            $address['zip_code'] = $address['zip'];
+            unset($address['zip']);
+        }
+
+        return $address;
     }
 
     /**

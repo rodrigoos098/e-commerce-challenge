@@ -26,12 +26,12 @@ class ProductResource extends JsonResource
             'active' => $this->active,
             'in_stock' => $this->quantity > 0,
             'low_stock' => $this->quantity <= $this->min_quantity,
-            'category' => new CategoryResource($this->whenLoaded('category')),
+            'category' => $this->whenLoaded('category', fn () => (new CategoryResource($this->category))->resolve($request)),
             'tags' => $this->whenLoaded('tags', fn () => $this->tags->map(fn ($tag) => [
                 'id' => $tag->id,
                 'name' => $tag->name,
                 'slug' => $tag->slug,
-            ])),
+            ])->values()->all()),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

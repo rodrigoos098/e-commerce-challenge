@@ -13,7 +13,7 @@ import type {
 export type { Product, Category, Order, OrderStatus, OrderItem, PaginatedResponse, User, Tag };
 
 // Types específicos do admin
-export type StockMovementType = 'in' | 'out' | 'adjustment' | 'return';
+export type StockMovementType = 'entrada' | 'saida' | 'ajuste' | 'venda' | 'devolucao';
 
 export interface StockMovement {
     id: number;
@@ -30,6 +30,11 @@ export interface DashboardStats {
     total_orders: number;
     total_revenue: number;
     low_stock_count: number;
+    orders_by_day: Array<{
+        date: string;
+        orders: number;
+        revenue: number;
+    }>;
     recent_orders: Order[];
     low_stock_products: Product[];
 }

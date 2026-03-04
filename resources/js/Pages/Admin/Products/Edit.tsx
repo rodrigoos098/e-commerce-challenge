@@ -54,7 +54,7 @@ export default function ProductsEdit({
             cost_price: product.cost_price,
             quantity: product.quantity,
             min_quantity: product.min_quantity,
-            category_id: product.category.id,
+            category_id: product.category?.id ?? 0,
             active: product.active,
         },
     });

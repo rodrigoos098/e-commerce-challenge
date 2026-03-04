@@ -103,10 +103,11 @@ class AdminProductController extends Controller
 
     public function show(Request $request, Product $product): Response
     {
+        $product->load(['category', 'tags']);
         $movements = $this->stockService->paginateForProduct($product->id, 50);
 
         return Inertia::render('Admin/Products/Show', [
-            'product' => (new ProductResource($product))->toArray($request),
+            'product' => (new ProductResource($product))->resolve($request),
             'movements' => $movements->items() ? collect($movements->items())->map(fn ($m) => [
                 'id' => $m->id,
                 'product_id' => $m->product_id,
@@ -120,11 +121,12 @@ class AdminProductController extends Controller
 
     public function edit(Request $request, Product $product): Response
     {
+        $product->load(['category', 'tags']);
         $categories = $this->categoryService->all();
         $tags = $this->tagService->all();
 
         return Inertia::render('Admin/Products/Edit', [
-            'product' => (new ProductResource($product))->toArray($request),
+            'product' => (new ProductResource($product))->resolve($request),
             'categories' => $categories->map(fn ($cat) => [
                 'id' => $cat->id,
                 'name' => $cat->name,

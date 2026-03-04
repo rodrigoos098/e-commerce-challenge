@@ -45,7 +45,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <article className="group relative flex flex-col rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
             {/* Image */}
             <Link href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-gray-100">
-                {product.category?.name && (
+                {product.category && (
                     <span className="absolute top-3 left-3 z-10 rounded-full bg-white/80 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium text-gray-700 border border-gray-200">
                         {product.category.name}
                     </span>

@@ -36,7 +36,7 @@ class OrderPageController extends Controller
         }
 
         return Inertia::render('Customer/Orders/Show', [
-            'order' => (new OrderResource($orderModel))->toArray($request),
+            'order' => (new OrderResource($orderModel))->resolve($request),
         ]);
     }
 
@@ -56,7 +56,7 @@ class OrderPageController extends Controller
             'street' => $request->input('shipping_street'),
             'city' => $request->input('shipping_city'),
             'state' => $request->input('shipping_state'),
-            'zip' => $request->input('shipping_zip'),
+            'zip_code' => $request->input('shipping_zip'),
             'country' => $request->input('shipping_country'),
         ];
 
@@ -68,7 +68,7 @@ class OrderPageController extends Controller
                 'street' => $request->input('billing_street', $shippingAddress['street']),
                 'city' => $request->input('billing_city', $shippingAddress['city']),
                 'state' => $request->input('billing_state', $shippingAddress['state']),
-                'zip' => $request->input('billing_zip', $shippingAddress['zip']),
+                'zip_code' => $request->input('billing_zip', $shippingAddress['zip_code']),
                 'country' => $request->input('billing_country', $shippingAddress['country']),
             ];
         }

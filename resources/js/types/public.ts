@@ -1,4 +1,4 @@
-import type { Product, Category, Tag, Order, OrderStatus, OrderItem, User, PaginatedResponse } from '@/types/shared';
+import type { Address, Product, Category, Tag, Order, OrderStatus, OrderItem, User, PaginatedResponse } from '@/types/shared';
 
 // Re-export para conveniência
 export type { Product, Category, Tag, Order, OrderStatus, OrderItem, User, PaginatedResponse };
@@ -20,14 +20,7 @@ export interface Cart {
     item_count: number;
 }
 
-export interface CheckoutAddress {
-    name: string;
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-}
+export type CheckoutAddress = Address;
 
 export interface CheckoutFormData {
     shipping_address: CheckoutAddress;

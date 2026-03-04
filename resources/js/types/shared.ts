@@ -1,4 +1,13 @@
 // Types compartilhados entre Admin e Public
+export interface Address {
+    name?: string;
+    street: string;
+    city: string;
+    state: string;
+    zip_code: string;
+    country: string;
+}
+
 export interface Product {
     id: number;
     name: string;
@@ -9,7 +18,7 @@ export interface Product {
     quantity: number;
     min_quantity: number;
     active: boolean;
-    category: Category;
+    category: Category | null;
     tags: Tag[];
     created_at: string;
     updated_at: string;
@@ -42,8 +51,8 @@ export interface Order {
     tax: number;
     shipping_cost: number;
     items: OrderItem[];
-    shipping_address?: string;
-    billing_address?: string;
+    shipping_address?: Address | null;
+    billing_address?: Address | null;
     notes?: string;
     created_at: string;
 }

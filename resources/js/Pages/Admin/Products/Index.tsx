@@ -83,7 +83,7 @@ export default function ProductsIndex({
             render: (row) => (
                 <div>
                     <p className="font-medium text-gray-900">{row.name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{row.category.name}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{row.category?.name ?? 'Sem categoria'}</p>
                 </div>
             ),
         },

@@ -17,7 +17,7 @@ class OrderResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'user' => new UserResource($this->whenLoaded('user')),
+            'user' => $this->whenLoaded('user', fn () => (new UserResource($this->user))->resolve($request)),
             'status' => $this->status,
             'subtotal' => (float) $this->subtotal,
             'tax' => (float) $this->tax,
@@ -26,7 +26,7 @@ class OrderResource extends JsonResource
             'shipping_address' => $this->shipping_address,
             'billing_address' => $this->billing_address,
             'notes' => $this->notes,
-            'items' => OrderItemResource::collection($this->whenLoaded('items')),
+            'items' => $this->whenLoaded('items', fn () => OrderItemResource::collection($this->items)->resolve($request)),
             'items_count' => $this->whenCounted('items'),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

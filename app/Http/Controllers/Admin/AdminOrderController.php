@@ -75,6 +75,7 @@ class AdminOrderController extends Controller
                     'total_price' => (float) $item->total_price,
                 ])->toArray(),
                 'shipping_address' => $order->shipping_address,
+                'billing_address' => $order->billing_address,
             ],
         ]);
     }
