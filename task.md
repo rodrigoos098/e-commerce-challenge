@@ -62,16 +62,16 @@
 - [x] Pint, ESLint, Prettier, TypeScript config
 
 ## Fase 2 — Integração
-- [ ] Conectar rotas web Inertia com controllers
-- [ ] Conectar admin frontend com backend via Inertia
-- [ ] Conectar público frontend com backend via Inertia
-- [ ] Ajustar autenticação Sanctum + Inertia
-- [ ] Rodar seeders
+- [x] Conectar rotas web Inertia com controllers
+- [x] Conectar admin frontend com backend via Inertia
+- [x] Conectar público frontend com backend via Inertia
+- [x] Ajustar autenticação Sanctum + Inertia
+- [x] Rodar seeders
 - [x] Suíte de testes completa
 - [x] Verificar cobertura ≥80%
 
 ## Fase 3 — Verificação Final
-- [ ] Testes automatizados passando
+- [x] Testes automatizados passando
 - [ ] Testes manuais (fluxo compra, admin, responsivo)
-- [ ] Swagger UI funcionando
-- [ ] Build de produção
+- [x] Swagger UI funcionando
+- [x] Build de produção
