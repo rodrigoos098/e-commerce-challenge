@@ -8,14 +8,6 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import FormField from '@/Components/Admin/FormField';
 import type { Category } from '@/types/admin';
 
-// — Mock data ——————————————————————————————————
-const MOCK_CATEGORIES: Category[] = [
-    { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true },
-    { id: 2, name: 'Computadores', slug: 'computadores', parent_id: 1, active: true },
-    { id: 6, name: 'Moda', slug: 'moda', parent_id: null, active: true },
-    { id: 9, name: 'Casa & Decoração', slug: 'casa-decoracao', parent_id: null, active: true },
-];
-
 // — Schema ——————————————————————
 const categorySchema = z.object({
     name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres').max(100),
@@ -28,11 +20,11 @@ type CategoryForm = z.infer<typeof categorySchema>;
 
 // — Props ——————————————————————
 interface CategoriesCreateProps {
-    categories?: Category[];
+    categories: Category[];
 }
 
 // — Component ——————————————————————
-export default function CategoriesCreate({ categories = MOCK_CATEGORIES }: CategoriesCreateProps) {
+export default function CategoriesCreate({ categories }: CategoriesCreateProps) {
     const [activeToggle, setActiveToggle] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 

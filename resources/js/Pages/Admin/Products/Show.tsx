@@ -4,34 +4,6 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import Modal from '@/Components/Admin/Modal';
 import type { Product, StockMovement } from '@/types/admin';
 
-// — Mock data ——————————————————————————————————
-const MOCK_PRODUCT: Product = {
-    id: 1,
-    name: 'Fone de Ouvido Bluetooth',
-    slug: 'fone-bluetooth',
-    description: 'Fone de ouvido sem fio com cancelamento de ruído ativo, driver 40mm, autonomia de 30 horas e carregamento rápido USB-C.',
-    price: 299.90,
-    cost_price: 120.00,
-    quantity: 2,
-    min_quantity: 10,
-    active: true,
-    category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true },
-    tags: [
-        { id: 1, name: 'Promoção', slug: 'promocao' },
-        { id: 3, name: 'Destaque', slug: 'destaque' },
-    ],
-    created_at: '2026-01-10T10:00:00Z',
-    updated_at: '2026-03-01T09:00:00Z',
-};
-
-const MOCK_MOVEMENTS: StockMovement[] = [
-    { id: 1, product_id: 1, type: 'in', quantity: 50, notes: 'Compra inicial de estoque', created_at: '2026-01-10T10:00:00Z' },
-    { id: 2, product_id: 1, type: 'out', quantity: 15, notes: 'Pedido #1003', created_at: '2026-01-15T14:00:00Z' },
-    { id: 3, product_id: 1, type: 'out', quantity: 20, notes: 'Pedido #1012, #1015', created_at: '2026-02-01T11:30:00Z' },
-    { id: 4, product_id: 1, type: 'adjustment', quantity: -3, notes: 'Ajuste por devaria danificada', created_at: '2026-02-10T09:20:00Z' },
-    { id: 5, product_id: 1, type: 'out', quantity: 10, notes: 'Pedido #1089', created_at: '2026-03-01T16:00:00Z' },
-];
-
 // — Helpers ——————————————————————————
 function formatCurrency(v: number): string {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
@@ -52,14 +24,14 @@ const movementTypeConfig = {
 
 // — Props ——————————————————————
 interface ProductsShowProps {
-    product?: Product;
-    movements?: StockMovement[];
+    product: Product;
+    movements: StockMovement[];
 }
 
 // — Component ——————————————————————
 export default function ProductsShow({
-    product = MOCK_PRODUCT,
-    movements = MOCK_MOVEMENTS,
+    product,
+    movements,
 }: ProductsShowProps) {
     const [deleteModal, setDeleteModal] = useState(false);
     const [deleting, setDeleting] = useState(false);

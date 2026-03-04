@@ -4,19 +4,6 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import Modal from '@/Components/Admin/Modal';
 import type { Category } from '@/types/admin';
 
-// — Mock data ——————————————————————————————————
-const MOCK_CATEGORIES: Category[] = [
-    { id: 1, name: 'Eletrônicos', slug: 'eletronicos', description: 'Produtos eletrônicos em geral', parent_id: null, active: true },
-    { id: 2, name: 'Computadores', slug: 'computadores', description: 'Desktops e notebooks', parent_id: 1, active: true },
-    { id: 3, name: 'Smartphones', slug: 'smartphones', description: 'Celulares e acessórios', parent_id: 1, active: true },
-    { id: 4, name: 'Periféricos', slug: 'perifericos', description: 'Teclados, mouses e afins', parent_id: 2, active: true },
-    { id: 5, name: 'Armazenamento', slug: 'armazenamento', description: 'SSDs, HDDs e pendrives', parent_id: 2, active: false },
-    { id: 6, name: 'Moda', slug: 'moda', description: 'Roupas e acessórios', parent_id: null, active: true },
-    { id: 7, name: 'Masculino', slug: 'masculino', description: 'Roupas masculinas', parent_id: 6, active: true },
-    { id: 8, name: 'Feminino', slug: 'feminino', description: 'Roupas femininas', parent_id: 6, active: true },
-    { id: 9, name: 'Casa & Decoração', slug: 'casa-decoracao', description: 'Móveis e decoração', parent_id: null, active: true },
-];
-
 // — Tree builder ——————————————————————————————
 interface CategoryNode extends Category {
     children: CategoryNode[];
@@ -148,11 +135,11 @@ function TreeRow({ node, depth, expanded, onToggle, onDelete }: TreeRowProps) {
 
 // — Props ——————————————————————
 interface CategoriesIndexProps {
-    categories?: Category[];
+    categories: Category[];
 }
 
 // — Component ——————————————————————
-export default function CategoriesIndex({ categories = MOCK_CATEGORIES }: CategoriesIndexProps) {
+export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
     const tree = buildTree(categories);
 
     // Start with all root categories expanded

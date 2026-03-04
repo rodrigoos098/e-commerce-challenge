@@ -3,41 +3,7 @@ import { Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBanner from '@/Components/Public/HeroBanner';
 import ProductGrid from '@/Components/Public/ProductGrid';
-import type { HomePageProps, Category, Product } from '@/types/public';
-
-// ——— Mock data ——————————————————————————————————————————————
-const MOCK_CATEGORIES: Category[] = [
-    { id: 1, name: 'Eletrônicos', slug: 'eletronicos', active: true, parent_id: null },
-    { id: 2, name: 'Roupas', slug: 'roupas', active: true, parent_id: null },
-    { id: 3, name: 'Esportes', slug: 'esportes', active: true, parent_id: null },
-    { id: 4, name: 'Casa & Jardim', slug: 'casa-jardim', active: true, parent_id: null },
-    { id: 5, name: 'Livros', slug: 'livros', active: true, parent_id: null },
-    { id: 6, name: 'Beleza', slug: 'beleza', active: true, parent_id: null },
-];
-
-const MOCK_PRODUCTS: Product[] = Array.from({ length: 8 }, (_, i) => ({
-    id: i + 1,
-    name: [
-        'Fone de Ouvido Bluetooth Premium',
-        'Camiseta Oversized Classic',
-        'Tênis Running Pro 3000',
-        'Smart Watch Series X',
-        'Livro: Clean Code',
-        'Mochila Ultraleve 30L',
-        'Câmera DSLR 24MP',
-        'Cadeira Gamer ErgoMax',
-    ][i],
-    slug: `produto-${i + 1}`,
-    description: 'Produto de alta qualidade com garantia.',
-    price: [299.9, 89.9, 349.9, 799.9, 69.9, 249.9, 3999.9, 1299.9][i],
-    quantity: [50, 100, 30, 15, 200, 80, 8, 25][i],
-    min_quantity: 5,
-    active: true,
-    category: MOCK_CATEGORIES[i % MOCK_CATEGORIES.length],
-    tags: [{ id: 1, name: 'destaque', slug: 'destaque' }],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-}));
+import type { HomePageProps } from '@/types/public';
 
 // ——— Feature cards ————————————————————————————————————————
 
@@ -80,10 +46,7 @@ const CATEGORY_ICONS: Record<string, string> = {
     beleza: '💄',
 };
 
-export default function Home({ featured_products, categories }: Partial<HomePageProps>) {
-    const products = featured_products ?? MOCK_PRODUCTS;
-    const cats = categories ?? MOCK_CATEGORIES;
-
+export default function Home({ featured_products, categories }: HomePageProps) {
     return (
         <PublicLayout title="Início">
             {/* Hero */}
@@ -102,7 +65,7 @@ export default function Home({ featured_products, categories }: Partial<HomePage
                         </Link>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-                        {cats.map((cat) => (
+                        {categories.map((cat) => (
                             <Link
                                 key={cat.id}
                                 href={`/products?category_id=${cat.id}`}
@@ -132,7 +95,7 @@ export default function Home({ featured_products, categories }: Partial<HomePage
                             Ver todos →
                         </Link>
                     </div>
-                    <ProductGrid products={products.slice(0, 8)} />
+                    <ProductGrid products={featured_products.slice(0, 8)} />
                 </div>
             </section>
 

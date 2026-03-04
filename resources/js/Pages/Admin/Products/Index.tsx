@@ -6,25 +6,6 @@ import SearchBar from '@/Components/Admin/SearchBar';
 import Modal from '@/Components/Admin/Modal';
 import type { Product, Category, PaginatedResponse } from '@/types/admin';
 
-// — Mock data ——————————————————————————————————————
-const MOCK_CATEGORIES: Category[] = [
-    { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true },
-    { id: 2, name: 'Computadores', slug: 'computadores', parent_id: 1, active: true },
-    { id: 3, name: 'Acessórios', slug: 'acessorios', parent_id: null, active: true },
-];
-
-const MOCK_PRODUCTS: Product[] = [
-    { id: 1, name: 'Fone de Ouvido Bluetooth', slug: 'fone-bluetooth', description: 'Fone sem fio premium', price: 299.90, cost_price: 120.00, quantity: 2, min_quantity: 10, active: true, category: MOCK_CATEGORIES[0], tags: [], created_at: '2026-01-10T10:00:00Z', updated_at: '2026-03-01T09:00:00Z' },
-    { id: 2, name: 'Mouse Ergonômico Sem Fio', slug: 'mouse-ergonomico', description: 'Mouse de alta precisão', price: 189.90, cost_price: 80.00, quantity: 1, min_quantity: 5, active: true, category: MOCK_CATEGORIES[2], tags: [], created_at: '2026-01-15T10:00:00Z', updated_at: '2026-03-01T09:00:00Z' },
-    { id: 3, name: 'Teclado Mecânico RGB', slug: 'teclado-mecanico', description: 'Teclado gamer', price: 459.00, cost_price: 200.00, quantity: 12, min_quantity: 5, active: true, category: MOCK_CATEGORIES[2], tags: [], created_at: '2026-01-20T10:00:00Z', updated_at: '2026-03-01T09:00:00Z' },
-    { id: 4, name: 'Monitor 27" 4K', slug: 'monitor-27-4k', description: 'Monitor UHD IPS', price: 2_499.00, cost_price: 1_200.00, quantity: 5, min_quantity: 3, active: true, category: MOCK_CATEGORIES[1], tags: [], created_at: '2026-02-01T10:00:00Z', updated_at: '2026-03-01T09:00:00Z' },
-    { id: 5, name: 'Webcam 1080p', slug: 'webcam-1080p', description: 'Webcam Full HD', price: 349.00, cost_price: 150.00, quantity: 0, min_quantity: 5, active: false, category: MOCK_CATEGORIES[1], tags: [], created_at: '2026-02-05T10:00:00Z', updated_at: '2026-03-01T09:00:00Z' },
-];
-
-const MOCK_PAGINATION: PaginatedResponse<Product>['meta'] = {
-    current_page: 1, per_page: 15, total: 148, last_page: 10,
-};
-
 // — Helpers ——————————————————————————
 function formatCurrency(v: number): string {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
@@ -32,8 +13,8 @@ function formatCurrency(v: number): string {
 
 // — Props ——————————————————————————
 interface ProductsIndexProps {
-    products?: PaginatedResponse<Product>;
-    categories?: Category[];
+    products: PaginatedResponse<Product>;
+    categories: Category[];
     filters?: {
         search?: string;
         category_id?: string;
@@ -44,11 +25,11 @@ interface ProductsIndexProps {
 // — Component ——————————————————————————
 export default function ProductsIndex({
     products,
-    categories = MOCK_CATEGORIES,
+    categories,
     filters = {},
 }: ProductsIndexProps) {
-    const productData = products?.data ?? MOCK_PRODUCTS;
-    const paginationMeta = products?.meta ?? MOCK_PAGINATION;
+    const productData = products.data;
+    const paginationMeta = products.meta;
 
     const [search, setSearch] = useState(filters.search ?? '');
     const [categoryFilter, setCategoryFilter] = useState(filters.category_id ?? '');

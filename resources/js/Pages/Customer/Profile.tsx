@@ -6,7 +6,7 @@ import { router } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
 import { z } from 'zod';
 import PublicLayout from '@/Layouts/PublicLayout';
-import type { ProfilePageProps, User } from '@/types/public';
+import type { ProfilePageProps } from '@/types/public';
 
 // ——— Schemas ——————————————————————————————————————————————
 
@@ -28,14 +28,6 @@ const passwordSchema = z
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 type PasswordFormData = z.infer<typeof passwordSchema>;
-
-// ——— Mock ——————————————————————————————————————————————————
-
-const MOCK_USER: User = {
-    id: 1,
-    name: 'João da Silva',
-    email: 'joao@exemplo.com',
-};
 
 // ——— Form field component ——————————————————————————————————
 
@@ -83,8 +75,7 @@ function SpinnerIcon() {
 
 // ——— Page ————————————————————————————————————————————————
 
-export default function Profile({ user }: Partial<ProfilePageProps>) {
-    const u = user ?? MOCK_USER;
+export default function Profile({ user }: ProfilePageProps) {
     const [activeTab, setActiveTab] = useState<'profile' | 'password'>('profile');
     const [profileSubmitting, setProfileSubmitting] = useState(false);
     const [passwordSubmitting, setPasswordSubmitting] = useState(false);
@@ -96,7 +87,7 @@ export default function Profile({ user }: Partial<ProfilePageProps>) {
         formState: { errors: profileErrors },
     } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema) as Resolver<ProfileFormData>,
-        defaultValues: { name: u.name, email: u.email },
+        defaultValues: { name: user.name, email: user.email },
     });
 
     const onProfileSubmit = (data: ProfileFormData) => {
@@ -138,12 +129,12 @@ export default function Profile({ user }: Partial<ProfilePageProps>) {
                 <div className="mb-8 flex items-center gap-4">
                     <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg">
                         <span className="text-2xl font-extrabold text-white">
-                            {u.name.charAt(0).toUpperCase()}
+                            {user.name.charAt(0).toUpperCase()}
                         </span>
                     </div>
                     <div>
-                        <h1 className="text-2xl font-extrabold text-gray-900">{u.name}</h1>
-                        <p className="text-sm text-gray-500">{u.email}</p>
+                        <h1 className="text-2xl font-extrabold text-gray-900">{user.name}</h1>
+                        <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
                 </div>
 

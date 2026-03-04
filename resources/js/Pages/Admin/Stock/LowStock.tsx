@@ -2,45 +2,9 @@ import { router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import type { Product } from '@/types/admin';
 
-// — Mock data ——————————————————————————————————
-const MOCK_CATEGORY = { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true };
-
-const MOCK_LOW_STOCK: Product[] = [
-    {
-        id: 4,  name: 'SSD NVMe 1TB',           slug: 'ssd-nvme-1tb',           description: '',
-        price: 399.90, cost_price: 280.00, quantity: 0, min_quantity: 5,
-        active: true, category: MOCK_CATEGORY, tags: [],
-        created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-10T00:00:00Z',
-    },
-    {
-        id: 7,  name: 'Cabo HDMI 2.1 2m',        slug: 'cabo-hdmi-2-1-2m',        description: '',
-        price: 89.90,  cost_price: 40.00,  quantity: 1, min_quantity: 10,
-        active: true, category: MOCK_CATEGORY, tags: [],
-        created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-08T00:00:00Z',
-    },
-    {
-        id: 11, name: 'Webcam Full HD',           slug: 'webcam-full-hd',           description: '',
-        price: 249.90, cost_price: 140.00, quantity: 2, min_quantity: 8,
-        active: true, category: MOCK_CATEGORY, tags: [],
-        created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-09T00:00:00Z',
-    },
-    {
-        id: 15, name: 'Teclado Bluetooth Slim',  slug: 'teclado-bluetooth-slim',  description: '',
-        price: 179.90, cost_price: 95.00,  quantity: 3, min_quantity: 5,
-        active: true, category: MOCK_CATEGORY, tags: [],
-        created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-07T00:00:00Z',
-    },
-    {
-        id: 22, name: 'Hub USB-C 7 em 1',        slug: 'hub-usb-c-7-em-1',        description: '',
-        price: 134.90, cost_price: 70.00,  quantity: 4, min_quantity: 10,
-        active: true, category: MOCK_CATEGORY, tags: [],
-        created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-06T00:00:00Z',
-    },
-];
-
 // — Props ——————————————————————
 interface LowStockProps {
-    products?: Product[];
+    products: Product[];
 }
 
 // — Helpers ——————————————————————
@@ -93,7 +57,7 @@ function barClass(p: Product): string {
 }
 
 // — Component ——————————————————————
-export default function LowStock({ products = MOCK_LOW_STOCK }: LowStockProps) {
+export default function LowStock({ products }: LowStockProps) {
     // Sort: out-of-stock first, then by highest deficit
     const sorted = [...products].sort((a, b) => {
         if (a.quantity === 0 && b.quantity !== 0) { return -1; }

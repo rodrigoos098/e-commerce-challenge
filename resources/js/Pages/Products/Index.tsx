@@ -6,59 +6,11 @@ import CategoryFilter from '@/Components/Public/CategoryFilter';
 import PriceFilter from '@/Components/Public/PriceFilter';
 import SearchInput from '@/Components/Public/SearchInput';
 import Pagination from '@/Components/Public/Pagination';
-import type { ProductsPageProps, Category, Product, PaginatedResponse } from '@/types/public';
-
-// ——— Mock data ——————————————————————————————————————————————
-const MOCK_CATEGORIES: Category[] = [
-    { id: 1, name: 'Eletrônicos', slug: 'eletronicos', active: true, parent_id: null, children: [
-        { id: 11, name: 'Smartphones', slug: 'smartphones', active: true, parent_id: 1 },
-        { id: 12, name: 'Notebooks', slug: 'notebooks', active: true, parent_id: 1 },
-    ] },
-    { id: 2, name: 'Roupas', slug: 'roupas', active: true, parent_id: null },
-    { id: 3, name: 'Esportes', slug: 'esportes', active: true, parent_id: null },
-    { id: 4, name: 'Casa & Jardim', slug: 'casa-jardim', active: true, parent_id: null },
-    { id: 5, name: 'Livros', slug: 'livros', active: true, parent_id: null },
-];
-
-const MOCK_PRODUCTS: Product[] = Array.from({ length: 12 }, (_, i) => ({
-    id: i + 1,
-    name: [
-        'Fone de Ouvido Bluetooth Premium',
-        'Camiseta Oversized Classic',
-        'Tênis Running Pro 3000',
-        'Smart Watch Series X',
-        'Livro: Clean Code',
-        'Mochila Ultraleve 30L',
-        'Câmera DSLR 24MP Full Frame',
-        'Cadeira Gamer ErgoMax',
-        'Monitor 4K 27 polegadas',
-        'Teclado Mecânico RGB',
-        'Mouse Gamer 12000 DPI',
-        'Headset 7.1 Surround',
-    ][i],
-    slug: `produto-${i + 1}`,
-    description: 'Produto de alta qualidade com garantia.',
-    price: [299.9, 89.9, 349.9, 799.9, 69.9, 249.9, 3999.9, 1299.9, 2199.9, 399.9, 179.9, 499.9][i],
-    quantity: [50, 100, 30, 15, 200, 80, 8, 25, 12, 60, 90, 35][i],
-    min_quantity: 5,
-    active: true,
-    category: MOCK_CATEGORIES[i % MOCK_CATEGORIES.length],
-    tags: [],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-}));
-
-const MOCK_PAGINATED: PaginatedResponse<Product> = {
-    data: MOCK_PRODUCTS,
-    meta: { current_page: 1, per_page: 15, total: 48, last_page: 4 },
-    links: { first: null, last: null, prev: null, next: null },
-};
+import type { ProductsPageProps } from '@/types/public';
 
 // ——— Page Component ———————————————————————————————————————
 
-export default function ProductsIndex({ products, categories, filters }: Partial<ProductsPageProps>) {
-    const pageData = products ?? MOCK_PAGINATED;
-    const cats = categories ?? MOCK_CATEGORIES;
+export default function ProductsIndex({ products, categories, filters }: ProductsPageProps) {
     const currentFilters = filters ?? {};
 
     const [search, setSearch] = useState(currentFilters.search ?? '');
@@ -137,7 +89,7 @@ export default function ProductsIndex({ products, categories, filters }: Partial
                 <SearchInput value={search} onChange={setSearch} />
             </div>
             <div className="border-t border-gray-100 pt-6">
-                <CategoryFilter categories={cats} selected={categoryId} onChange={handleCategoryChange} />
+                <CategoryFilter categories={categories} selected={categoryId} onChange={handleCategoryChange} />
             </div>
             <div className="border-t border-gray-100 pt-6">
                 <PriceFilter
@@ -168,7 +120,7 @@ export default function ProductsIndex({ products, categories, filters }: Partial
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Produtos</h1>
                         <p className="mt-1 text-sm text-gray-500">
-                            {pageData.meta.total} resultado{pageData.meta.total !== 1 ? 's' : ''}
+                            {products.meta.total} resultado{products.meta.total !== 1 ? 's' : ''}
                             {search && <> para "<strong>{search}</strong>"</>}
                         </p>
                     </div>
@@ -233,8 +185,8 @@ export default function ProductsIndex({ products, categories, filters }: Partial
 
                     {/* Products grid */}
                     <div className="flex-1 min-w-0">
-                        <ProductGrid products={pageData.data} emptyMessage="Nenhum produto encontrado para os filtros selecionados." />
-                        <Pagination meta={pageData.meta} onPageChange={handlePageChange} />
+                        <ProductGrid products={products.data} emptyMessage="Nenhum produto encontrado para os filtros selecionados." />
+                        <Pagination meta={products.meta} onPageChange={handlePageChange} />
                     </div>
                 </div>
             </div>

@@ -17,37 +17,12 @@ interface OrderRow {
 }
 
 interface OrdersIndexProps {
-    orders?: {
+    orders: {
         data: OrderRow[];
         meta: PaginationMeta;
     };
     filters?: { search?: string; status?: string };
 }
-
-// — Mock data ——————————————————————————————————
-const MOCK_ORDERS: OrderRow[] = [
-    { id: 1, status: 'pending',    total: 1299.90, created_at: '2025-01-10T14:30:00Z', user: { id: 1, name: 'Ana Souza',      email: 'ana@example.com'    } },
-    { id: 2, status: 'processing', total:  459.50, created_at: '2025-01-09T10:15:00Z', user: { id: 2, name: 'Bruno Lima',     email: 'bruno@example.com'  } },
-    { id: 3, status: 'shipped',    total:  789.00, created_at: '2025-01-08T08:00:00Z', user: { id: 3, name: 'Carla Dias',     email: 'carla@example.com'  } },
-    { id: 4, status: 'delivered',  total: 2350.00, created_at: '2025-01-05T16:45:00Z', user: { id: 4, name: 'Diego Mota',     email: 'diego@example.com'  } },
-    { id: 5, status: 'cancelled',  total:  129.90, created_at: '2025-01-04T11:20:00Z', user: { id: 5, name: 'Elisa Ferreira', email: 'elisa@example.com'  } },
-];
-
-const MOCK_PAGINATION = {
-    data: MOCK_ORDERS,
-    meta: {
-        current_page: 1,
-        last_page: 3,
-        per_page: 15,
-        total: 42,
-        links: [
-            { url: null,                   label: '&laquo; Anterior', active: false },
-            { url: '/admin/orders?page=1', label: '1',               active: true  },
-            { url: '/admin/orders?page=2', label: '2',               active: false },
-            { url: '/admin/orders?page=2', label: 'Próximo &raquo;', active: false },
-        ],
-    },
-};
 
 // — Constants ——————————————————————
 const STATUS_OPTIONS: { value: string; label: string }[] = [
@@ -68,7 +43,7 @@ function formatCurrency(value: number) {
 }
 
 // — Component ——————————————————————
-export default function OrdersIndex({ orders = MOCK_PAGINATION, filters = {} }: OrdersIndexProps) {
+export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) {
     const [statusFilter, setStatusFilter] = useState(filters.status ?? '');
 
     function applyFilters(updates: Record<string, string>) {
@@ -150,7 +125,7 @@ export default function OrdersIndex({ orders = MOCK_PAGINATION, filters = {} }: 
                 {/* Status pills */}
                 <div className="flex flex-wrap gap-2">
                     {STATUS_OPTIONS.filter((s) => s.value !== '').map((s) => {
-                        const count = MOCK_ORDERS.filter((o) => o.status === s.value).length;
+                        const count = orders.data.filter((o) => o.status === s.value).length;
                         const active = statusFilter === s.value;
                         return (
                             <button

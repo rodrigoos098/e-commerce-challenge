@@ -2,27 +2,7 @@ import React from 'react';
 import { Link, router } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import Pagination from '@/Components/Public/Pagination';
-import type { OrdersPageProps, Order, OrderStatus, PaginatedResponse } from '@/types/public';
-
-// ——— Mock ——————————————————————————————————————————————————
-
-const MOCK_ORDERS: Order[] = Array.from({ length: 5 }, (_, i) => ({
-    id: i + 100,
-    user_id: 1,
-    status: (['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as OrderStatus[])[i],
-    total: [320.0, 1540.0, 89.9, 2199.9, 499.9][i],
-    subtotal: [290.0, 1399.7, 79.9, 2000.0, 450.0][i],
-    tax: [26.1, 125.97, 7.19, 180.0, 40.5][i],
-    shipping_cost: [3.9, 14.33, 2.81, 19.9, 9.4][i],
-    items: [],
-    created_at: new Date(Date.now() - i * 7 * 24 * 60 * 60 * 1000).toISOString(),
-}));
-
-const MOCK_PAGINATED: PaginatedResponse<Order> = {
-    data: MOCK_ORDERS,
-    meta: { current_page: 1, per_page: 15, total: 5, last_page: 1 },
-    links: { first: null, last: null, prev: null, next: null },
-};
+import type { OrdersPageProps, OrderStatus } from '@/types/public';
 
 // ——— Status badge ————————————————————————————————————————
 
@@ -60,9 +40,7 @@ function formatDate(iso: string) {
 
 // ——— Page ————————————————————————————————————————————————
 
-export default function OrdersIndex({ orders }: Partial<OrdersPageProps>) {
-    const data = orders ?? MOCK_PAGINATED;
-
+export default function OrdersIndex({ orders }: OrdersPageProps) {
     const handlePageChange = (page: number) => {
         router.get('/customer/orders', { page }, { preserveState: true, replace: true });
     };
@@ -72,7 +50,7 @@ export default function OrdersIndex({ orders }: Partial<OrdersPageProps>) {
             <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-8">Meus Pedidos</h1>
 
-                {data.data.length === 0 ? (
+                {orders.data.length === 0 ? (
                     <div className="text-center py-20">
                         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 mx-auto mb-5">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2} aria-hidden="true">
@@ -90,7 +68,7 @@ export default function OrdersIndex({ orders }: Partial<OrdersPageProps>) {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {data.data.map((order) => (
+                        {orders.data.map((order) => (
                             <Link
                                 key={order.id}
                                 href={`/customer/orders/${order.id}`}
@@ -120,7 +98,7 @@ export default function OrdersIndex({ orders }: Partial<OrdersPageProps>) {
                             </Link>
                         ))}
 
-                        <Pagination meta={data.meta} onPageChange={handlePageChange} />
+                        <Pagination meta={orders.meta} onPageChange={handlePageChange} />
                     </div>
                 )}
             </div>

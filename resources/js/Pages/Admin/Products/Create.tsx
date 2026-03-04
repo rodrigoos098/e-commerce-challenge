@@ -8,21 +8,6 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import FormField from '@/Components/Admin/FormField';
 import type { Category, Tag } from '@/types/admin';
 
-// — Mock data ——————————————————————————————————
-const MOCK_CATEGORIES: Category[] = [
-    { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true },
-    { id: 2, name: 'Computadores', slug: 'computadores', parent_id: 1, active: true },
-    { id: 3, name: 'Acessórios', slug: 'acessorios', parent_id: null, active: true },
-    { id: 4, name: 'Periféricos', slug: 'perifericos', parent_id: 2, active: true },
-];
-const MOCK_TAGS: Tag[] = [
-    { id: 1, name: 'Promoção', slug: 'promocao' },
-    { id: 2, name: 'Novo', slug: 'novo' },
-    { id: 3, name: 'Destaque', slug: 'destaque' },
-    { id: 4, name: 'Importado', slug: 'importado' },
-    { id: 5, name: 'Garantia 2 anos', slug: 'garantia-2-anos' },
-];
-
 // — Zod schema ————————————————————————
 const productSchema = z.object({
     name: z.string().min(3, 'Nome deve ter ao menos 3 caracteres').max(255),
@@ -39,14 +24,14 @@ type ProductForm = z.infer<typeof productSchema>;
 
 // — Props ——————————————————————
 interface ProductsCreateProps {
-    categories?: Category[];
-    tags?: Tag[];
+    categories: Category[];
+    tags: Tag[];
 }
 
 // — Component ——————————————————————
 export default function ProductsCreate({
-    categories = MOCK_CATEGORIES,
-    tags = MOCK_TAGS,
+    categories,
+    tags,
 }: ProductsCreateProps) {
     const [selectedTags, setSelectedTags] = useState<number[]>([]);
     const [activeToggle, setActiveToggle] = useState(true);

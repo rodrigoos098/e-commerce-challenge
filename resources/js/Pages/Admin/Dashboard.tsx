@@ -4,27 +4,6 @@ import StatusBadge from '@/Components/Admin/StatusBadge';
 import { Link } from '@inertiajs/react';
 import type { DashboardStats } from '@/types/admin';
 
-// — Mock data (será substituído pelas props reais do Inertia::render() na integração) ——————
-const MOCK_STATS: DashboardStats = {
-    total_products: 148,
-    total_orders: 3_241,
-    total_revenue: 189_450.75,
-    low_stock_count: 7,
-    recent_orders: [
-        { id: 1001, user_id: 1, status: 'pending', total: 299.90, subtotal: 270.00, tax: 14.90, shipping_cost: 15.00, items: [], created_at: '2026-03-03T10:15:00Z' },
-        { id: 1002, user_id: 2, status: 'processing', total: 549.00, subtotal: 510.00, tax: 24.00, shipping_cost: 15.00, items: [], created_at: '2026-03-03T09:02:00Z' },
-        { id: 1003, user_id: 3, status: 'shipped', total: 129.90, subtotal: 115.00, tax: 4.90, shipping_cost: 10.00, items: [], created_at: '2026-03-02T22:30:00Z' },
-        { id: 1004, user_id: 4, status: 'delivered', total: 899.00, subtotal: 850.00, tax: 34.00, shipping_cost: 15.00, items: [], created_at: '2026-03-02T18:10:00Z' },
-        { id: 1005, user_id: 5, status: 'cancelled', total: 45.00, subtotal: 40.00, tax: 0.00, shipping_cost: 5.00, items: [], created_at: '2026-03-02T15:55:00Z' },
-    ],
-    low_stock_products: [
-        { id: 1, name: 'Fone de Ouvido Bluetooth', slug: 'fone-bluetooth', description: '', price: 299.90, quantity: 2, min_quantity: 10, active: true, category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true }, tags: [], created_at: '', updated_at: '' },
-        { id: 2, name: 'Mouse Ergonômico Sem Fio', slug: 'mouse-ergonomico', description: '', price: 189.90, quantity: 1, min_quantity: 5, active: true, category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true }, tags: [], created_at: '', updated_at: '' },
-        { id: 3, name: 'Carregador USB-C 65W', slug: 'carregador-usbc', description: '', price: 79.90, quantity: 3, min_quantity: 15, active: true, category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true }, tags: [], created_at: '', updated_at: '' },
-        { id: 4, name: 'Teclado Mecânico', slug: 'teclado-mecanico', description: '', price: 459.00, quantity: 0, min_quantity: 5, active: true, category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true }, tags: [], created_at: '', updated_at: '' },
-    ],
-};
-
 // Dados de gráfico (últimos 7 dias simulados)
 const CHART_DATA = [
     { day: 'Seg', orders: 42, revenue: 9_840 },
@@ -71,11 +50,11 @@ const IconWarning = () => (
 
 // — Page Props —————————————————————————————————————
 interface DashboardProps {
-    stats?: DashboardStats;
+    stats: DashboardStats;
 }
 
 // — Component ————————————————————————————————————
-export default function Dashboard({ stats = MOCK_STATS }: DashboardProps) {
+export default function Dashboard({ stats }: DashboardProps) {
     const maxOrders = Math.max(...CHART_DATA.map((d) => d.orders));
 
     return (

@@ -4,44 +4,7 @@ import { toast } from 'react-hot-toast';
 import PublicLayout from '@/Layouts/PublicLayout';
 import QuantitySelector from '@/Components/Public/QuantitySelector';
 import ProductGrid from '@/Components/Public/ProductGrid';
-import type { ProductShowPageProps, Product } from '@/types/public';
-
-// ——— Mock ————————————————————————————————————————————————
-
-const MOCK_PRODUCT: Product = {
-    id: 1,
-    name: 'Fone de Ouvido Bluetooth Premium',
-    slug: 'fone-de-ouvido-bluetooth-premium',
-    description: 'Experimente a qualidade sonora superior com nosso fone de ouvido Bluetooth Premium. Com cancelamento de ruído ativo, bateria de 40 horas e drivers de 40mm, você terá uma experiência auditiva incomparável. Design ergonômico e dobrável para fácil transporte.',
-    price: 299.9,
-    cost_price: 180.0,
-    quantity: 50,
-    min_quantity: 5,
-    active: true,
-    category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', active: true, parent_id: null },
-    tags: [
-        { id: 1, name: 'destaque', slug: 'destaque' },
-        { id: 2, name: 'bluetooth', slug: 'bluetooth' },
-        { id: 3, name: 'premium', slug: 'premium' },
-    ],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-};
-
-const MOCK_RELATED: Product[] = Array.from({ length: 4 }, (_, i) => ({
-    id: i + 10,
-    name: ['Smart Watch Series X', 'Headset 7.1 Surround', 'Teclado Mecânico RGB', 'Mouse Gamer 12000 DPI'][i],
-    slug: `related-${i + 10}`,
-    description: 'Produto relacionado.',
-    price: [799.9, 499.9, 399.9, 179.9][i],
-    quantity: 30,
-    min_quantity: 5,
-    active: true,
-    category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', active: true, parent_id: null },
-    tags: [],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-}));
+import type { ProductShowPageProps } from '@/types/public';
 
 // ——— Helpers ————————————————————————————————————————————————
 
@@ -76,25 +39,22 @@ function StockIndicator({ quantity, minQuantity }: { quantity: number; minQuanti
 
 // ——— Page ————————————————————————————————————————————————
 
-export default function ProductShow({ product, related_products }: Partial<ProductShowPageProps>) {
-    const p = product ?? MOCK_PRODUCT;
-    const related = related_products ?? MOCK_RELATED;
-
+export default function ProductShow({ product, related_products }: ProductShowPageProps) {
     const [quantity, setQuantity] = useState(1);
     const [adding, setAdding] = useState(false);
 
-    const isOutOfStock = p.quantity === 0;
+    const isOutOfStock = product.quantity === 0;
 
     const handleAddToCart = () => {
         if (isOutOfStock) { return; }
         setAdding(true);
         router.post(
             '/cart/items',
-            { product_id: p.id, quantity },
+            { product_id: product.id, quantity },
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success(`"${p.name}" adicionado ao carrinho!`);
+                    toast.success(`"${product.name}" adicionado ao carrinho!`);
                     setAdding(false);
                 },
                 onError: () => {
@@ -106,23 +66,23 @@ export default function ProductShow({ product, related_products }: Partial<Produ
     };
 
     return (
-        <PublicLayout title={p.name}>
+        <PublicLayout title={product.name}>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
                 {/* Breadcrumb */}
                 <nav aria-label="Navegação" className="mb-8 flex items-center gap-2 text-sm text-gray-400">
                     <Link href="/" className="hover:text-violet-600 transition-colors">Início</Link>
                     <span aria-hidden="true">/</span>
                     <Link href="/products" className="hover:text-violet-600 transition-colors">Produtos</Link>
-                    {p.category && (
+                    {product.category && (
                         <>
                             <span aria-hidden="true">/</span>
-                            <Link href={`/products?category_id=${p.category.id}`} className="hover:text-violet-600 transition-colors">
-                                {p.category.name}
+                            <Link href={`/products?category_id=${product.category.id}`} className="hover:text-violet-600 transition-colors">
+                                {product.category.name}
                             </Link>
                         </>
                     )}
                     <span aria-hidden="true">/</span>
-                    <span className="text-gray-600 font-medium line-clamp-1">{p.name}</span>
+                    <span className="text-gray-600 font-medium line-clamp-1">{product.name}</span>
                 </nav>
 
                 {/* Product detail */}
@@ -131,14 +91,14 @@ export default function ProductShow({ product, related_products }: Partial<Produ
                     <div className="space-y-4">
                         <div className="overflow-hidden rounded-2xl bg-gray-100 border border-gray-200 aspect-square">
                             <img
-                                src={`https://picsum.photos/seed/${p.id}/800/800`}
-                                alt={p.name}
+                                src={`https://picsum.photos/seed/${product.id}/800/800`}
+                                alt={product.name}
                                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                             />
                         </div>
                         {/* Thumbnail row */}
                         <div className="flex gap-3">
-                            {[p.id, p.id + 100, p.id + 200].map((seed) => (
+                            {[product.id, product.id + 100, product.id + 200].map((seed) => (
                                 <button
                                     key={seed}
                                     className="h-20 w-20 overflow-hidden rounded-xl border-2 border-violet-200 bg-gray-100 hover:border-violet-500 transition-colors"
@@ -160,15 +120,15 @@ export default function ProductShow({ product, related_products }: Partial<Produ
                     <div className="flex flex-col">
                         {/* Category & Tags */}
                         <div className="flex flex-wrap items-center gap-2 mb-4">
-                            {p.category && (
+                            {product.category && (
                                 <Link
-                                    href={`/products?category_id=${p.category.id}`}
+                                    href={`/products?category_id=${product.category.id}`}
                                     className="rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 hover:bg-violet-200 transition-colors"
                                 >
-                                    {p.category.name}
+                                    {product.category.name}
                                 </Link>
                             )}
-                            {p.tags.map((tag) => (
+                            {product.tags.map((tag) => (
                                 <span key={tag.id} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
                                     #{tag.name}
                                 </span>
@@ -177,24 +137,24 @@ export default function ProductShow({ product, related_products }: Partial<Produ
 
                         {/* Name */}
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight mb-4">
-                            {p.name}
+                            {product.name}
                         </h1>
 
                         {/* Price */}
                         <div className="mb-6">
-                            <p className="text-4xl font-extrabold text-gray-900">{formatPrice(p.price)}</p>
+                            <p className="text-4xl font-extrabold text-gray-900">{formatPrice(product.price)}</p>
                             <p className="mt-1 text-sm text-gray-400">
-                                Em até 12× de {formatPrice(p.price / 12)} sem juros
+                                Em até 12× de {formatPrice(product.price / 12)} sem juros
                             </p>
                         </div>
 
                         {/* Stock indicator */}
                         <div className="mb-6">
-                            <StockIndicator quantity={p.quantity} minQuantity={p.min_quantity} />
+                            <StockIndicator quantity={product.quantity} minQuantity={product.min_quantity} />
                         </div>
 
                         {/* Description */}
-                        <p className="text-sm text-gray-600 leading-relaxed mb-8">{p.description}</p>
+                        <p className="text-sm text-gray-600 leading-relaxed mb-8">{product.description}</p>
 
                         {/* Quantity + Add to cart */}
                         {!isOutOfStock && (
@@ -204,7 +164,7 @@ export default function ProductShow({ product, related_products }: Partial<Produ
                                     <QuantitySelector
                                         value={quantity}
                                         onChange={setQuantity}
-                                        max={p.quantity}
+                                        max={product.quantity}
                                     />
                                 </div>
                                 <button
@@ -260,10 +220,10 @@ export default function ProductShow({ product, related_products }: Partial<Produ
                 </div>
 
                 {/* Related products */}
-                {related.length > 0 && (
+                {related_products && related_products.length > 0 && (
                     <section className="mt-16" aria-labelledby="related-heading">
                         <h2 id="related-heading" className="text-xl font-bold text-gray-900 mb-6">Você também pode gostar</h2>
-                        <ProductGrid products={related} />
+                        <ProductGrid products={related_products} />
                     </section>
                 )}
             </div>

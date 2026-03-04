@@ -47,37 +47,6 @@ const checkoutSchema = z.object({
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
-// ——— Mock ————————————————————————————————————————————————
-
-const MOCK_CART: Cart = {
-    id: 1,
-    items: [
-        {
-            id: 1,
-            product: {
-                id: 1,
-                name: 'Fone de Ouvido Bluetooth Premium',
-                slug: 'fone-bluetooth',
-                description: '',
-                price: 299.9,
-                quantity: 50,
-                min_quantity: 5,
-                active: true,
-                category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', active: true, parent_id: null },
-                tags: [],
-                created_at: '',
-                updated_at: '',
-            },
-            quantity: 2,
-        },
-    ],
-    subtotal: 599.8,
-    tax: 53.98,
-    shipping_cost: 15.0,
-    total: 668.78,
-    item_count: 2,
-};
-
 // ——— Helpers ——————————————————————————————————————————————
 
 function formatPrice(value: number) {
@@ -242,8 +211,7 @@ function StepBar({ current }: { current: number }) {
 
 // ——— Page ————————————————————————————————————————————————
 
-export default function Checkout({ cart }: Partial<CheckoutPageProps>) {
-    const c = cart ?? MOCK_CART;
+export default function Checkout({ cart }: CheckoutPageProps) {
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [submitting, setSubmitting] = useState(false);
 
@@ -444,13 +412,13 @@ export default function Checkout({ cart }: Partial<CheckoutPageProps>) {
 
                         {/* Order summary — always visible on desktop */}
                         <div className="hidden lg:block lg:col-span-1">
-                            <OrderSummary cart={c} />
+                            <OrderSummary cart={cart} />
                         </div>
 
                         {/* Order summary — mobile: show only on step 3 */}
                         {step === 3 && (
                             <div className="lg:hidden">
-                                <OrderSummary cart={c} />
+                                <OrderSummary cart={cart} />
                             </div>
                         )}
                     </div>

@@ -8,36 +8,6 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import FormField from '@/Components/Admin/FormField';
 import type { Product, Category, Tag } from '@/types/admin';
 
-// — Mock data ——————————————————————————————————
-const MOCK_PRODUCT: Product = {
-    id: 1,
-    name: 'Fone de Ouvido Bluetooth',
-    slug: 'fone-bluetooth',
-    description: 'Fone de ouvido sem fio com cancelamento de ruído ativo e 30h de bateria.',
-    price: 299.90,
-    cost_price: 120.00,
-    quantity: 2,
-    min_quantity: 10,
-    active: true,
-    category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true },
-    tags: [{ id: 1, name: 'Promoção', slug: 'promocao' }],
-    created_at: '2026-01-10T10:00:00Z',
-    updated_at: '2026-03-01T09:00:00Z',
-};
-const MOCK_CATEGORIES: Category[] = [
-    { id: 1, name: 'Eletrônicos', slug: 'eletronicos', parent_id: null, active: true },
-    { id: 2, name: 'Computadores', slug: 'computadores', parent_id: 1, active: true },
-    { id: 3, name: 'Acessórios', slug: 'acessorios', parent_id: null, active: true },
-    { id: 4, name: 'Periféricos', slug: 'perifericos', parent_id: 2, active: true },
-];
-const MOCK_TAGS: Tag[] = [
-    { id: 1, name: 'Promoção', slug: 'promocao' },
-    { id: 2, name: 'Novo', slug: 'novo' },
-    { id: 3, name: 'Destaque', slug: 'destaque' },
-    { id: 4, name: 'Importado', slug: 'importado' },
-    { id: 5, name: 'Garantia 2 anos', slug: 'garantia-2-anos' },
-];
-
 // — Schema — mesmas regras do Create ——————————————————————
 const productSchema = z.object({
     name: z.string().min(3, 'Nome deve ter ao menos 3 caracteres').max(255),
@@ -54,16 +24,16 @@ type ProductForm = z.infer<typeof productSchema>;
 
 // — Props ——————————————————————
 interface ProductsEditProps {
-    product?: Product;
-    categories?: Category[];
-    tags?: Tag[];
+    product: Product;
+    categories: Category[];
+    tags: Tag[];
 }
 
 // — Component ——————————————————————
 export default function ProductsEdit({
-    product = MOCK_PRODUCT,
-    categories = MOCK_CATEGORIES,
-    tags = MOCK_TAGS,
+    product,
+    categories,
+    tags,
 }: ProductsEditProps) {
     const [selectedTags, setSelectedTags] = useState<number[]>(
         product.tags.map((t) => t.id),

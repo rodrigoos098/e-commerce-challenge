@@ -3,64 +3,13 @@ import { Link, router } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
 import PublicLayout from '@/Layouts/PublicLayout';
 import CartItemComponent from '@/Components/Public/CartItem';
-import type { CartPageProps, Cart } from '@/types/public';
-
-// ——— Mock ————————————————————————————————————————————————
-
-const MOCK_CART: Cart = {
-    id: 1,
-    items: [
-        {
-            id: 1,
-            product: {
-                id: 1,
-                name: 'Fone de Ouvido Bluetooth Premium',
-                slug: 'fone-bluetooth',
-                description: '',
-                price: 299.9,
-                quantity: 50,
-                min_quantity: 5,
-                active: true,
-                category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', active: true, parent_id: null },
-                tags: [],
-                created_at: '',
-                updated_at: '',
-            },
-            quantity: 2,
-        },
-        {
-            id: 2,
-            product: {
-                id: 4,
-                name: 'Smart Watch Series X',
-                slug: 'smart-watch',
-                description: '',
-                price: 799.9,
-                quantity: 15,
-                min_quantity: 5,
-                active: true,
-                category: { id: 1, name: 'Eletrônicos', slug: 'eletronicos', active: true, parent_id: null },
-                tags: [],
-                created_at: '',
-                updated_at: '',
-            },
-            quantity: 1,
-        },
-    ],
-    subtotal: 1399.7,
-    tax: 125.97,
-    shipping_cost: 15.0,
-    total: 1540.67,
-    item_count: 3,
-};
+import type { CartPageProps } from '@/types/public';
 
 function formatPrice(value: number) {
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-export default function Cart({ cart }: Partial<CartPageProps>) {
-    const c = cart ?? MOCK_CART;
-
+export default function Cart({ cart }: CartPageProps) {
     const handleClearCart = () => {
         router.delete('/cart', {
             onSuccess: () => toast.success('Carrinho limpo!'),
@@ -68,7 +17,7 @@ export default function Cart({ cart }: Partial<CartPageProps>) {
         });
     };
 
-    if (c.items.length === 0) {
+    if (cart.items.length === 0) {
         return (
             <PublicLayout title="Carrinho">
                 <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-20 text-center">
@@ -99,7 +48,7 @@ export default function Cart({ cart }: Partial<CartPageProps>) {
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
                         Meu Carrinho
-                        <span className="ml-2 text-base font-normal text-gray-400">({c.item_count} {c.item_count === 1 ? 'item' : 'itens'})</span>
+                        <span className="ml-2 text-base font-normal text-gray-400">({cart.item_count} {cart.item_count === 1 ? 'item' : 'itens'})</span>
                     </h1>
                     <button
                         type="button"
@@ -114,7 +63,7 @@ export default function Cart({ cart }: Partial<CartPageProps>) {
                     {/* Items */}
                     <div className="lg:col-span-2">
                         <div className="rounded-2xl bg-white border border-gray-100 shadow-sm px-6">
-                            {c.items.map((item) => (
+                            {cart.items.map((item) => (
                                 <CartItemComponent key={item.id} item={item} />
                             ))}
                         </div>
@@ -140,21 +89,21 @@ export default function Cart({ cart }: Partial<CartPageProps>) {
                             <div className="space-y-3 text-sm">
                                 <div className="flex justify-between text-gray-600">
                                     <span>Subtotal</span>
-                                    <span>{formatPrice(c.subtotal)}</span>
+                                    <span>{formatPrice(cart.subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Impostos</span>
-                                    <span>{formatPrice(c.tax)}</span>
+                                    <span>{formatPrice(cart.tax)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Frete</span>
-                                    <span className={c.shipping_cost === 0 ? 'text-green-600 font-medium' : ''}>
-                                        {c.shipping_cost === 0 ? 'Grátis' : formatPrice(c.shipping_cost)}
+                                    <span className={cart.shipping_cost === 0 ? 'text-green-600 font-medium' : ''}>
+                                        {cart.shipping_cost === 0 ? 'Grátis' : formatPrice(cart.shipping_cost)}
                                     </span>
                                 </div>
                                 <div className="border-t border-gray-100 pt-3 flex justify-between font-bold text-base text-gray-900">
                                     <span>Total</span>
-                                    <span>{formatPrice(c.total)}</span>
+                                    <span>{formatPrice(cart.total)}</span>
                                 </div>
                             </div>
 

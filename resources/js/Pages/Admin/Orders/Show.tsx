@@ -27,29 +27,6 @@ interface ShowOrder {
     shipping_address?: string;
 }
 
-// — Mock data ——————————————————————————————————
-const MOCK_ORDER: ShowOrder = {
-    id: 3,
-    status: 'shipped',
-    total: 789.00,
-    subtotal: 719.00,
-    shipping_cost: 70.00,
-    notes: 'Presente — incluir embalagem especial.',
-    created_at: '2025-01-08T08:00:00Z',
-    user: { id: 3, name: 'Carla Dias', email: 'carla@example.com' },
-    items: [
-        { id: 1, product_name: 'Teclado Mecânico RGB',  quantity: 1, unit_price: 649.00, total_price: 649.00 },
-        { id: 2, product_name: 'Mouse Pad XL',          quantity: 2, unit_price: 35.00,  total_price: 70.00  },
-    ],
-    shipping_address: JSON.stringify({
-        street: 'Rua das Flores, 123',
-        neighborhood: 'Jardins',
-        city: 'São Paulo',
-        state: 'SP',
-        zip: '01425-000',
-    }),
-};
-
 // — Config ——————————————————————
 const STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
     pending:    ['processing', 'cancelled'],
@@ -89,11 +66,11 @@ function parseAddress(raw?: string): Record<string, string> {
 
 // — Props ——————————————————————
 interface OrdersShowProps {
-    order?: ShowOrder;
+    order: ShowOrder;
 }
 
 // — Component ——————————————————————
-export default function OrdersShow({ order = MOCK_ORDER }: OrdersShowProps) {
+export default function OrdersShow({ order }: OrdersShowProps) {
     const [confirmModal, setConfirmModal] = useState<{ open: boolean; targetStatus: OrderStatus | null }>({
         open: false, targetStatus: null,
     });
