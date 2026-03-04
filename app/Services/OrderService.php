@@ -159,4 +159,28 @@ class OrderService
 
         return $updatedOrder;
     }
+
+    /**
+     * Get total count of all orders.
+     */
+    public function totalCount(): int
+    {
+        return $this->orderRepository->totalCount();
+    }
+
+    /**
+     * Get total revenue (excluding cancelled orders).
+     */
+    public function totalRevenue(): float
+    {
+        return $this->orderRepository->totalRevenue();
+    }
+
+    /**
+     * Get the most recent orders.
+     */
+    public function recent(int $limit = 5): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->orderRepository->recent($limit);
+    }
 }

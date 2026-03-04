@@ -93,4 +93,32 @@ class OrderRepository implements OrderRepositoryInterface
 
         return $order->fresh(['items.product']);
     }
+
+    /**
+     * Get total count of all orders.
+     */
+    public function totalCount(): int
+    {
+        return Order::query()->count();
+    }
+
+    /**
+     * Get total revenue (excluding cancelled orders).
+     */
+    public function totalRevenue(): float
+    {
+        return (float) Order::query()->where('status', '!=', 'cancelled')->sum('total');
+    }
+
+    /**
+     * Get the most recent orders.
+     */
+    public function recent(int $limit = 5): \Illuminate\Database\Eloquent\Collection
+    {
+        return Order::query()
+            ->with('user')
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
 }

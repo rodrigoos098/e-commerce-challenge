@@ -16,7 +16,8 @@ class ProductService
 {
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Get paginated products with optional filters.
@@ -125,6 +126,14 @@ class ProductService
     public function lowStock(): Collection
     {
         return $this->productRepository->lowStock();
+    }
+
+    /**
+     * Get total count of products.
+     */
+    public function totalCount(): int
+    {
+        return $this->productRepository->totalCount();
     }
 
     /**

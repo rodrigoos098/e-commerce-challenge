@@ -41,4 +41,19 @@ interface OrderRepositoryInterface
      * Update the status of an order.
      */
     public function updateStatus(Order $order, string $status): Order;
+
+    /**
+     * Get total count of all orders.
+     */
+    public function totalCount(): int;
+
+    /**
+     * Get total revenue (excluding cancelled orders).
+     */
+    public function totalRevenue(): float;
+
+    /**
+     * Get the most recent orders.
+     */
+    public function recent(int $limit = 5): \Illuminate\Database\Eloquent\Collection;
 }

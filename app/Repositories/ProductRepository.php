@@ -141,4 +141,12 @@ class ProductRepository implements ProductRepositoryInterface
 
         return $query->exists();
     }
+
+    /**
+     * Get total count of active products.
+     */
+    public function totalCount(): int
+    {
+        return Product::query()->count();
+    }
 }

@@ -83,4 +83,57 @@ class AuthService
             'email' => $user->email,
         ]);
     }
+
+    /**
+     * Register a new user without creating an API token (for session-based auth).
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function registerUser(array $data): User
+    {
+        $user = User::query()->create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
+
+        $user->assignRole('customer');
+
+        $this->logActivity('auth', 'User registered', [
+            'registered_user_id' => $user->id,
+            'email' => $user->email,
+        ]);
+
+        return $user;
+    }
+
+    /**
+     * Update a user's profile information.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function updateProfile(User $user, array $data): User
+    {
+        $user->update($data);
+
+        $this->logActivity('auth', 'Profile updated', [
+            'user_id' => $user->id,
+        ]);
+
+        return $user;
+    }
+
+    /**
+     * Update a user's password.
+     */
+    public function updatePassword(User $user, string $password): void
+    {
+        $user->update([
+            'password' => Hash::make($password),
+        ]);
+
+        $this->logActivity('auth', 'Password changed', [
+            'user_id' => $user->id,
+        ]);
+    }
 }

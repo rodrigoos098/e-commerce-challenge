@@ -60,4 +60,9 @@ interface ProductRepositoryInterface
      * Check if a slug already exists (including soft-deleted records).
      */
     public function slugExists(string $slug, ?int $exceptId = null): bool;
+
+    /**
+     * Get total count of active products.
+     */
+    public function totalCount(): int;
 }
