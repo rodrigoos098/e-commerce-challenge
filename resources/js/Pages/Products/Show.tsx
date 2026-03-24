@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import PublicLayout from '@/Layouts/PublicLayout';
 import QuantitySelector from '@/Components/Public/QuantitySelector';
 import ProductGrid from '@/Components/Public/ProductGrid';
+import Spinner from '@/Components/Shared/Spinner';
 import type { ProductShowPageProps } from '@/types/public';
 
 // ——— Helpers ————————————————————————————————————————————————
@@ -154,10 +155,7 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                                 >
                                     {adding ? (
                                         <>
-                                            <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                            </svg>
+                                            <Spinner />
                                             Adicionando...
                                         </>
                                     ) : (

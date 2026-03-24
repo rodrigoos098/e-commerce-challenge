@@ -6,6 +6,7 @@ import type { Resolver } from 'react-hook-form';
 import { router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import FormField from '@/Components/Admin/FormField';
+import Button from '@/Components/Shared/Button';
 import type { Category } from '@/types/admin';
 
 // — Schema ——————————————————————
@@ -158,26 +159,16 @@ export default function CategoriesEdit({ category, categories }: CategoriesEditP
 
                         {/* Actions */}
                         <div className="flex items-center justify-end gap-3 pt-2">
-                            <button
+                            <Button
                                 type="button"
+                                variant="secondary"
                                 onClick={() => router.visit('/admin/categories')}
-                                className="px-5 py-2.5 text-sm font-medium text-warm-600 bg-white border border-warm-300 rounded-lg hover:bg-warm-50 transition-colors"
                             >
                                 Cancelar
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={submitting}
-                                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-kintsugi-600 hover:bg-kintsugi-700 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
-                            >
-                                {submitting && (
-                                    <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                    </svg>
-                                )}
+                            </Button>
+                            <Button type="submit" loading={submitting}>
                                 Salvar Alterações
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </div>

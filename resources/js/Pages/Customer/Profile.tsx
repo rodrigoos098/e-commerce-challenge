@@ -6,6 +6,7 @@ import { router } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
 import { z } from 'zod';
 import PublicLayout from '@/Layouts/PublicLayout';
+import Spinner from '@/Components/Shared/Spinner';
 import type { ProfilePageProps } from '@/types/public';
 
 // ——— Schemas ——————————————————————————————————————————————
@@ -61,15 +62,6 @@ function Field({ id, label, type = 'text', error, placeholder, autoComplete, reg
                 <p id={`${id}-error`} role="alert" className="mt-1 text-xs text-red-600">{error}</p>
             )}
         </div>
-    );
-}
-
-function SpinnerIcon() {
-    return (
-        <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
     );
 }
 
@@ -189,7 +181,7 @@ export default function Profile({ user }: ProfilePageProps) {
                                     disabled={profileSubmitting}
                                     className="rounded-xl bg-kintsugi-500 px-6 py-2.5 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-md shadow-kintsugi-200 disabled:opacity-60 flex items-center gap-2"
                                 >
-                                    {profileSubmitting && <SpinnerIcon />}
+                                    {profileSubmitting && <Spinner />}
                                     Salvar Alterações
                                 </button>
                             </div>
@@ -235,7 +227,7 @@ export default function Profile({ user }: ProfilePageProps) {
                                     disabled={passwordSubmitting}
                                     className="rounded-xl bg-kintsugi-500 px-6 py-2.5 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-md shadow-kintsugi-200 disabled:opacity-60 flex items-center gap-2"
                                 >
-                                    {passwordSubmitting && <SpinnerIcon />}
+                                    {passwordSubmitting && <Spinner />}
                                     Alterar Senha
                                 </button>
                             </div>

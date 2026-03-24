@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
 import { z } from 'zod';
+import Spinner from '@/Components/Shared/Spinner';
+import Logo from '@/Components/Shared/Logo';
 
 const registerSchema = z.object({
     name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
@@ -61,9 +63,7 @@ export default function Register() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-2">
-                        <span className="text-2xl font-display font-extrabold text-warm-700">
-                            Shopsugi<span className="text-kintsugi-600">ツ</span>
-                        </span>
+                        <Logo />
                     </Link>
                     <h1 className="mt-6 text-2xl font-bold text-warm-700">Junte-se ao Shopsugiツ</h1>
                     <p className="mt-1 text-sm text-warm-500">Descubra arte artesanal unica de todo o Brasil.</p>
@@ -161,12 +161,7 @@ export default function Register() {
                             disabled={processing}
                             className="w-full rounded-xl bg-kintsugi-500 py-3 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-lg shadow-kintsugi-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                            {processing && (
-                                <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                </svg>
-                            )}
+                            {processing && <Spinner />}
                             Criar conta
                         </button>
                     </form>
