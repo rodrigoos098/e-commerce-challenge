@@ -101,13 +101,13 @@ export default function DataTable<T extends { id: number | string }>({
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-warm-200">
                         {loading ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <tr key={i}>
                                     {columns.map((col) => (
                                         <td key={String(col.key)} className="px-4 py-3">
-                                            <div className="h-4 bg-gray-100 rounded animate-pulse w-3/4" />
+                                            <div className="h-4 bg-warm-100 rounded animate-pulse w-3/4" />
                                         </td>
                                     ))}
                                 </tr>
@@ -174,7 +174,7 @@ export default function DataTable<T extends { id: number | string }>({
                                             'px-2.5 py-1.5 text-xs rounded transition-colors',
                                             isActive
                                                 ? 'bg-kintsugi-600 text-white font-semibold'
-                                                : 'text-warm-600 hover:bg-gray-200',
+                                                : 'text-warm-600 hover:bg-warm-100',
                                         ].join(' ')}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
@@ -196,7 +196,7 @@ export default function DataTable<T extends { id: number | string }>({
                                     <Link
                                         key={page}
                                         href={href}
-                                        className="px-2.5 py-1.5 text-xs rounded text-warm-600 hover:bg-gray-200 transition-colors"
+                                        className="px-2.5 py-1.5 text-xs rounded text-warm-600 hover:bg-warm-100 transition-colors"
                                     >
                                         {page}
                                     </Link>

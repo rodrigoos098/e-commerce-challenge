@@ -41,7 +41,7 @@ interface FormFieldProps {
 }
 
 const baseInputClasses =
-    'w-full rounded-lg border border-warm-300 bg-white px-3 py-2 text-sm text-warm-700 placeholder-gray-400 ' +
+    'w-full rounded-lg border border-warm-300 bg-white px-3 py-2 text-sm text-warm-700 placeholder-warm-400 ' +
     'focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20 ' +
     'disabled:bg-warm-50 disabled:text-warm-400 disabled:cursor-not-allowed ' +
     'transition-colors duration-150';
@@ -81,7 +81,7 @@ export default function FormField({
                     onClick={() => onToggle?.(!checked)}
                     className={[
                         'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20',
-                        checked ? 'bg-kintsugi-600' : 'bg-gray-300',
+                        checked ? 'bg-kintsugi-600' : 'bg-warm-300',
                         disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
                     ].join(' ')}
                 >

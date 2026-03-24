@@ -25,7 +25,7 @@ export default function ProductGrid({ products, loading = false, emptyMessage = 
             <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-16 w-16 text-gray-200 mb-4"
+                    className="h-16 w-16 text-warm-200 mb-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

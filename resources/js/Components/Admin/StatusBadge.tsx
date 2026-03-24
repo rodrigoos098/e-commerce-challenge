@@ -40,9 +40,9 @@ const dotColor: Record<OrderStatus, string> = {
 export default function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
     const config = statusConfig[status] ?? {
         label: status,
-        classes: 'bg-gray-100 text-warm-600 ring-gray-200',
+        classes: 'bg-warm-100 text-warm-600 ring-warm-200',
     };
-    const dot = dotColor[status] ?? 'bg-gray-400';
+    const dot = dotColor[status] ?? 'bg-warm-400';
 
     return (
         <span

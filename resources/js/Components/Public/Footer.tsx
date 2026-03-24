@@ -59,9 +59,9 @@ export default function Footer() {
                     <div>
                         <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contato</h3>
                         <ul className="space-y-2 text-sm text-warm-400">
-                            <li>📧 contato@shopsugi.com</li>
-                            <li>📞 (11) 99999-9999</li>
-                            <li>🕘 Seg–Sex, 9h–18h</li>
+                            <li>contato@shopsugi.com</li>
+                            <li>(11) 99999-9999</li>
+                            <li>Seg–Sex, 9h–18h</li>
                         </ul>
                     </div>
                 </div>

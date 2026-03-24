@@ -78,10 +78,10 @@ export default function ProductsShow({
                                 <span
                                     className={[
                                         'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
-                                        product.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-warm-500',
+                                        product.active ? 'bg-emerald-100 text-emerald-700' : 'bg-warm-100 text-warm-500',
                                     ].join(' ')}
                                 >
-                                    <span className={['h-1.5 w-1.5 rounded-full', product.active ? 'bg-emerald-500' : 'bg-gray-400'].join(' ')} />
+                                    <span className={['h-1.5 w-1.5 rounded-full', product.active ? 'bg-emerald-500' : 'bg-warm-400'].join(' ')} />
                                     {product.active ? 'Ativo' : 'Inativo'}
                                 </span>
                             </div>
@@ -118,7 +118,7 @@ export default function ProductsShow({
                                 {product.tags.length > 0 && (
                                     <div className="flex flex-wrap gap-2 pt-1">
                                         {product.tags.map((tag) => (
-                                            <span key={tag.id} className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-warm-600">
+                                            <span key={tag.id} className="rounded-full bg-warm-100 px-2.5 py-0.5 text-xs font-medium text-warm-600">
                                                 {tag.name}
                                             </span>
                                         ))}
@@ -157,7 +157,7 @@ export default function ProductsShow({
                                 {movements.length === 0 ? (
                                     <p className="px-5 py-8 text-center text-sm text-warm-400">Nenhuma movimentacao registrada.</p>
                                 ) : (
-                                    <div className="divide-y divide-gray-100">
+                                    <div className="divide-y divide-warm-200">
                                         {movements.map((movement) => {
                                             const config = movementTypeConfig[movement.type] ?? movementTypeConfig.ajuste;
                                             const isDecrease = movement.type === 'saida' || movement.type === 'venda';

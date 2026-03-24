@@ -64,7 +64,7 @@ export default function SearchBar({
                 value={value}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className="w-full rounded-lg border border-warm-300 bg-white py-2 pl-9 pr-9 text-sm text-warm-700 placeholder-gray-400 focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20 transition-colors"
+                className="w-full rounded-lg border border-warm-300 bg-white py-2 pl-9 pr-9 text-sm text-warm-700 placeholder-warm-400 focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20 transition-colors"
             />
 
             {/* Clear button */}

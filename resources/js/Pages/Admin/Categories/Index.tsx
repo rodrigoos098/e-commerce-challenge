@@ -73,7 +73,7 @@ function TreeRow({ node, depth, expanded, onToggle, onDelete }: TreeRowProps) {
                         ) : (
                             <span className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
                                 {depth > 0 && (
-                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                    <span className="w-1 h-1 rounded-full bg-warm-300" />
                                 )}
                             </span>
                         )}
@@ -92,9 +92,9 @@ function TreeRow({ node, depth, expanded, onToggle, onDelete }: TreeRowProps) {
                 <td className="px-4 py-3">
                     <span className={[
                         'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full',
-                        node.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-warm-500',
+                        node.active ? 'bg-emerald-100 text-emerald-700' : 'bg-warm-100 text-warm-500',
                     ].join(' ')}>
-                        <span className={['h-1.5 w-1.5 rounded-full', node.active ? 'bg-emerald-500' : 'bg-gray-400'].join(' ')} />
+                        <span className={['h-1.5 w-1.5 rounded-full', node.active ? 'bg-emerald-500' : 'bg-warm-400'].join(' ')} />
                         {node.active ? 'Ativa' : 'Inativa'}
                     </span>
                 </td>
@@ -220,7 +220,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                     <button
                         type="button"
                         onClick={collapseAll}
-                        className="flex items-center gap-1.5 text-xs font-medium text-warm-600 hover:text-warm-700 px-3 py-1.5 rounded-md border border-warm-200 hover:bg-gray-100 transition-all"
+                        className="flex items-center gap-1.5 text-xs font-medium text-warm-600 hover:text-warm-700 px-3 py-1.5 rounded-md border border-warm-200 hover:bg-warm-100 transition-all"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
@@ -242,7 +242,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                                     <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-warm-500 uppercase tracking-wider">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-warm-200">
                                 {tree.length === 0 ? (
                                     <tr>
                                         <td colSpan={5} className="px-4 py-12 text-center text-sm text-warm-400">

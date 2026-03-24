@@ -140,7 +140,7 @@ export default function LowStock({ products }: LowStockProps) {
                             </button>
                         </div>
 
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y divide-warm-200">
                             {sortedProducts.map((product) => {
                                 const percentage = fillPercent(product);
 
@@ -175,7 +175,7 @@ export default function LowStock({ products }: LowStockProps) {
 
                                                 <div className="hidden w-20 sm:block">
                                                     <p className="mb-1 text-right text-xs text-warm-500">{Math.round(percentage)}%</p>
-                                                    <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+                                                    <div className="h-2 overflow-hidden rounded-full bg-warm-200">
                                                         <div
                                                             className={`h-2 rounded-full transition-all ${barClass(product)}`}
                                                             style={{ width: `${percentage}%` }}

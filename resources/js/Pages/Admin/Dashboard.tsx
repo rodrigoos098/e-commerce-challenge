@@ -156,7 +156,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 Ver todos
                             </Link>
                         </div>
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y divide-warm-200">
                             {stats.recent_orders.map((order) => (
                                 <div key={order.id} className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-warm-50">
                                     <div>
@@ -186,7 +186,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 Ver relatorio
                             </Link>
                         </div>
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y divide-warm-200">
                             {stats.low_stock_products.map((product) => {
                                 const isCritical = product.quantity === 0;
 

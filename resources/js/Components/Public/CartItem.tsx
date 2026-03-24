@@ -61,7 +61,7 @@ export default function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
     return (
         <div className="flex items-start gap-4 py-5 border-b border-warm-200 last:border-0">
             {/* Image */}
-            <div className="shrink-0 h-20 w-20 rounded-xl overflow-hidden bg-gray-100 border border-warm-200">
+            <div className="shrink-0 h-20 w-20 rounded-xl overflow-hidden bg-warm-100 border border-warm-200">
                 <img
                     src={`/storage/products/${item.product.id}.webp`}
                     alt={item.product.name}
@@ -101,7 +101,7 @@ export default function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
                     />
                     <div className="text-right">
                         <p className="text-sm font-bold text-warm-700">{formatPrice(lineTotal)}</p>
-                        <p className="text-xs text-warm-400">{formatPrice(item.product.price)} each</p>
+                        <p className="text-xs text-warm-400">{formatPrice(item.product.price)} / unid.</p>
                     </div>
                 </div>
             </div>

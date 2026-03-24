@@ -6,12 +6,12 @@ interface SkeletonLoaderProps {
 }
 
 function SkeletonItem({ type }: { type: SkeletonLoaderProps['type'] }) {
-    const baseClasses = 'animate-pulse bg-gray-200 dark:bg-gray-700 rounded';
+    const baseClasses = 'animate-pulse bg-warm-200 rounded';
 
     switch (type) {
         case 'card':
             return (
-                <div className="rounded-xl border border-warm-200 dark:border-gray-700 p-4 space-y-3">
+                <div className="rounded-xl border border-warm-200 p-4 space-y-3">
                     <div className={`${baseClasses} h-40 w-full rounded-lg`} />
                     <div className={`${baseClasses} h-4 w-3/4`} />
                     <div className={`${baseClasses} h-4 w-1/2`} />

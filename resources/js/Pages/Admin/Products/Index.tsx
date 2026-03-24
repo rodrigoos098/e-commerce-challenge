@@ -131,9 +131,9 @@ export default function ProductsIndex({
             render: (row) => (
                 <span className={[
                     'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full',
-                    row.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-warm-500',
+                    row.active ? 'bg-emerald-100 text-emerald-700' : 'bg-warm-100 text-warm-500',
                 ].join(' ')}>
-                    <span className={['h-1.5 w-1.5 rounded-full', row.active ? 'bg-emerald-500' : 'bg-gray-400'].join(' ')} />
+                    <span className={['h-1.5 w-1.5 rounded-full', row.active ? 'bg-emerald-500' : 'bg-warm-400'].join(' ')} />
                     {row.active ? 'Ativo' : 'Inativo'}
                 </span>
             ),

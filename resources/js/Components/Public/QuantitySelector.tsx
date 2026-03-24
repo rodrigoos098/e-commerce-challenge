@@ -31,7 +31,7 @@ export default function QuantitySelector({
     };
 
     const btnBase = `flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-150
-        text-warm-600 hover:bg-gray-100 hover:text-warm-700 active:scale-90
+        text-warm-600 hover:bg-warm-100 hover:text-warm-700 active:scale-90
         disabled:opacity-40 disabled:cursor-not-allowed`;
 
     return (

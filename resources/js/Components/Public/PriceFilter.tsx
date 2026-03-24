@@ -64,7 +64,7 @@ export default function PriceFilter({ min, max, currentMin, currentMax, onChange
                         step={10}
                         value={localMin}
                         onChange={handleMinChange}
-                        className="w-full h-1.5 rounded-full appearance-none bg-gray-200 accent-kintsugi-500 cursor-pointer"
+                        className="w-full h-1.5 rounded-full appearance-none bg-warm-200 accent-kintsugi-500 cursor-pointer"
                     />
                 </div>
 
@@ -78,7 +78,7 @@ export default function PriceFilter({ min, max, currentMin, currentMax, onChange
                         step={10}
                         value={localMax}
                         onChange={handleMaxChange}
-                        className="w-full h-1.5 rounded-full appearance-none bg-gray-200 accent-kintsugi-500 cursor-pointer"
+                        className="w-full h-1.5 rounded-full appearance-none bg-warm-200 accent-kintsugi-500 cursor-pointer"
                     />
                 </div>
             </div>

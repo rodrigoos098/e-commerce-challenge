@@ -103,7 +103,7 @@ export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) 
                         <button
                             type="button"
                             onClick={() => router.visit(`/admin/orders/${o.id}`)}
-                            className="px-3 py-1.5 text-xs font-medium text-warm-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                            className="px-3 py-1.5 text-xs font-medium text-warm-600 bg-warm-100 hover:bg-warm-200 rounded-md transition-colors"
                         >
                             Ver Detalhes
                         </button>

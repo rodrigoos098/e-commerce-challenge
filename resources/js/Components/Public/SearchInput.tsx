@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface SearchInputProps {
     value: string;
     onChange: (value: string) => void;
-    onSearch?: (value: string) => void;
     placeholder?: string;
     className?: string;
     autoFocus?: boolean;
@@ -12,37 +11,17 @@ interface SearchInputProps {
 export default function SearchInput({
     value,
     onChange,
-    onSearch,
     placeholder = 'Buscar produtos...',
     className = '',
     autoFocus = false,
 }: SearchInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
-    const [debouncedValue, setDebouncedValue] = useState(value);
 
     useEffect(() => {
         if (autoFocus && inputRef.current) {
             inputRef.current.focus();
         }
     }, [autoFocus]);
-
-    // Update internal debounced state when external value changes
-    useEffect(() => {
-        setDebouncedValue(value);
-    }, [value]);
-
-    // Internal 300ms debounce — emits to onSearch
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (onSearch) { onSearch(debouncedValue); }
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [debouncedValue, onSearch]);
-
-    const handleChange = (newValue: string) => {
-        setDebouncedValue(newValue);
-        onChange(newValue);
-    };
 
     return (
         <div className={`relative ${className}`}>
@@ -63,15 +42,15 @@ export default function SearchInput({
                 ref={inputRef}
                 type="search"
                 value={value}
-                onChange={(e) => handleChange(e.target.value)}
+                onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 aria-label={placeholder}
-                className="w-full rounded-xl border border-warm-200 bg-white py-2.5 pl-10 pr-10 text-sm text-warm-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all"
+                className="w-full rounded-xl border border-warm-200 bg-white py-2.5 pl-10 pr-10 text-sm text-warm-700 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all"
             />
             {value && (
                 <button
                     type="button"
-                    onClick={() => handleChange('')}
+                    onClick={() => onChange('')}
                     aria-label="Limpar busca"
                     className="absolute inset-y-0 right-3 flex items-center text-warm-400 hover:text-warm-600 transition-colors"
                 >

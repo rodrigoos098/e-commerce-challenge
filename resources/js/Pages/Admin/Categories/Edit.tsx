@@ -78,7 +78,7 @@ export default function CategoriesEdit({ category, categories }: CategoriesEditP
                         <p className="text-sm text-warm-500 mt-0.5">
                             Atualizando <span className="font-medium text-warm-600">{category.name}</span>
                             {' · '}
-                            <code className="text-xs bg-gray-100 text-warm-600 px-1 rounded">{category.slug}</code>
+                            <code className="text-xs bg-warm-100 text-warm-600 px-1 rounded">{category.slug}</code>
                         </p>
                     </div>
 

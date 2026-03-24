@@ -88,27 +88,13 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                 {/* Product detail */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
                     {/* Images */}
-                    <div className="space-y-4">
+                    <div>
                         <div className="overflow-hidden rounded-2xl bg-warm-50 border border-warm-200 aspect-square">
                             <img
-                                src={`/storage/products/${product.id}.webp`}
+                                src={product.image_url ?? `/storage/products/${product.id}.webp`}
                                 alt={product.name}
                                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                             />
-                        </div>
-                        {/* Thumbnail row */}
-                        <div className="flex gap-3">
-                            <div
-                                className="h-20 w-20 overflow-hidden rounded-xl border-2 border-kintsugi-200 bg-warm-50"
-                            >
-                                <img
-                                    src={product.image_url ?? `/storage/products/${product.id}.webp`}
-                                    alt=""
-                                    className="h-full w-full object-cover"
-                                    loading="lazy"
-                                    aria-hidden="true"
-                                />
-                            </div>
                         </div>
                     </div>
 
@@ -139,9 +125,6 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                         {/* Price */}
                         <div className="mb-6">
                             <p className="text-4xl font-extrabold text-warm-700">{formatPrice(product.price)}</p>
-                            <p className="mt-1 text-sm text-warm-400">
-                                Em até 12× de {formatPrice(product.price / 12)} sem juros
-                            </p>
                         </div>
 
                         {/* Stock indicator */}
@@ -201,16 +184,24 @@ export default function ProductShow({ product, related_products }: ProductShowPa
 
                         {/* Trust badges */}
                         <div className="border-t border-warm-200 pt-6 grid grid-cols-3 gap-3 text-center">
-                            {[
-                                { icon: '✨', label: 'Peca Autentica' },
-                                { icon: '🎁', label: 'Embalagem Premium' },
-                                { icon: '↩️', label: '30 dias para trocar' },
-                            ].map((badge) => (
-                                <div key={badge.label} className="flex flex-col items-center gap-1">
-                                    <span className="text-2xl" aria-hidden="true">{badge.icon}</span>
-                                    <span className="text-xs text-warm-500">{badge.label}</span>
-                                </div>
-                            ))}
+                            <div className="flex flex-col items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-kintsugi-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="text-xs text-warm-500">Peca Autentica</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-kintsugi-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18C2.504 7.5 2 8.004 2 8.625v1.5c0 .621.504 1.125 1.125 1.125z" />
+                                </svg>
+                                <span className="text-xs text-warm-500">Embalagem Premium</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-kintsugi-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                </svg>
+                                <span className="text-xs text-warm-500">30 dias para trocar</span>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -73,20 +73,20 @@ export default function OrderStatusTimeline({ status }: OrderStatusTimelineProps
                                     ) : isCurrent ? (
                                         <span className="h-2 w-2 rounded-full bg-white animate-pulse" aria-hidden="true" />
                                     ) : (
-                                        <span className="h-2 w-2 rounded-full bg-gray-300" aria-hidden="true" />
+                                        <span className="h-2 w-2 rounded-full bg-warm-300" aria-hidden="true" />
                                     )}
                                 </div>
 
                                 {/* Line */}
                                 {idx < STEPS.length - 1 && (
                                     <div
-                                        className={`sm:hidden h-8 w-0.5 ml-3.5 ${isDone ? 'bg-kintsugi-500' : 'bg-gray-200'}`}
+                                        className={`sm:hidden h-8 w-0.5 ml-3.5 ${isDone ? 'bg-kintsugi-500' : 'bg-warm-200'}`}
                                         aria-hidden="true"
                                     />
                                 )}
                                 {idx < STEPS.length - 1 && (
                                     <div
-                                        className={`hidden sm:block flex-1 h-0.5 mx-1 mt-4 ${isDone ? 'bg-kintsugi-500' : 'bg-gray-200'}`}
+                                        className={`hidden sm:block flex-1 h-0.5 mx-1 mt-4 ${isDone ? 'bg-kintsugi-500' : 'bg-warm-200'}`}
                                         style={{ minWidth: 20 }}
                                         aria-hidden="true"
                                     />

@@ -44,7 +44,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     return (
         <article className="group relative flex flex-col rounded-2xl bg-white border border-warm-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
             {/* Image */}
-            <Link href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-gray-100">
+            <Link href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-warm-100">
                 {product.category && (
                     <span className="absolute top-3 left-3 z-10 rounded-full bg-white/80 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium text-warm-600 border border-warm-200">
                         {product.category.name}
@@ -92,11 +92,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <div className="mt-auto pt-4 flex items-center justify-between gap-2">
                     <div>
                         <p className="text-lg font-extrabold text-warm-700">{formatPrice(product.price)}</p>
-                        {product.cost_price && (
-                            <p className="text-xs text-warm-400">
-                                Custo: {formatPrice(product.cost_price)}
-                            </p>
-                        )}
                     </div>
                     <button
                         onClick={handleAddToCart}

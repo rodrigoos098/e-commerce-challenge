@@ -29,7 +29,7 @@ function CategoryItem({
                     ${depth > 0 ? 'pl-6' : ''}
                     ${isSelected
                         ? 'bg-kintsugi-50 text-kintsugi-600 font-semibold'
-                        : 'text-warm-600 hover:bg-gray-100 hover:text-warm-700'
+                        : 'text-warm-600 hover:bg-warm-100 hover:text-warm-700'
                     }`}
             >
                 {isSelected && (
@@ -66,7 +66,7 @@ export default function CategoryFilter({ categories, selected, onChange }: Categ
                         className={`w-full text-left rounded-lg px-3 py-2 text-sm transition-colors duration-150 ${
                             !selected
                                 ? 'bg-kintsugi-50 text-kintsugi-600 font-semibold'
-                                : 'text-warm-600 hover:bg-gray-100 hover:text-warm-700'
+                                : 'text-warm-600 hover:bg-warm-100 hover:text-warm-700'
                         }`}
                     >
                         Todas as categorias

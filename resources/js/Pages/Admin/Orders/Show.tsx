@@ -153,7 +153,7 @@ export default function OrdersShow({ order }: OrdersShowProps) {
                             <div className="border-b border-warm-200 px-6 py-4">
                                 <h2 className="text-sm font-semibold uppercase tracking-wider text-warm-600">Itens do Pedido</h2>
                             </div>
-                            <div className="divide-y divide-gray-100">
+                            <div className="divide-y divide-warm-200">
                                 {order.items.map((item) => (
                                     <div key={item.id} className="flex items-center justify-between px-6 py-4">
                                         <div>

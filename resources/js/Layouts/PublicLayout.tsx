@@ -137,7 +137,7 @@ function Header({ cartCount }: { cartCount: number }) {
                                 placeholder="Buscar produtos..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full rounded-full border border-warm-200 bg-warm-50 py-2 pl-10 pr-4 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all"
+                                className="w-full rounded-full border border-warm-200 bg-warm-50 py-2 pl-10 pr-4 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all"
                             />
                         </div>
                     </div>
@@ -158,7 +158,7 @@ function Header({ cartCount }: { cartCount: number }) {
                             <div className="relative">
                                 <button
                                     onClick={() => setUserDropdownOpen((v) => !v)}
-                                    className="flex items-center gap-1.5 rounded-full bg-gray-100 pl-2 pr-3 py-1.5 text-sm font-medium text-warm-600 hover:bg-gray-200 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-kintsugi-500"
+                                    className="flex items-center gap-1.5 rounded-full bg-warm-100 pl-2 pr-3 py-1.5 text-sm font-medium text-warm-600 hover:bg-warm-200 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-kintsugi-500"
                                     aria-haspopup="true"
                                     aria-expanded={userDropdownOpen}
                                 >
@@ -255,7 +255,7 @@ function Header({ cartCount }: { cartCount: number }) {
                             placeholder="Buscar produtos..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full rounded-full border border-warm-200 bg-warm-50 py-2 pl-10 pr-4 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent"
+                            className="w-full rounded-full border border-warm-200 bg-warm-50 py-2 pl-10 pr-4 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent"
                         />
                     </div>
                 </div>
