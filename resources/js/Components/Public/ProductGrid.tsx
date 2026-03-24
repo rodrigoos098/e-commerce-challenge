@@ -34,8 +34,8 @@ export default function ProductGrid({ products, loading = false, emptyMessage = 
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
-                <p className="text-lg font-semibold text-gray-500">{emptyMessage}</p>
-                <p className="text-sm text-gray-400 mt-1">Tente ajustar os filtros ou busca.</p>
+                <p className="text-lg font-semibold text-warm-500">{emptyMessage}</p>
+                <p className="text-sm text-warm-400 mt-1">Tente ajustar os filtros ou busca.</p>
             </div>
         );
     }

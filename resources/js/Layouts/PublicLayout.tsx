@@ -25,7 +25,7 @@ const IconShoppingCart = ({ count }: { count: number }) => (
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-9H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
         {count > 0 && (
-            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white">
+            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-kintsugi-500 text-xs font-bold text-white">
                 {count > 99 ? '99+' : count}
             </span>
         )}
@@ -33,7 +33,7 @@ const IconShoppingCart = ({ count }: { count: number }) => (
 );
 
 const IconSearch = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-warm-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
 );
@@ -96,23 +96,20 @@ function Header({ cartCount }: { cartCount: number }) {
 
     const navLinks = [
         { label: 'Início', href: '/' },
-        { label: 'Produtos', href: '/products' },
+        { label: 'Coleção', href: '/products' },
         { label: 'Categorias', href: '/products?category=all' },
     ];
 
     return (
         <header
-            className={`sticky top-0 z-50 bg-white border-b border-gray-100 transition-shadow duration-200 ${scrolled ? 'shadow-md' : ''}`}
+            className={`sticky top-0 z-50 bg-white border-b border-warm-200 transition-shadow duration-200 ${scrolled ? 'shadow-md' : ''}`}
         >
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between gap-4">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 shrink-0">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-md">
-                            <span className="text-white font-extrabold text-lg leading-none">E</span>
-                        </div>
-                        <span className="hidden sm:block text-xl font-bold text-gray-900 tracking-tight">
-                            E<span className="text-violet-600">Shop</span>
+                        <span className="font-display text-2xl font-bold text-kintsugi-600 tracking-tight">
+                            Shopsugi<span className="text-kintsugi-400">ツ</span>
                         </span>
                     </Link>
 
@@ -122,7 +119,7 @@ function Header({ cartCount }: { cartCount: number }) {
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className="text-sm font-medium text-gray-600 hover:text-violet-600 transition-colors duration-150"
+                                className="text-sm font-medium text-warm-600 hover:text-kintsugi-500 transition-colors duration-150"
                             >
                                 {link.label}
                             </Link>
@@ -140,7 +137,7 @@ function Header({ cartCount }: { cartCount: number }) {
                                 placeholder="Buscar produtos..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full rounded-full border border-gray-200 bg-gray-50 py-2 pl-10 pr-4 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
+                                className="w-full rounded-full border border-warm-200 bg-warm-50 py-2 pl-10 pr-4 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all"
                             />
                         </div>
                     </div>
@@ -150,7 +147,7 @@ function Header({ cartCount }: { cartCount: number }) {
                         {/* Cart */}
                         <Link
                             href="/cart"
-                            className="relative text-gray-600 hover:text-violet-600 transition-colors duration-150 p-1"
+                            className="relative text-warm-600 hover:text-kintsugi-500 transition-colors duration-150 p-1"
                             aria-label={`Carrinho com ${cartCount} itens`}
                         >
                             <IconShoppingCart count={cartCount} />
@@ -161,11 +158,11 @@ function Header({ cartCount }: { cartCount: number }) {
                             <div className="relative">
                                 <button
                                     onClick={() => setUserDropdownOpen((v) => !v)}
-                                    className="flex items-center gap-1.5 rounded-full bg-gray-100 pl-2 pr-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                    className="flex items-center gap-1.5 rounded-full bg-gray-100 pl-2 pr-3 py-1.5 text-sm font-medium text-warm-600 hover:bg-gray-200 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-kintsugi-500"
                                     aria-haspopup="true"
                                     aria-expanded={userDropdownOpen}
                                 >
-                                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white">
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-kintsugi-500 text-xs font-bold text-white">
                                         {user.name.charAt(0).toUpperCase()}
                                     </div>
                                     <span className="hidden sm:block max-w-[80px] truncate">{user.name.split(' ')[0]}</span>
@@ -179,21 +176,21 @@ function Header({ cartCount }: { cartCount: number }) {
                                             onClick={() => setUserDropdownOpen(false)}
                                             aria-hidden="true"
                                         />
-                                        <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl bg-white shadow-xl border border-gray-100 py-1 overflow-hidden">
-                                            <div className="px-4 py-2 border-b border-gray-100">
-                                                <p className="text-xs text-gray-500">Conectado como</p>
-                                                <p className="text-sm font-semibold text-gray-800 truncate">{user.email}</p>
+                                        <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl bg-white shadow-xl border border-warm-200 py-1 overflow-hidden">
+                                            <div className="px-4 py-2 border-b border-warm-200">
+                                                <p className="text-xs text-warm-500">Conectado como</p>
+                                                <p className="text-sm font-semibold text-warm-700 truncate">{user.email}</p>
                                             </div>
                                             <Link
                                                 href="/customer/orders"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                className="block px-4 py-2 text-sm text-warm-600 hover:bg-warm-50 transition-colors"
                                                 onClick={() => setUserDropdownOpen(false)}
                                             >
                                                 Meus Pedidos
                                             </Link>
                                             <Link
                                                 href="/customer/profile"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                className="block px-4 py-2 text-sm text-warm-600 hover:bg-warm-50 transition-colors"
                                                 onClick={() => setUserDropdownOpen(false)}
                                             >
                                                 Meu Perfil
@@ -201,13 +198,13 @@ function Header({ cartCount }: { cartCount: number }) {
                                             {user.roles?.includes('admin') && (
                                                 <Link
                                                     href="/admin"
-                                                    className="block px-4 py-2 text-sm text-violet-600 font-medium hover:bg-violet-50 transition-colors"
+                                                    className="block px-4 py-2 text-sm text-kintsugi-500 font-medium hover:bg-kintsugi-50 transition-colors"
                                                     onClick={() => setUserDropdownOpen(false)}
                                                 >
                                                     Painel Admin
                                                 </Link>
                                             )}
-                                            <div className="border-t border-gray-100 mt-1">
+                                            <div className="border-t border-warm-200 mt-1">
                                                 <button
                                                     onClick={handleLogout}
                                                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -223,13 +220,13 @@ function Header({ cartCount }: { cartCount: number }) {
                             <div className="hidden sm:flex items-center gap-2">
                                 <Link
                                     href="/login"
-                                    className="text-sm font-medium text-gray-600 hover:text-violet-600 transition-colors"
+                                    className="text-sm font-medium text-warm-600 hover:text-kintsugi-500 transition-colors"
                                 >
                                     Entrar
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="rounded-full bg-violet-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-violet-700 transition-colors shadow-sm"
+                                    className="rounded-full bg-kintsugi-500 px-4 py-1.5 text-sm font-semibold text-white hover:bg-kintsugi-600 transition-colors shadow-sm"
                                 >
                                     Criar conta
                                 </Link>
@@ -238,7 +235,7 @@ function Header({ cartCount }: { cartCount: number }) {
 
                         {/* Mobile hamburger */}
                         <button
-                            className="md:hidden text-gray-600 hover:text-violet-600 transition-colors p-1"
+                            className="md:hidden text-warm-600 hover:text-kintsugi-500 transition-colors p-1"
                             onClick={() => setMobileOpen((v) => !v)}
                             aria-label="Abrir menu"
                         >
@@ -258,7 +255,7 @@ function Header({ cartCount }: { cartCount: number }) {
                             placeholder="Buscar produtos..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full rounded-full border border-gray-200 bg-gray-50 py-2 pl-10 pr-4 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            className="w-full rounded-full border border-warm-200 bg-warm-50 py-2 pl-10 pr-4 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent"
                         />
                     </div>
                 </div>
@@ -266,32 +263,32 @@ function Header({ cartCount }: { cartCount: number }) {
 
             {/* Mobile menu */}
             {mobileOpen && (
-                <div className="md:hidden border-t border-gray-100 bg-white shadow-lg">
+                <div className="md:hidden border-t border-warm-200 bg-white shadow-lg">
                     <nav className="flex flex-col px-4 py-3 gap-1">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.href}
                                 href={link.href}
                                 onClick={() => setMobileOpen(false)}
-                                className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
+                                className="block rounded-lg px-3 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50 hover:text-kintsugi-500 transition-colors"
                             >
                                 {link.label}
                             </Link>
                         ))}
                         {!user && (
                             <>
-                                <div className="border-t border-gray-100 mt-2 pt-2 flex flex-col gap-1">
+                                <div className="border-t border-warm-200 mt-2 pt-2 flex flex-col gap-1">
                                     <Link
                                         href="/login"
                                         onClick={() => setMobileOpen(false)}
-                                        className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                        className="block rounded-lg px-3 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50"
                                     >
                                         Entrar
                                     </Link>
                                     <Link
                                         href="/register"
                                         onClick={() => setMobileOpen(false)}
-                                        className="block rounded-lg px-3 py-2 text-sm font-medium bg-violet-600 text-white text-center hover:bg-violet-700"
+                                        className="block rounded-lg px-3 py-2 text-sm font-medium bg-kintsugi-500 text-white text-center hover:bg-kintsugi-600"
                                     >
                                         Criar conta
                                     </Link>
@@ -299,18 +296,18 @@ function Header({ cartCount }: { cartCount: number }) {
                             </>
                         )}
                         {user && (
-                            <div className="border-t border-gray-100 mt-2 pt-2 flex flex-col gap-1">
+                            <div className="border-t border-warm-200 mt-2 pt-2 flex flex-col gap-1">
                                 <Link
                                     href="/customer/orders"
                                     onClick={() => setMobileOpen(false)}
-                                    className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                    className="block rounded-lg px-3 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50"
                                 >
                                     Meus Pedidos
                                 </Link>
                                 <Link
                                     href="/customer/profile"
                                     onClick={() => setMobileOpen(false)}
-                                    className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                    className="block rounded-lg px-3 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50"
                                 >
                                     Meu Perfil
                                 </Link>
@@ -337,14 +334,14 @@ export default function PublicLayout({ children, title, cartCount = 0 }: PublicL
 
     useEffect(() => {
         if (title) {
-            document.title = `${title} — EShop`;
+            document.title = `${title} — Shopsugiツ`;
         } else {
-            document.title = 'EShop — Sua loja online';
+            document.title = 'Shopsugiツ — Arte em cada detalhe';
         }
     }, [title]);
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50">
+        <div className="min-h-screen flex flex-col bg-warm-50">
             <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
             <Header cartCount={effectiveCartCount} />
             <main className="flex-1">

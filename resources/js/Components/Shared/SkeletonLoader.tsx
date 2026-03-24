@@ -11,7 +11,7 @@ function SkeletonItem({ type }: { type: SkeletonLoaderProps['type'] }) {
     switch (type) {
         case 'card':
             return (
-                <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+                <div className="rounded-xl border border-warm-200 dark:border-gray-700 p-4 space-y-3">
                     <div className={`${baseClasses} h-40 w-full rounded-lg`} />
                     <div className={`${baseClasses} h-4 w-3/4`} />
                     <div className={`${baseClasses} h-4 w-1/2`} />

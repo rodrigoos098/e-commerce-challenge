@@ -49,7 +49,7 @@ export default function SearchBar({
             <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gray-400"
+                    className="h-4 w-4 text-warm-400"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -64,7 +64,7 @@ export default function SearchBar({
                 value={value}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-9 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+                className="w-full rounded-lg border border-warm-300 bg-white py-2 pl-9 pr-9 text-sm text-warm-700 placeholder-gray-400 focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20 transition-colors"
             />
 
             {/* Clear button */}
@@ -72,7 +72,7 @@ export default function SearchBar({
                 <button
                     type="button"
                     onClick={handleClear}
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute inset-y-0 right-3 flex items-center text-warm-400 hover:text-warm-600 transition-colors"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

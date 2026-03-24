@@ -14,7 +14,8 @@ use Illuminate\Support\Str;
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -30,6 +31,7 @@ class Product extends Model
         'quantity',
         'min_quantity',
         'active',
+        'image_url',
         'category_id',
     ];
 

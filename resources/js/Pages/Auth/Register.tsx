@@ -56,27 +56,24 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-indigo-50 px-4 py-12">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-kintsugi-50 via-cream to-warm-100 px-4 py-12">
             <div className="w-full max-w-md">
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-2">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg">
-                            <span className="text-white font-extrabold text-xl leading-none">E</span>
-                        </div>
-                        <span className="text-2xl font-extrabold text-gray-900">
-                            E<span className="text-violet-600">Shop</span>
+                        <span className="text-2xl font-display font-extrabold text-warm-700">
+                            Shopsugi<span className="text-kintsugi-600">ツ</span>
                         </span>
                     </Link>
-                    <h1 className="mt-6 text-2xl font-bold text-gray-900">Crie sua conta</h1>
-                    <p className="mt-1 text-sm text-gray-500">É rápido, grátis e sem compromisso!</p>
+                    <h1 className="mt-6 text-2xl font-bold text-warm-700">Junte-se ao Shopsugiツ</h1>
+                    <p className="mt-1 text-sm text-warm-500">Descubra arte artesanal unica de todo o Brasil.</p>
                 </div>
 
-                <div className="rounded-3xl bg-white shadow-xl border border-gray-100 p-8">
+                <div className="rounded-3xl bg-white shadow-xl border border-warm-200 p-8">
                     <form onSubmit={handleSubmit} noValidate className="space-y-5">
                         {/* Name */}
                         <div>
-                            <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                            <label htmlFor="name" className="block text-sm font-semibold text-warm-600 mb-1.5">
                                 Nome completo
                             </label>
                             <input
@@ -87,8 +84,8 @@ export default function Register() {
                                 placeholder="João da Silva"
                                 autoComplete="name"
                                 aria-describedby={mergedErrors.name ? 'name-error' : undefined}
-                                className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${mergedErrors.name ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all
+                                    ${mergedErrors.name ? 'border-red-300 bg-red-50' : 'border-warm-200 bg-warm-50'}`}
                             />
                             {mergedErrors.name && (
                                 <p id="name-error" role="alert" className="mt-1.5 text-xs text-red-600">{mergedErrors.name}</p>
@@ -97,7 +94,7 @@ export default function Register() {
 
                         {/* Email */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                            <label htmlFor="email" className="block text-sm font-semibold text-warm-600 mb-1.5">
                                 E-mail
                             </label>
                             <input
@@ -108,8 +105,8 @@ export default function Register() {
                                 placeholder="seu@email.com"
                                 autoComplete="email"
                                 aria-describedby={mergedErrors.email ? 'email-error' : undefined}
-                                className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${mergedErrors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all
+                                    ${mergedErrors.email ? 'border-red-300 bg-red-50' : 'border-warm-200 bg-warm-50'}`}
                             />
                             {mergedErrors.email && (
                                 <p id="email-error" role="alert" className="mt-1.5 text-xs text-red-600">{mergedErrors.email}</p>
@@ -118,7 +115,7 @@ export default function Register() {
 
                         {/* Password */}
                         <div>
-                            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                            <label htmlFor="password" className="block text-sm font-semibold text-warm-600 mb-1.5">
                                 Senha
                             </label>
                             <input
@@ -129,8 +126,8 @@ export default function Register() {
                                 placeholder="Mínimo 8 caracteres"
                                 autoComplete="new-password"
                                 aria-describedby={mergedErrors.password ? 'password-error' : undefined}
-                                className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${mergedErrors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all
+                                    ${mergedErrors.password ? 'border-red-300 bg-red-50' : 'border-warm-200 bg-warm-50'}`}
                             />
                             {mergedErrors.password && (
                                 <p id="password-error" role="alert" className="mt-1.5 text-xs text-red-600">{mergedErrors.password}</p>
@@ -139,7 +136,7 @@ export default function Register() {
 
                         {/* Confirm password */}
                         <div>
-                            <label htmlFor="password_confirmation" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                            <label htmlFor="password_confirmation" className="block text-sm font-semibold text-warm-600 mb-1.5">
                                 Confirmar senha
                             </label>
                             <input
@@ -150,8 +147,8 @@ export default function Register() {
                                 placeholder="Repita a senha"
                                 autoComplete="new-password"
                                 aria-describedby={mergedErrors.password_confirmation ? 'pw-confirm-error' : undefined}
-                                className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                                    ${mergedErrors.password_confirmation ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                                className={`w-full rounded-xl border px-4 py-3 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all
+                                    ${mergedErrors.password_confirmation ? 'border-red-300 bg-red-50' : 'border-warm-200 bg-warm-50'}`}
                             />
                             {mergedErrors.password_confirmation && (
                                 <p id="pw-confirm-error" role="alert" className="mt-1.5 text-xs text-red-600">{mergedErrors.password_confirmation}</p>
@@ -162,7 +159,7 @@ export default function Register() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full rounded-xl bg-violet-600 py-3 text-sm font-bold text-white hover:bg-violet-700 active:scale-[.98] transition-all shadow-lg shadow-violet-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full rounded-xl bg-kintsugi-500 py-3 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-lg shadow-kintsugi-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {processing && (
                                 <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
@@ -174,16 +171,16 @@ export default function Register() {
                         </button>
                     </form>
 
-                    <p className="mt-6 text-center text-sm text-gray-500">
+                    <p className="mt-6 text-center text-sm text-warm-500">
                         Já tem uma conta?{' '}
-                        <Link href="/login" className="font-semibold text-violet-600 hover:text-violet-800 transition-colors">
+                        <Link href="/login" className="font-semibold text-kintsugi-600 hover:text-kintsugi-700 transition-colors">
                             Fazer login
                         </Link>
                     </p>
                 </div>
 
-                <p className="mt-6 text-center text-xs text-gray-400">
-                    <Link href="/" className="hover:text-violet-600 transition-colors">← Voltar para a loja</Link>
+                <p className="mt-6 text-center text-xs text-warm-400">
+                    <Link href="/" className="hover:text-kintsugi-600 transition-colors">← Voltar para a loja</Link>
                 </p>
             </div>
         </div>

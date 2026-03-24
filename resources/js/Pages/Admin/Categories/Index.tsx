@@ -49,7 +49,7 @@ function TreeRow({ node, depth, expanded, onToggle, onDelete }: TreeRowProps) {
 
     return (
         <>
-            <tr className="hover:bg-gray-50 transition-colors">
+            <tr className="hover:bg-warm-50 transition-colors">
                 <td className="px-4 py-3">
                     <div className="flex items-center gap-2" style={{ paddingLeft: `${depth * 24}px` }}>
                         {/* Expand/collapse toggle */}
@@ -57,7 +57,7 @@ function TreeRow({ node, depth, expanded, onToggle, onDelete }: TreeRowProps) {
                             <button
                                 type="button"
                                 onClick={() => onToggle(node.id)}
-                                className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors flex-shrink-0"
+                                className="w-5 h-5 flex items-center justify-center text-warm-400 hover:text-kintsugi-600 transition-colors flex-shrink-0"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -79,33 +79,33 @@ function TreeRow({ node, depth, expanded, onToggle, onDelete }: TreeRowProps) {
                         )}
 
                         <div>
-                            <p className={['font-medium text-gray-900', depth === 0 ? 'text-sm' : 'text-sm'].join(' ')}>
+                            <p className={['font-medium text-warm-700', depth === 0 ? 'text-sm' : 'text-sm'].join(' ')}>
                                 {node.name}
                             </p>
                             {node.description && (
-                                <p className="text-xs text-gray-400 mt-0.5">{node.description}</p>
+                                <p className="text-xs text-warm-400 mt-0.5">{node.description}</p>
                             )}
                         </div>
                     </div>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-500 font-mono">{node.slug}</td>
+                <td className="px-4 py-3 text-sm text-warm-500 font-mono">{node.slug}</td>
                 <td className="px-4 py-3">
                     <span className={[
                         'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full',
-                        node.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500',
+                        node.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-warm-500',
                     ].join(' ')}>
                         <span className={['h-1.5 w-1.5 rounded-full', node.active ? 'bg-emerald-500' : 'bg-gray-400'].join(' ')} />
                         {node.active ? 'Ativa' : 'Inativa'}
                     </span>
                 </td>
                 <td className="px-4 py-3">
-                    <span className="text-sm text-gray-500">{node.children.length}</span>
+                    <span className="text-sm text-warm-500">{node.children.length}</span>
                 </td>
                 <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                         <Link
                             href={`/admin/categories/${node.id}/edit`}
-                            className="text-xs font-medium text-indigo-600 hover:text-indigo-700 px-2.5 py-1.5 rounded-md hover:bg-indigo-50 transition-colors"
+                            className="text-xs font-medium text-kintsugi-600 hover:text-kintsugi-700 px-2.5 py-1.5 rounded-md hover:bg-kintsugi-50 transition-colors"
                         >
                             Editar
                         </Link>
@@ -189,14 +189,14 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Categorias</h1>
-                        <p className="text-sm text-gray-500 mt-0.5">
+                        <h1 className="text-2xl font-bold text-warm-700">Categorias</h1>
+                        <p className="text-sm text-warm-500 mt-0.5">
                             {rootCount} raiz · {totalCount} total
                         </p>
                     </div>
                     <Link
                         href="/admin/categories/create"
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm"
+                        className="flex items-center gap-2 bg-kintsugi-600 hover:bg-kintsugi-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -210,7 +210,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                     <button
                         type="button"
                         onClick={expandAll}
-                        className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-indigo-600 px-3 py-1.5 rounded-md border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all"
+                        className="flex items-center gap-1.5 text-xs font-medium text-warm-600 hover:text-kintsugi-600 px-3 py-1.5 rounded-md border border-warm-200 hover:border-kintsugi-300 hover:bg-kintsugi-50 transition-all"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
@@ -220,7 +220,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                     <button
                         type="button"
                         onClick={collapseAll}
-                        className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-100 transition-all"
+                        className="flex items-center gap-1.5 text-xs font-medium text-warm-600 hover:text-warm-700 px-3 py-1.5 rounded-md border border-warm-200 hover:bg-gray-100 transition-all"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
@@ -230,22 +230,22 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                 </div>
 
                 {/* Tree table */}
-                <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
+                <div className="bg-white rounded-xl border border-warm-200 shadow-xs overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="border-b border-gray-200 bg-gray-50">
-                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
-                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Slug</th>
-                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Subcats.</th>
-                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Ações</th>
+                                <tr className="border-b border-warm-200 bg-warm-50">
+                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-warm-500 uppercase tracking-wider">Nome</th>
+                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-warm-500 uppercase tracking-wider">Slug</th>
+                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-warm-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-warm-500 uppercase tracking-wider">Subcats.</th>
+                                    <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-warm-500 uppercase tracking-wider">Ações</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {tree.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="px-4 py-12 text-center text-sm text-gray-400">
+                                        <td colSpan={5} className="px-4 py-12 text-center text-sm text-warm-400">
                                             Nenhuma categoria cadastrada.
                                         </td>
                                     </tr>
@@ -279,7 +279,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                 loading={deleting}
             >
                 <div className="space-y-3">
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm text-warm-600">
                         Tem certeza que deseja excluir a categoria{' '}
                         <strong className="font-semibold">{deleteModal.category?.name}</strong>?
                     </p>

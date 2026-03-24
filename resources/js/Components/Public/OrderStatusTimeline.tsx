@@ -60,9 +60,9 @@ export default function OrderStatusTimeline({ status }: OrderStatusTimelineProps
                                 {/* Dot */}
                                 <div
                                     className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors
-                                        ${isCurrent ? 'border-violet-600 bg-violet-600 shadow-lg shadow-violet-200' : ''}
-                                        ${isDone ? 'border-violet-600 bg-violet-600' : ''}
-                                        ${isUpcoming ? 'border-gray-200 bg-white' : ''}
+                                        ${isCurrent ? 'border-kintsugi-500 bg-kintsugi-500 shadow-lg shadow-kintsugi-200' : ''}
+                                        ${isDone ? 'border-kintsugi-500 bg-kintsugi-500' : ''}
+                                        ${isUpcoming ? 'border-warm-200 bg-white' : ''}
                                     `}
                                     aria-current={isCurrent ? 'step' : undefined}
                                 >
@@ -80,13 +80,13 @@ export default function OrderStatusTimeline({ status }: OrderStatusTimelineProps
                                 {/* Line */}
                                 {idx < STEPS.length - 1 && (
                                     <div
-                                        className={`sm:hidden h-8 w-0.5 ml-3.5 ${isDone ? 'bg-violet-600' : 'bg-gray-200'}`}
+                                        className={`sm:hidden h-8 w-0.5 ml-3.5 ${isDone ? 'bg-kintsugi-500' : 'bg-gray-200'}`}
                                         aria-hidden="true"
                                     />
                                 )}
                                 {idx < STEPS.length - 1 && (
                                     <div
-                                        className={`hidden sm:block flex-1 h-0.5 mx-1 mt-4 ${isDone ? 'bg-violet-600' : 'bg-gray-200'}`}
+                                        className={`hidden sm:block flex-1 h-0.5 mx-1 mt-4 ${isDone ? 'bg-kintsugi-500' : 'bg-gray-200'}`}
                                         style={{ minWidth: 20 }}
                                         aria-hidden="true"
                                     />
@@ -95,10 +95,10 @@ export default function OrderStatusTimeline({ status }: OrderStatusTimelineProps
 
                             {/* Labels */}
                             <div className="ml-3 sm:ml-0 sm:mt-2 sm:text-center">
-                                <p className={`text-xs font-semibold ${isCurrent ? 'text-violet-700' : isDone ? 'text-gray-700' : 'text-gray-400'}`}>
+                                <p className={`text-xs font-semibold ${isCurrent ? 'text-kintsugi-600' : isDone ? 'text-warm-600' : 'text-warm-400'}`}>
                                     {step.label}
                                 </p>
-                                <p className="text-xs text-gray-400 hidden sm:block">{step.description}</p>
+                                <p className="text-xs text-warm-400 hidden sm:block">{step.description}</p>
                             </div>
                         </li>
                     );

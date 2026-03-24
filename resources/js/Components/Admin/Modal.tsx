@@ -70,19 +70,19 @@ export default function Modal({
             {/* Panel */}
             <div
                 className={[
-                    'relative w-full bg-white rounded-xl shadow-xl border border-gray-200 flex flex-col max-h-[90vh]',
+                    'relative w-full bg-white rounded-xl shadow-xl border border-warm-200 flex flex-col max-h-[90vh]',
                     sizeMap[size],
                 ].join(' ')}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 flex-shrink-0">
-                    <h2 id="modal-title" className="text-base font-semibold text-gray-900">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-warm-200 flex-shrink-0">
+                    <h2 id="modal-title" className="text-base font-semibold text-warm-700">
                         {title}
                     </h2>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 transition-colors rounded-md p-1 hover:bg-gray-100"
+                        className="text-warm-400 hover:text-warm-600 transition-colors rounded-md p-1 hover:bg-gray-100"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -97,12 +97,12 @@ export default function Modal({
 
                 {/* Footer (only when onConfirm provided) */}
                 {onConfirm && (
-                    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl flex-shrink-0">
+                    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-warm-200 bg-warm-50 rounded-b-xl flex-shrink-0">
                         <button
                             type="button"
                             onClick={onClose}
                             disabled={loading}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-warm-600 bg-white border border-warm-300 rounded-lg hover:bg-warm-50 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                         >
                             {cancelLabel}
                         </button>
@@ -114,7 +114,7 @@ export default function Modal({
                                 'px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2',
                                 confirmDestructive
                                     ? 'bg-red-600 hover:bg-red-700'
-                                    : 'bg-indigo-600 hover:bg-indigo-700',
+                                    : 'bg-kintsugi-600 hover:bg-kintsugi-700',
                             ].join(' ')}
                         >
                             {loading && (

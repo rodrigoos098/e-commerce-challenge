@@ -64,21 +64,21 @@ export default function ProductsShow({
                             <button
                                 type="button"
                                 onClick={() => router.visit('/admin/products')}
-                                className="mb-2 flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-indigo-600"
+                                className="mb-2 flex items-center gap-1.5 text-sm text-warm-500 transition-colors hover:text-kintsugi-600"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                                 </svg>
                                 Voltar para Produtos
                             </button>
-                            <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
+                            <h1 className="text-2xl font-bold text-warm-700">{product.name}</h1>
                             <div className="mt-1.5 flex items-center gap-2">
-                                <span className="text-sm text-gray-400">{product.category?.name ?? 'Sem categoria'}</span>
-                                <span className="text-gray-300">·</span>
+                                <span className="text-sm text-warm-400">{product.category?.name ?? 'Sem categoria'}</span>
+                                <span className="text-warm-300">·</span>
                                 <span
                                     className={[
                                         'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
-                                        product.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500',
+                                        product.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-warm-500',
                                     ].join(' ')}
                                 >
                                     <span className={['h-1.5 w-1.5 rounded-full', product.active ? 'bg-emerald-500' : 'bg-gray-400'].join(' ')} />
@@ -89,7 +89,7 @@ export default function ProductsShow({
                         <div className="flex flex-shrink-0 items-center gap-2">
                             <Link
                                 href={`/admin/products/${product.id}/edit`}
-                                className="flex items-center gap-2 rounded-lg bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-100"
+                                className="flex items-center gap-2 rounded-lg bg-kintsugi-50 px-4 py-2 text-sm font-medium text-kintsugi-600 transition-colors hover:bg-kintsugi-100"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -111,14 +111,14 @@ export default function ProductsShow({
 
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         <div className="space-y-6 lg:col-span-2">
-                            <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-xs">
-                                <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-700">Descricao</h2>
-                                <p className="text-sm leading-relaxed text-gray-700">{product.description}</p>
+                            <div className="space-y-4 rounded-xl border border-warm-200 bg-white p-6 shadow-xs">
+                                <h2 className="text-sm font-semibold uppercase tracking-wider text-warm-600">Descricao</h2>
+                                <p className="text-sm leading-relaxed text-warm-600">{product.description}</p>
 
                                 {product.tags.length > 0 && (
                                     <div className="flex flex-wrap gap-2 pt-1">
                                         {product.tags.map((tag) => (
-                                            <span key={tag.id} className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+                                            <span key={tag.id} className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-warm-600">
                                                 {tag.name}
                                             </span>
                                         ))}
@@ -126,22 +126,22 @@ export default function ProductsShow({
                                 )}
                             </div>
 
-                            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-xs">
-                                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-700">Precos</h2>
+                            <div className="rounded-xl border border-warm-200 bg-white p-6 shadow-xs">
+                                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-warm-600">Precos</h2>
                                 <div className="grid grid-cols-3 gap-4">
                                     <div>
-                                        <p className="text-xs uppercase tracking-wide text-gray-400">Venda</p>
-                                        <p className="mt-0.5 text-xl font-bold text-gray-900">{formatCurrency(product.price)}</p>
+                                        <p className="text-xs uppercase tracking-wide text-warm-400">Venda</p>
+                                        <p className="mt-0.5 text-xl font-bold text-warm-700">{formatCurrency(product.price)}</p>
                                     </div>
                                     {product.cost_price !== undefined && (
                                         <div>
-                                            <p className="text-xs uppercase tracking-wide text-gray-400">Custo</p>
-                                            <p className="mt-0.5 text-xl font-bold text-gray-700">{formatCurrency(product.cost_price)}</p>
+                                            <p className="text-xs uppercase tracking-wide text-warm-400">Custo</p>
+                                            <p className="mt-0.5 text-xl font-bold text-warm-600">{formatCurrency(product.cost_price)}</p>
                                         </div>
                                     )}
                                     {margin !== null && (
                                         <div>
-                                            <p className="text-xs uppercase tracking-wide text-gray-400">Margem</p>
+                                            <p className="text-xs uppercase tracking-wide text-warm-400">Margem</p>
                                             <p className={['mt-0.5 text-xl font-bold', margin > 20 ? 'text-emerald-600' : 'text-amber-600'].join(' ')}>
                                                 {margin.toFixed(1)}%
                                             </p>
@@ -150,12 +150,12 @@ export default function ProductsShow({
                                 </div>
                             </div>
 
-                            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
-                                <div className="border-b border-gray-200 px-5 py-4">
-                                    <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-700">Movimentacoes de Estoque</h2>
+                            <div className="overflow-hidden rounded-xl border border-warm-200 bg-white shadow-xs">
+                                <div className="border-b border-warm-200 px-5 py-4">
+                                    <h2 className="text-sm font-semibold uppercase tracking-wider text-warm-600">Movimentacoes de Estoque</h2>
                                 </div>
                                 {movements.length === 0 ? (
-                                    <p className="px-5 py-8 text-center text-sm text-gray-400">Nenhuma movimentacao registrada.</p>
+                                    <p className="px-5 py-8 text-center text-sm text-warm-400">Nenhuma movimentacao registrada.</p>
                                 ) : (
                                     <div className="divide-y divide-gray-100">
                                         {movements.map((movement) => {
@@ -163,19 +163,19 @@ export default function ProductsShow({
                                             const isDecrease = movement.type === 'saida' || movement.type === 'venda';
 
                                             return (
-                                                <div key={movement.id} className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-gray-50">
+                                                <div key={movement.id} className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-warm-50">
                                                     <div className="flex items-center gap-3">
                                                         <span className={['rounded-full px-2 py-0.5 text-xs font-semibold', config.classes].join(' ')}>
                                                             {config.label}
                                                         </span>
-                                                        <span className="text-sm text-gray-500">{movement.notes ?? '-'}</span>
+                                                        <span className="text-sm text-warm-500">{movement.notes ?? '-'}</span>
                                                     </div>
                                                     <div className="ml-4 flex-shrink-0 text-right">
                                                         <p className={['text-sm font-bold', isDecrease ? 'text-red-600' : 'text-emerald-600'].join(' ')}>
                                                             {config.sign}
                                                             {movement.quantity}
                                                         </p>
-                                                        <p className="text-xs text-gray-400">{formatDate(movement.created_at)}</p>
+                                                        <p className="text-xs text-warm-400">{formatDate(movement.created_at)}</p>
                                                     </div>
                                                 </div>
                                             );
@@ -189,17 +189,17 @@ export default function ProductsShow({
                             <div
                                 className={[
                                     'rounded-xl border p-5 shadow-xs',
-                                    isOut ? 'border-red-200 bg-red-50' : isLow ? 'border-amber-200 bg-amber-50' : 'border-gray-200 bg-white',
+                                    isOut ? 'border-red-200 bg-red-50' : isLow ? 'border-amber-200 bg-amber-50' : 'border-warm-200 bg-white',
                                 ].join(' ')}
                             >
-                                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Estoque Atual</p>
-                                <p className={['text-5xl font-black', isOut ? 'text-red-600' : isLow ? 'text-amber-500' : 'text-gray-900'].join(' ')}>
+                                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-warm-500">Estoque Atual</p>
+                                <p className={['text-5xl font-black', isOut ? 'text-red-600' : isLow ? 'text-amber-500' : 'text-warm-700'].join(' ')}>
                                     {product.quantity}
                                 </p>
-                                <p className="mt-1 text-sm text-gray-400">unidades</p>
-                                <div className="mt-3 border-t border-gray-200/60 pt-3">
-                                    <p className="text-xs text-gray-500">
-                                        Minimo: <span className="font-semibold text-gray-700">{product.min_quantity} un.</span>
+                                <p className="mt-1 text-sm text-warm-400">unidades</p>
+                                <div className="mt-3 border-t border-warm-200/60 pt-3">
+                                    <p className="text-xs text-warm-500">
+                                        Minimo: <span className="font-semibold text-warm-600">{product.min_quantity} un.</span>
                                     </p>
                                 </div>
                                 {isOut && (
@@ -214,24 +214,24 @@ export default function ProductsShow({
                                 )}
                             </div>
 
-                            <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-5 shadow-xs">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Informacoes</p>
+                            <div className="space-y-3 rounded-xl border border-warm-200 bg-white p-5 shadow-xs">
+                                <p className="text-xs font-semibold uppercase tracking-wider text-warm-500">Informacoes</p>
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
-                                        <span className="text-gray-500">ID</span>
-                                        <span className="font-medium text-gray-700">#{product.id}</span>
+                                        <span className="text-warm-500">ID</span>
+                                        <span className="font-medium text-warm-600">#{product.id}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-500">Slug</span>
-                                        <span className="ml-4 truncate font-medium text-gray-700">{product.slug}</span>
+                                        <span className="text-warm-500">Slug</span>
+                                        <span className="ml-4 truncate font-medium text-warm-600">{product.slug}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-500">Criado em</span>
-                                        <span className="font-medium text-gray-700">{formatDate(product.created_at)}</span>
+                                        <span className="text-warm-500">Criado em</span>
+                                        <span className="font-medium text-warm-600">{formatDate(product.created_at)}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-500">Atualizado</span>
-                                        <span className="font-medium text-gray-700">{formatDate(product.updated_at)}</span>
+                                        <span className="text-warm-500">Atualizado</span>
+                                        <span className="font-medium text-warm-600">{formatDate(product.updated_at)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -250,7 +250,7 @@ export default function ProductsShow({
                 confirmDestructive
                 loading={deleting}
             >
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-warm-600">
                     Tem certeza que deseja excluir <strong className="font-semibold">{product.name}</strong>?
                     Esta acao nao pode ser desfeita.
                 </p>

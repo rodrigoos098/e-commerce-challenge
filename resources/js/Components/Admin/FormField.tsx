@@ -41,9 +41,9 @@ interface FormFieldProps {
 }
 
 const baseInputClasses =
-    'w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 ' +
-    'focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ' +
-    'disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed ' +
+    'w-full rounded-lg border border-warm-300 bg-white px-3 py-2 text-sm text-warm-700 placeholder-gray-400 ' +
+    'focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20 ' +
+    'disabled:bg-warm-50 disabled:text-warm-400 disabled:cursor-not-allowed ' +
     'transition-colors duration-150';
 
 const errorInputClasses =
@@ -80,8 +80,8 @@ export default function FormField({
                     disabled={disabled}
                     onClick={() => onToggle?.(!checked)}
                     className={[
-                        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20',
-                        checked ? 'bg-indigo-600' : 'bg-gray-300',
+                        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20',
+                        checked ? 'bg-kintsugi-600' : 'bg-gray-300',
                         disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
                     ].join(' ')}
                 >
@@ -135,7 +135,7 @@ export default function FormField({
                     className={[
                         fieldClasses,
                         'file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium',
-                        'file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100',
+                        'file:bg-kintsugi-50 file:text-kintsugi-700 hover:file:bg-kintsugi-100',
                     ].join(' ')}
                     {...register}
                 />
@@ -162,7 +162,7 @@ export default function FormField({
             <div className={type === 'toggle' ? 'flex items-center justify-between' : ''}>
                 <label
                     htmlFor={type !== 'toggle' ? name : undefined}
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-warm-600"
                 >
                     {label}
                     {required && <span className="text-red-500 ml-0.5">*</span>}
@@ -173,7 +173,7 @@ export default function FormField({
             {type !== 'toggle' && renderField()}
 
             {hint && !error && (
-                <p className="text-xs text-gray-500">{hint}</p>
+                <p className="text-xs text-warm-500">{hint}</p>
             )}
             {error && (
                 <p className="text-xs text-red-500 flex items-center gap-1">

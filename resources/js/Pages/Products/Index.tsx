@@ -88,10 +88,10 @@ export default function ProductsIndex({ products, categories, filters }: Product
             <div>
                 <SearchInput value={search} onChange={setSearch} />
             </div>
-            <div className="border-t border-gray-100 pt-6">
+            <div className="border-t border-warm-200 pt-6">
                 <CategoryFilter categories={categories} selected={categoryId} onChange={handleCategoryChange} />
             </div>
-            <div className="border-t border-gray-100 pt-6">
+            <div className="border-t border-warm-200 pt-6">
                 <PriceFilter
                     min={0}
                     max={10000}
@@ -104,7 +104,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
                 <button
                     type="button"
                     onClick={clearFilters}
-                    className="w-full rounded-xl border border-gray-200 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                    className="w-full rounded-xl border border-warm-200 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50 transition-colors"
                 >
                     Limpar todos os filtros
                 </button>
@@ -113,13 +113,13 @@ export default function ProductsIndex({ products, categories, filters }: Product
     );
 
     return (
-        <PublicLayout title="Produtos">
+        <PublicLayout title="Colecao">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
                 {/* Page header */}
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Produtos</h1>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-warm-700">Nossa Colecao</h1>
+                        <p className="mt-1 text-sm text-warm-500">
                             {products.meta.total} resultado{products.meta.total !== 1 ? 's' : ''}
                             {search && <> para "<strong>{search}</strong>"</>}
                         </p>
@@ -129,7 +129,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
                     <button
                         type="button"
                         onClick={() => setSidebarOpen((v) => !v)}
-                        className="lg:hidden flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+                        className="lg:hidden flex items-center gap-2 rounded-xl border border-warm-200 bg-white px-4 py-2 text-sm font-medium text-warm-600 shadow-sm hover:bg-warm-50 transition-colors"
                         aria-expanded={sidebarOpen}
                         aria-controls="filters-sidebar"
                     >
@@ -138,7 +138,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
                         </svg>
                         Filtros
                         {hasActiveFilters && (
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-600 text-xs text-white font-bold">
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-kintsugi-500 text-xs text-white font-bold">
                                 !
                             </span>
                         )}
@@ -166,12 +166,12 @@ export default function ProductsIndex({ products, categories, filters }: Product
                                 className="fixed inset-y-0 left-0 z-50 w-72 overflow-y-auto bg-white p-6 shadow-2xl lg:hidden"
                             >
                                 <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-base font-bold text-gray-900">Filtros</h2>
+                                    <h2 className="text-base font-bold text-warm-700">Filtros</h2>
                                     <button
                                         type="button"
                                         onClick={() => setSidebarOpen(false)}
                                         aria-label="Fechar filtros"
-                                        className="text-gray-400 hover:text-gray-600"
+                                        className="text-warm-400 hover:text-warm-600"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

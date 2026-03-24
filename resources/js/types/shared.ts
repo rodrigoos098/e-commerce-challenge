@@ -18,6 +18,7 @@ export interface Product {
     quantity: number;
     min_quantity: number;
     active: boolean;
+    image_url: string | null;
     category: Category | null;
     tags: Tag[];
     created_at: string;

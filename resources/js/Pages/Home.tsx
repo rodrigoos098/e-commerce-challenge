@@ -10,40 +10,42 @@ import type { HomePageProps } from '@/types/public';
 const FEATURES = [
     {
         icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-kintsugi-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18C2.504 7.5 2 8.004 2 8.625v1.5c0 .621.504 1.125 1.125 1.125z" />
             </svg>
         ),
-        title: 'Frete Rápido',
-        description: 'Entrega em até 3 dias úteis para todo o Brasil.',
+        title: 'Embalagem Artesanal',
+        description: 'Cada peca embalada com cuidado e materiais sustentaveis.',
     },
     {
         icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-kintsugi-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l.075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 013.15 0V15M6.9 7.575a1.575 1.575 0 10-3.15 0v8.175a6.075 6.075 0 006.075 6.075h2.1a6.075 6.075 0 006.075-6.075V4.575" />
             </svg>
         ),
-        title: 'Compra Segura',
-        description: 'Seus dados protegidos com criptografia SSL.',
+        title: 'Direto do Artesao',
+        description: 'Compre diretamente de quem cria. Sem intermediarios.',
     },
     {
         icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-kintsugi-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
             </svg>
         ),
-        title: 'Suporte 24h',
-        description: 'Atendimento disponível a qualquer hora do dia.',
+        title: 'Pecas Unicas',
+        description: 'Edicoes limitadas e trabalhos exclusivos feitos a mao.',
     },
 ];
 
 const CATEGORY_ICONS: Record<string, string> = {
-    eletronicos: '💻',
-    roupas: '👕',
-    esportes: '⚽',
-    'casa-jardim': '🏠',
-    livros: '📚',
-    beleza: '💄',
+    ceramicas: '🏺',
+    texteis: '🧵',
+    arte: '🎨',
+    papelaria: '✂️',
+    joias: '💎',
+    velas: '🕯️',
+    decoracao: '🛋️',
+    jardim: '🌿',
 };
 
 export default function Home({ featured_products, categories }: HomePageProps) {
@@ -57,10 +59,10 @@ export default function Home({ featured_products, categories }: HomePageProps) {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-widest text-violet-600 mb-1">Browse</p>
-                            <h2 id="categories-heading" className="text-2xl sm:text-3xl font-extrabold text-gray-900">Categorias</h2>
+                            <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Browse</p>
+                            <h2 id="categories-heading" className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700">Categorias</h2>
                         </div>
-                        <Link href="/products" className="text-sm font-semibold text-violet-600 hover:text-violet-800 transition-colors">
+                        <Link href="/products" className="text-sm font-semibold text-kintsugi-500 hover:text-kintsugi-600 transition-colors">
                             Ver todos →
                         </Link>
                     </div>
@@ -69,12 +71,12 @@ export default function Home({ featured_products, categories }: HomePageProps) {
                             <Link
                                 key={cat.id}
                                 href={`/products?category_id=${cat.id}`}
-                                className="group flex flex-col items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-5 text-center hover:border-violet-200 hover:bg-violet-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                                className="group flex flex-col items-center gap-3 rounded-2xl border border-warm-200 bg-warm-50 p-5 text-center hover:border-kintsugi-200 hover:bg-kintsugi-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                             >
                                 <span className="text-3xl" role="img" aria-hidden="true">
                                     {CATEGORY_ICONS[cat.slug] ?? '🛍️'}
                                 </span>
-                                <span className="text-sm font-semibold text-gray-700 group-hover:text-violet-700 transition-colors">
+                                <span className="text-sm font-semibold text-warm-600 group-hover:text-kintsugi-600 transition-colors">
                                     {cat.name}
                                 </span>
                             </Link>
@@ -88,10 +90,10 @@ export default function Home({ featured_products, categories }: HomePageProps) {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-widest text-violet-600 mb-1">Selecionados</p>
-                            <h2 id="featured-heading" className="text-2xl sm:text-3xl font-extrabold text-gray-900">Produtos em Destaque</h2>
+                            <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Selecionados</p>
+                            <h2 id="featured-heading" className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700">Pecas em Destaque</h2>
                         </div>
-                        <Link href="/products" className="text-sm font-semibold text-violet-600 hover:text-violet-800 transition-colors">
+                        <Link href="/products" className="text-sm font-semibold text-kintsugi-500 hover:text-kintsugi-600 transition-colors">
                             Ver todos →
                         </Link>
                     </div>
@@ -100,23 +102,23 @@ export default function Home({ featured_products, categories }: HomePageProps) {
             </section>
 
             {/* Why us */}
-            <section className="bg-gradient-to-br from-violet-50 to-indigo-50 py-14" aria-labelledby="features-heading">
+            <section className="bg-gradient-to-br from-kintsugi-50 to-kintsugi-50 py-14" aria-labelledby="features-heading">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-10">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-violet-600 mb-1">Diferenciais</p>
-                        <h2 id="features-heading" className="text-2xl sm:text-3xl font-extrabold text-gray-900">Por que comprar conosco?</h2>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Diferenciais</p>
+                        <h2 id="features-heading" className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700">Por que escolher Shopsugi&#x30C4;?</h2>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         {FEATURES.map((feature) => (
                             <div
                                 key={feature.title}
-                                className="flex flex-col items-center text-center rounded-2xl bg-white border border-violet-100 p-8 shadow-sm hover:shadow-md transition-shadow duration-200"
+                                className="flex flex-col items-center text-center rounded-2xl bg-white border border-kintsugi-100 p-8 shadow-sm hover:shadow-md transition-shadow duration-200"
                             >
-                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 mb-4">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-kintsugi-50 mb-4">
                                     {feature.icon}
                                 </div>
-                                <h3 className="text-base font-bold text-gray-900 mb-2">{feature.title}</h3>
-                                <p className="text-sm text-gray-500 leading-relaxed">{feature.description}</p>
+                                <h3 className="text-base font-bold text-warm-700 mb-2">{feature.title}</h3>
+                                <p className="text-sm text-warm-500 leading-relaxed">{feature.description}</p>
                             </div>
                         ))}
                     </div>
@@ -124,22 +126,22 @@ export default function Home({ featured_products, categories }: HomePageProps) {
             </section>
 
             {/* CTA bottom */}
-            <section className="bg-gray-900 py-16">
+            <section className="bg-warm-800 py-16">
                 <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Pronto para começar?</h2>
-                    <p className="text-gray-400 mb-8 leading-relaxed">
-                        Crie sua conta agora e aproveite ofertas exclusivas para novos clientes.
+                    <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white mb-4">Junte-se a comunidade</h2>
+                    <p className="text-warm-400 mb-8 leading-relaxed">
+                        Cadastre-se e receba acesso antecipado a novas colecoes e edicoes limitadas.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link
                             href="/register"
-                            className="rounded-full bg-violet-600 px-8 py-3 text-sm font-bold text-white hover:bg-violet-500 transition-colors shadow-lg"
+                            className="rounded-full bg-kintsugi-500 px-8 py-3 text-sm font-bold text-white hover:bg-kintsugi-400 transition-colors shadow-lg"
                         >
                             Criar conta grátis
                         </Link>
                         <Link
                             href="/products"
-                            className="rounded-full border border-gray-600 px-8 py-3 text-sm font-semibold text-gray-300 hover:border-gray-400 hover:text-white transition-colors"
+                            className="rounded-full border border-warm-600 px-8 py-3 text-sm font-semibold text-warm-400 hover:border-warm-400 hover:text-white transition-colors"
                         >
                             Ver produtos
                         </Link>

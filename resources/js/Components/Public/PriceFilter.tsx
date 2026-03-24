@@ -44,12 +44,12 @@ export default function PriceFilter({ min, max, currentMin, currentMax, onChange
 
     return (
         <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Faixa de Preço</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-warm-500">Faixa de Preço</h3>
 
             {/* Price display */}
-            <div className="mb-4 flex items-center justify-between text-sm text-gray-700">
+            <div className="mb-4 flex items-center justify-between text-sm text-warm-600">
                 <span className="font-medium">{formatPrice(localMin)}</span>
-                <span className="text-gray-400">até</span>
+                <span className="text-warm-400">até</span>
                 <span className="font-medium">{formatPrice(localMax)}</span>
             </div>
 
@@ -64,7 +64,7 @@ export default function PriceFilter({ min, max, currentMin, currentMax, onChange
                         step={10}
                         value={localMin}
                         onChange={handleMinChange}
-                        className="w-full h-1.5 rounded-full appearance-none bg-gray-200 accent-violet-600 cursor-pointer"
+                        className="w-full h-1.5 rounded-full appearance-none bg-gray-200 accent-kintsugi-500 cursor-pointer"
                     />
                 </div>
 
@@ -78,7 +78,7 @@ export default function PriceFilter({ min, max, currentMin, currentMax, onChange
                         step={10}
                         value={localMax}
                         onChange={handleMaxChange}
-                        className="w-full h-1.5 rounded-full appearance-none bg-gray-200 accent-violet-600 cursor-pointer"
+                        className="w-full h-1.5 rounded-full appearance-none bg-gray-200 accent-kintsugi-500 cursor-pointer"
                     />
                 </div>
             </div>
@@ -88,14 +88,14 @@ export default function PriceFilter({ min, max, currentMin, currentMax, onChange
                 <button
                     type="button"
                     onClick={handleApply}
-                    className="flex-1 rounded-lg bg-violet-600 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors"
+                    className="flex-1 rounded-lg bg-kintsugi-500 py-1.5 text-xs font-semibold text-white hover:bg-kintsugi-600 transition-colors"
                 >
                     Aplicar
                 </button>
                 <button
                     type="button"
                     onClick={handleReset}
-                    className="flex-1 rounded-lg border border-gray-200 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                    className="flex-1 rounded-lg border border-warm-200 py-1.5 text-xs font-medium text-warm-600 hover:bg-warm-50 transition-colors"
                 >
                     Limpar
                 </button>

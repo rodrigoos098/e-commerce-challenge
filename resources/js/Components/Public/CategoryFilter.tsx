@@ -28,12 +28,12 @@ function CategoryItem({
                 className={`w-full text-left rounded-lg px-3 py-2 text-sm transition-colors duration-150 flex items-center gap-2
                     ${depth > 0 ? 'pl-6' : ''}
                     ${isSelected
-                        ? 'bg-violet-50 text-violet-700 font-semibold'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                        ? 'bg-kintsugi-50 text-kintsugi-600 font-semibold'
+                        : 'text-warm-600 hover:bg-gray-100 hover:text-warm-700'
                     }`}
             >
                 {isSelected && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-violet-600 shrink-0" aria-hidden="true" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-kintsugi-500 shrink-0" aria-hidden="true" />
                 )}
                 {category.name}
             </button>
@@ -57,7 +57,7 @@ function CategoryItem({
 export default function CategoryFilter({ categories, selected, onChange }: CategoryFilterProps) {
     return (
         <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Categorias</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-warm-500">Categorias</h3>
             <ul className="space-y-0.5">
                 <li>
                     <button
@@ -65,8 +65,8 @@ export default function CategoryFilter({ categories, selected, onChange }: Categ
                         onClick={() => onChange(null)}
                         className={`w-full text-left rounded-lg px-3 py-2 text-sm transition-colors duration-150 ${
                             !selected
-                                ? 'bg-violet-50 text-violet-700 font-semibold'
-                                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                                ? 'bg-kintsugi-50 text-kintsugi-600 font-semibold'
+                                : 'text-warm-600 hover:bg-gray-100 hover:text-warm-700'
                         }`}
                     >
                         Todas as categorias

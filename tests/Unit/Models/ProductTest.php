@@ -22,10 +22,10 @@ class ProductTest extends TestCase
     {
         $expected = [
             'name', 'slug', 'description', 'price', 'cost_price',
-            'quantity', 'min_quantity', 'active', 'category_id',
+            'quantity', 'min_quantity', 'active', 'image_url', 'category_id',
         ];
 
-        $product = new Product;
+        $product = new Product();
 
         $this->assertEquals($expected, $product->getFillable());
     }
@@ -117,7 +117,7 @@ class ProductTest extends TestCase
 
     public function test_category_relationship_returns_belongs_to(): void
     {
-        $product = new Product;
+        $product = new Product();
 
         $this->assertInstanceOf(BelongsTo::class, $product->category());
     }
@@ -131,7 +131,7 @@ class ProductTest extends TestCase
 
     public function test_tags_relationship_returns_belongs_to_many(): void
     {
-        $product = new Product;
+        $product = new Product();
 
         $this->assertInstanceOf(BelongsToMany::class, $product->tags());
     }
@@ -147,14 +147,14 @@ class ProductTest extends TestCase
 
     public function test_order_items_relationship_returns_has_many(): void
     {
-        $product = new Product;
+        $product = new Product();
 
         $this->assertInstanceOf(HasMany::class, $product->orderItems());
     }
 
     public function test_stock_movements_relationship_returns_has_many(): void
     {
-        $product = new Product;
+        $product = new Product();
 
         $this->assertInstanceOf(HasMany::class, $product->stockMovements());
     }

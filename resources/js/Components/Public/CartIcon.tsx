@@ -11,7 +11,7 @@ export default function CartIcon({ count, href = '/cart' }: CartIconProps) {
         <Link
             href={href}
             aria-label={`Carrinho com ${count} ${count === 1 ? 'item' : 'itens'}`}
-            className="relative flex items-center justify-center p-2 text-gray-600 hover:text-violet-600 transition-colors duration-150"
+            className="relative flex items-center justify-center p-2 text-warm-600 hover:text-kintsugi-500 transition-colors duration-150"
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -30,7 +30,7 @@ export default function CartIcon({ count, href = '/cart' }: CartIconProps) {
             </svg>
             {count > 0 && (
                 <span
-                    className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white tabular-nums"
+                    className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-kintsugi-500 text-xs font-bold text-white tabular-nums"
                     aria-hidden="true"
                 >
                     {count > 99 ? '99+' : count}

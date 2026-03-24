@@ -86,7 +86,7 @@ export default function ProductsEdit({
                         <button
                             type="button"
                             onClick={() => router.visit('/admin/products')}
-                            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-indigo-600 mb-3 transition-colors"
+                            className="flex items-center gap-1.5 text-sm text-warm-500 hover:text-kintsugi-600 mb-3 transition-colors"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -95,12 +95,12 @@ export default function ProductsEdit({
                         </button>
                         <div className="flex items-start justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">Editar Produto</h1>
-                                <p className="text-sm text-gray-500 mt-0.5">{product.name}</p>
+                                <h1 className="text-2xl font-bold text-warm-700">Editar Produto</h1>
+                                <p className="text-sm text-warm-500 mt-0.5">{product.name}</p>
                             </div>
                             <a
                                 href={`/admin/products/${product.id}`}
-                                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+                                className="text-sm text-kintsugi-600 hover:text-kintsugi-700 font-medium transition-colors"
                             >
                                 Ver detalhes →
                             </a>
@@ -109,8 +109,8 @@ export default function ProductsEdit({
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         {/* Basic info */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-xs p-6 space-y-5">
-                            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-100 pb-3">
+                        <div className="bg-white rounded-xl border border-warm-200 shadow-xs p-6 space-y-5">
+                            <h2 className="text-sm font-semibold text-warm-600 uppercase tracking-wider border-b border-warm-200 pb-3">
                                 Informações básicas
                             </h2>
                             <FormField
@@ -141,8 +141,8 @@ export default function ProductsEdit({
                         </div>
 
                         {/* Pricing */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-xs p-6 space-y-5">
-                            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-100 pb-3">
+                        <div className="bg-white rounded-xl border border-warm-200 shadow-xs p-6 space-y-5">
+                            <h2 className="text-sm font-semibold text-warm-600 uppercase tracking-wider border-b border-warm-200 pb-3">
                                 Preços
                             </h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -169,8 +169,8 @@ export default function ProductsEdit({
                         </div>
 
                         {/* Stock */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-xs p-6 space-y-5">
-                            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-100 pb-3">
+                        <div className="bg-white rounded-xl border border-warm-200 shadow-xs p-6 space-y-5">
+                            <h2 className="text-sm font-semibold text-warm-600 uppercase tracking-wider border-b border-warm-200 pb-3">
                                 Estoque
                             </h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -199,8 +199,8 @@ export default function ProductsEdit({
                         </div>
 
                         {/* Tags */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-xs p-6 space-y-4">
-                            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-100 pb-3">
+                        <div className="bg-white rounded-xl border border-warm-200 shadow-xs p-6 space-y-4">
+                            <h2 className="text-sm font-semibold text-warm-600 uppercase tracking-wider border-b border-warm-200 pb-3">
                                 Tags
                             </h2>
                             <div className="flex flex-wrap gap-2">
@@ -214,8 +214,8 @@ export default function ProductsEdit({
                                             className={[
                                                 'px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150',
                                                 selected
-                                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                                                    : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-600',
+                                                    ? 'bg-kintsugi-600 text-white border-kintsugi-600 shadow-sm'
+                                                    : 'bg-white text-warm-600 border-warm-300 hover:border-kintsugi-400 hover:text-kintsugi-600',
                                             ].join(' ')}
                                         >
                                             {selected && <span className="mr-1">✓</span>}
@@ -227,7 +227,7 @@ export default function ProductsEdit({
                         </div>
 
                         {/* Status */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-xs p-6">
+                        <div className="bg-white rounded-xl border border-warm-200 shadow-xs p-6">
                             <FormField
                                 label="Produto Ativo"
                                 name="active"
@@ -243,14 +243,14 @@ export default function ProductsEdit({
                             <button
                                 type="button"
                                 onClick={() => router.visit('/admin/products')}
-                                className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="px-5 py-2.5 text-sm font-medium text-warm-600 bg-white border border-warm-300 rounded-lg hover:bg-warm-50 transition-colors"
                             >
                                 Cancelar
                             </button>
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-kintsugi-600 hover:bg-kintsugi-700 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
                             >
                                 {submitting && (
                                     <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

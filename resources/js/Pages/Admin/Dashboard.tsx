@@ -57,8 +57,8 @@ export default function Dashboard({ stats }: DashboardProps) {
         <AdminLayout title="Dashboard">
             <div className="space-y-8 p-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                    <p className="mt-0.5 text-sm text-gray-500">Visao geral das metricas do e-commerce</p>
+                    <h1 className="text-2xl font-bold text-warm-700">Dashboard</h1>
+                    <p className="mt-0.5 text-sm text-warm-500">Visao geral das metricas do e-commerce</p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -66,7 +66,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                         title="Total de Produtos"
                         value={stats.total_products.toLocaleString('pt-BR')}
                         icon={<IconBox />}
-                        color="indigo"
+                        color="kintsugi"
                         trend={{ direction: 'up', value: '+12', label: 'este mes' }}
                     />
                     <StatCard
@@ -93,13 +93,13 @@ export default function Dashboard({ stats }: DashboardProps) {
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-                    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-xs xl:col-span-2">
+                    <div className="rounded-xl border border-warm-200 bg-white p-6 shadow-xs xl:col-span-2">
                         <div className="mb-6 flex items-center justify-between">
                             <div>
-                                <h2 className="text-base font-semibold text-gray-900">Pedidos - ultimos 7 dias</h2>
-                                <p className="mt-0.5 text-xs text-gray-400">Quantidade de pedidos por dia</p>
+                                <h2 className="text-base font-semibold text-warm-700">Pedidos - ultimos 7 dias</h2>
+                                <p className="mt-0.5 text-xs text-warm-400">Quantidade de pedidos por dia</p>
                             </div>
-                            <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600">Esta semana</span>
+                            <span className="rounded-full bg-kintsugi-50 px-2.5 py-1 text-xs font-medium text-kintsugi-600">Esta semana</span>
                         </div>
                         <div className="flex h-36 items-end gap-3">
                             {chartData.map((entry) => {
@@ -107,25 +107,25 @@ export default function Dashboard({ stats }: DashboardProps) {
 
                                 return (
                                     <div key={entry.date} className="group flex flex-1 flex-col items-center gap-2">
-                                        <span className="text-xs font-semibold text-gray-700 opacity-0 transition-opacity group-hover:opacity-100">
+                                        <span className="text-xs font-semibold text-warm-600 opacity-0 transition-opacity group-hover:opacity-100">
                                             {entry.orders}
                                         </span>
                                         <div className="flex w-full items-end" style={{ height: '96px' }}>
                                             <div
-                                                className="w-full rounded-t-md bg-indigo-500 transition-colors duration-150 group-hover:bg-indigo-600"
+                                                className="w-full rounded-t-md bg-kintsugi-500 transition-colors duration-150 group-hover:bg-kintsugi-600"
                                                 style={{ height: `${heightPct}%`, minHeight: '4px' }}
                                                 title={`${entry.day}: ${entry.orders} pedidos - ${formatCurrency(entry.revenue)}`}
                                             />
                                         </div>
-                                        <span className="text-xs text-gray-500">{entry.day}</span>
+                                        <span className="text-xs text-warm-500">{entry.day}</span>
                                     </div>
                                 );
                             })}
                         </div>
                     </div>
 
-                    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-xs">
-                        <h2 className="mb-4 text-base font-semibold text-gray-900">Acoes rapidas</h2>
+                    <div className="rounded-xl border border-warm-200 bg-white p-6 shadow-xs">
+                        <h2 className="mb-4 text-base font-semibold text-warm-700">Acoes rapidas</h2>
                         <div className="space-y-2">
                             {[
                                 { label: 'Novo Produto', href: '/admin/products/create' },
@@ -136,10 +136,10 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 <Link
                                     key={action.href}
                                     href={action.href}
-                                    className="group flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 transition-all duration-150 hover:border-indigo-300 hover:bg-indigo-50"
+                                    className="group flex w-full items-center justify-between rounded-lg border border-warm-200 px-4 py-3 transition-all duration-150 hover:border-kintsugi-300 hover:bg-kintsugi-50"
                                 >
-                                    <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-700">{action.label}</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 group-hover:text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <span className="text-sm font-medium text-warm-600 group-hover:text-kintsugi-700">{action.label}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-warm-400 group-hover:text-kintsugi-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </Link>
@@ -149,32 +149,32 @@ export default function Dashboard({ stats }: DashboardProps) {
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
-                        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-                            <h2 className="text-base font-semibold text-gray-900">Ultimos Pedidos</h2>
-                            <Link href="/admin/orders" className="text-xs font-medium text-indigo-600 hover:text-indigo-700">
+                    <div className="overflow-hidden rounded-xl border border-warm-200 bg-white shadow-xs">
+                        <div className="flex items-center justify-between border-b border-warm-200 px-5 py-4">
+                            <h2 className="text-base font-semibold text-warm-700">Ultimos Pedidos</h2>
+                            <Link href="/admin/orders" className="text-xs font-medium text-kintsugi-600 hover:text-kintsugi-700">
                                 Ver todos
                             </Link>
                         </div>
                         <div className="divide-y divide-gray-100">
                             {stats.recent_orders.map((order) => (
-                                <div key={order.id} className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-gray-50">
+                                <div key={order.id} className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-warm-50">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-800">#{order.id}</p>
-                                        <p className="mt-0.5 text-xs text-gray-400">{formatDate(order.created_at)}</p>
+                                        <p className="text-sm font-medium text-warm-700">#{order.id}</p>
+                                        <p className="mt-0.5 text-xs text-warm-400">{formatDate(order.created_at)}</p>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <StatusBadge status={order.status} size="sm" />
-                                        <span className="text-sm font-semibold text-gray-900">{formatCurrency(order.total)}</span>
+                                        <span className="text-sm font-semibold text-warm-700">{formatCurrency(order.total)}</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
-                        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-                            <h2 className="text-base font-semibold text-gray-900">
+                    <div className="overflow-hidden rounded-xl border border-warm-200 bg-white shadow-xs">
+                        <div className="flex items-center justify-between border-b border-warm-200 px-5 py-4">
+                            <h2 className="text-base font-semibold text-warm-700">
                                 Estoque Critico
                                 {stats.low_stock_count > 0 && (
                                     <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-600">
@@ -193,18 +193,18 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 return (
                                     <div
                                         key={product.id}
-                                        className={['flex items-center justify-between px-5 py-3 transition-colors hover:bg-gray-50', isCritical ? 'bg-red-50/50' : ''].join(' ')}
+                                        className={['flex items-center justify-between px-5 py-3 transition-colors hover:bg-warm-50', isCritical ? 'bg-red-50/50' : ''].join(' ')}
                                     >
                                         <div className="min-w-0">
-                                            <p className="truncate text-sm font-medium text-gray-800">{product.name}</p>
-                                            <p className="mt-0.5 text-xs text-gray-400">{product.category?.name ?? 'Sem categoria'}</p>
+                                            <p className="truncate text-sm font-medium text-warm-700">{product.name}</p>
+                                            <p className="mt-0.5 text-xs text-warm-400">{product.category?.name ?? 'Sem categoria'}</p>
                                         </div>
                                         <div className="ml-3 flex flex-shrink-0 items-center gap-3">
                                             <div className="text-right">
                                                 <p className={['text-sm font-bold', isCritical ? 'text-red-600' : 'text-amber-600'].join(' ')}>
                                                     {product.quantity} un.
                                                 </p>
-                                                <p className="text-xs text-gray-400">min: {product.min_quantity}</p>
+                                                <p className="text-xs text-warm-400">min: {product.min_quantity}</p>
                                             </div>
                                             {isCritical && (
                                                 <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">

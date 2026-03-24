@@ -31,11 +31,11 @@ export default function QuantitySelector({
     };
 
     const btnBase = `flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-150
-        text-gray-600 hover:bg-gray-100 hover:text-gray-900 active:scale-90
+        text-warm-600 hover:bg-gray-100 hover:text-warm-700 active:scale-90
         disabled:opacity-40 disabled:cursor-not-allowed`;
 
     return (
-        <div className="inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-white p-1" role="group" aria-label="Selecionar quantidade">
+        <div className="inline-flex items-center gap-1 rounded-xl border border-warm-200 bg-white p-1" role="group" aria-label="Selecionar quantidade">
             <button
                 type="button"
                 onClick={handleDecrement}
@@ -56,7 +56,7 @@ export default function QuantitySelector({
                 max={max}
                 disabled={disabled}
                 aria-label="Quantidade"
-                className="w-10 text-center text-sm font-semibold text-gray-900 bg-transparent border-0 focus:outline-none disabled:opacity-40 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-10 text-center text-sm font-semibold text-warm-700 bg-transparent border-0 focus:outline-none disabled:opacity-40 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
 
             <button

@@ -69,50 +69,46 @@ export default function ProductShow({ product, related_products }: ProductShowPa
         <PublicLayout title={product.name}>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
                 {/* Breadcrumb */}
-                <nav aria-label="Navegação" className="mb-8 flex items-center gap-2 text-sm text-gray-400">
-                    <Link href="/" className="hover:text-violet-600 transition-colors">Início</Link>
+                <nav aria-label="Navegação" className="mb-8 flex items-center gap-2 text-sm text-warm-400">
+                    <Link href="/" className="hover:text-kintsugi-600 transition-colors">Início</Link>
                     <span aria-hidden="true">/</span>
-                    <Link href="/products" className="hover:text-violet-600 transition-colors">Produtos</Link>
+                    <Link href="/products" className="hover:text-kintsugi-600 transition-colors">Produtos</Link>
                     {product.category && (
                         <>
                             <span aria-hidden="true">/</span>
-                            <Link href={`/products?category_id=${product.category.id}`} className="hover:text-violet-600 transition-colors">
+                            <Link href={`/products?category_id=${product.category.id}`} className="hover:text-kintsugi-600 transition-colors">
                                 {product.category.name}
                             </Link>
                         </>
                     )}
                     <span aria-hidden="true">/</span>
-                    <span className="text-gray-600 font-medium line-clamp-1">{product.name}</span>
+                    <span className="text-warm-600 font-medium line-clamp-1">{product.name}</span>
                 </nav>
 
                 {/* Product detail */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
                     {/* Images */}
                     <div className="space-y-4">
-                        <div className="overflow-hidden rounded-2xl bg-gray-100 border border-gray-200 aspect-square">
+                        <div className="overflow-hidden rounded-2xl bg-warm-50 border border-warm-200 aspect-square">
                             <img
-                                src={`https://picsum.photos/seed/${product.id}/800/800`}
+                                src={`/storage/products/${product.id}.webp`}
                                 alt={product.name}
                                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                             />
                         </div>
                         {/* Thumbnail row */}
                         <div className="flex gap-3">
-                            {[product.id, product.id + 100, product.id + 200].map((seed) => (
-                                <button
-                                    key={seed}
-                                    className="h-20 w-20 overflow-hidden rounded-xl border-2 border-violet-200 bg-gray-100 hover:border-violet-500 transition-colors"
-                                    aria-label="Ver imagem"
-                                >
-                                    <img
-                                        src={`https://picsum.photos/seed/${seed}/160/160`}
-                                        alt=""
-                                        className="h-full w-full object-cover"
-                                        loading="lazy"
-                                        aria-hidden="true"
-                                    />
-                                </button>
-                            ))}
+                            <div
+                                className="h-20 w-20 overflow-hidden rounded-xl border-2 border-kintsugi-200 bg-warm-50"
+                            >
+                                <img
+                                    src={product.image_url ?? `/storage/products/${product.id}.webp`}
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                    loading="lazy"
+                                    aria-hidden="true"
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -123,27 +119,27 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                             {product.category && (
                                 <Link
                                     href={`/products?category_id=${product.category.id}`}
-                                    className="rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 hover:bg-violet-200 transition-colors"
+                                    className="rounded-full bg-kintsugi-100 px-3 py-1 text-xs font-semibold text-kintsugi-700 hover:bg-kintsugi-200 transition-colors"
                                 >
                                     {product.category.name}
                                 </Link>
                             )}
                             {product.tags.map((tag) => (
-                                <span key={tag.id} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+                                <span key={tag.id} className="rounded-full bg-warm-100 px-3 py-1 text-xs font-medium text-warm-600">
                                     #{tag.name}
                                 </span>
                             ))}
                         </div>
 
                         {/* Name */}
-                        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight mb-4">
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-warm-700 leading-tight mb-4">
                             {product.name}
                         </h1>
 
                         {/* Price */}
                         <div className="mb-6">
-                            <p className="text-4xl font-extrabold text-gray-900">{formatPrice(product.price)}</p>
-                            <p className="mt-1 text-sm text-gray-400">
+                            <p className="text-4xl font-extrabold text-warm-700">{formatPrice(product.price)}</p>
+                            <p className="mt-1 text-sm text-warm-400">
                                 Em até 12× de {formatPrice(product.price / 12)} sem juros
                             </p>
                         </div>
@@ -154,7 +150,7 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                         </div>
 
                         {/* Description */}
-                        <p className="text-sm text-gray-600 leading-relaxed mb-8">{product.description}</p>
+                        <p className="text-sm text-warm-600 leading-relaxed mb-8">{product.description}</p>
 
                         {/* Quantity + Add to cart */}
                         {!isOutOfStock && (
@@ -171,7 +167,7 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                                     type="button"
                                     onClick={handleAddToCart}
                                     disabled={adding}
-                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-2xl bg-violet-600 px-8 py-3.5 text-sm font-bold text-white hover:bg-violet-700 active:scale-[.98] transition-all shadow-lg shadow-violet-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-2xl bg-kintsugi-500 px-8 py-3.5 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-lg shadow-kintsugi-200 disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
                                     {adding ? (
                                         <>
@@ -197,22 +193,22 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                             <button
                                 type="button"
                                 disabled
-                                className="w-full rounded-2xl bg-gray-200 py-3.5 text-sm font-bold text-gray-500 cursor-not-allowed mb-6"
+                                className="w-full rounded-2xl bg-warm-200 py-3.5 text-sm font-bold text-warm-500 cursor-not-allowed mb-6"
                             >
                                 Produto Esgotado
                             </button>
                         )}
 
                         {/* Trust badges */}
-                        <div className="border-t border-gray-100 pt-6 grid grid-cols-3 gap-3 text-center">
+                        <div className="border-t border-warm-200 pt-6 grid grid-cols-3 gap-3 text-center">
                             {[
-                                { icon: '🔒', label: 'Compra Segura' },
-                                { icon: '🚚', label: 'Frete Rápido' },
+                                { icon: '✨', label: 'Peca Autentica' },
+                                { icon: '🎁', label: 'Embalagem Premium' },
                                 { icon: '↩️', label: '30 dias para trocar' },
                             ].map((badge) => (
                                 <div key={badge.label} className="flex flex-col items-center gap-1">
                                     <span className="text-2xl" aria-hidden="true">{badge.icon}</span>
-                                    <span className="text-xs text-gray-500">{badge.label}</span>
+                                    <span className="text-xs text-warm-500">{badge.label}</span>
                                 </div>
                             ))}
                         </div>
@@ -222,7 +218,7 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                 {/* Related products */}
                 {related_products && related_products.length > 0 && (
                     <section className="mt-16" aria-labelledby="related-heading">
-                        <h2 id="related-heading" className="text-xl font-bold text-gray-900 mb-6">Você também pode gostar</h2>
+                        <h2 id="related-heading" className="text-xl font-bold text-warm-700 mb-6">Você também pode gostar</h2>
                         <ProductGrid products={related_products} />
                     </section>
                 )}

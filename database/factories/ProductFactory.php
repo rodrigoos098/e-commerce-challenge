@@ -18,17 +18,17 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->unique()->words(3, true);
-        $price = fake()->randomFloat(2, 10, 500);
+        $name = fake()->unique()->words(fake()->numberBetween(2, 4), true);
+        $price = fake()->randomFloat(2, 20, 500);
 
         return [
             'name' => ucwords($name),
             'slug' => Str::slug($name),
-            'description' => fake()->paragraphs(2, true),
+            'description' => fake()->paragraph(),
             'price' => $price,
-            'cost_price' => fake()->randomFloat(2, 5, $price * 0.8),
-            'quantity' => fake()->numberBetween(0, 200),
-            'min_quantity' => fake()->numberBetween(5, 20),
+            'cost_price' => round($price * fake()->randomFloat(2, 0.3, 0.6), 2),
+            'quantity' => fake()->numberBetween(0, 100),
+            'min_quantity' => fake()->numberBetween(1, 10),
             'active' => true,
             'category_id' => Category::factory(),
         ];

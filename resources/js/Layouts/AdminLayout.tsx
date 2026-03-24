@@ -186,19 +186,14 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     const SidebarContent = () => (
         <div className="flex flex-col h-full">
             {/* Logo */}
-            <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-700/60">
-                <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-                    A
-                </div>
-                <div>
-                    <p className="text-white font-semibold text-sm leading-tight">E-Commerce</p>
-                    <p className="text-slate-400 text-xs">Painel Admin</p>
-                </div>
+            <div className="flex items-center gap-3 px-6 py-5 border-b border-warm-800/60">
+                <span className="font-display text-xl font-bold text-kintsugi-400">Shopsugiツ</span>
+                <span className="text-warm-400 text-xs ml-1">Backoffice</span>
             </div>
 
             {/* Navigation */}
             <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-                <p className="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Menu</p>
+                <p className="px-3 mb-2 text-xs font-semibold text-warm-500 uppercase tracking-wider">Menu</p>
                 {navItems.map((item) => {
                     const active = isActive(item);
                     return (
@@ -208,14 +203,14 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                             className={[
                                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group',
                                 active
-                                    ? 'bg-indigo-600 text-white shadow-sm'
-                                    : 'text-slate-400 hover:text-white hover:bg-slate-800',
+                                    ? 'bg-kintsugi-600 text-white shadow-sm'
+                                    : 'text-warm-400 hover:text-white hover:bg-warm-800',
                             ].join(' ')}
                         >
                             <span
                                 className={[
                                     'flex-shrink-0 transition-colors',
-                                    active ? 'text-white' : 'text-slate-400 group-hover:text-white',
+                                    active ? 'text-white' : 'text-warm-400 group-hover:text-white',
                                 ].join(' ')}
                             >
                                 {item.icon}
@@ -232,19 +227,19 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
             </nav>
 
             {/* User */}
-            <div className="px-3 py-4 border-t border-slate-700/60">
+            <div className="px-3 py-4 border-t border-warm-800/60">
                 <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
-                    <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-kintsugi-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                         {getUserInitials(userName)}
                     </div>
                     <div className="min-w-0 flex-1">
                         <p className="text-white text-sm font-medium truncate">{userName}</p>
-                        <p className="text-slate-400 text-xs truncate">{userEmail}</p>
+                        <p className="text-warm-400 text-xs truncate">{userEmail}</p>
                     </div>
                     <button
                         onClick={handleLogout}
                         title="Sair"
-                        className="text-slate-400 hover:text-red-400 transition-colors flex-shrink-0"
+                        className="text-warm-400 hover:text-red-400 transition-colors flex-shrink-0"
                     >
                         <IconLogout />
                     </button>
@@ -254,7 +249,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     );
 
     return (
-        <div className="flex h-screen bg-gray-50 overflow-hidden">
+        <div className="flex h-screen bg-warm-50 overflow-hidden">
             <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
 
             {/* Mobile overlay */}
@@ -268,7 +263,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
             {/* Sidebar (desktop: fixed, mobile: off-canvas) */}
             <aside
                 className={[
-                    'fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col transition-transform duration-300 ease-in-out',
+                    'fixed inset-y-0 left-0 z-30 w-64 bg-warm-900 flex flex-col transition-transform duration-300 ease-in-out',
                     'lg:translate-x-0 lg:static lg:inset-auto lg:flex-shrink-0',
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full',
                 ].join(' ')}
@@ -276,7 +271,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                 {/* Mobile close button */}
                 <button
                     onClick={() => setSidebarOpen(false)}
-                    className="absolute top-4 right-4 text-slate-400 hover:text-white lg:hidden"
+                    className="absolute top-4 right-4 text-warm-400 hover:text-white lg:hidden"
                 >
                     <IconClose />
                 </button>
@@ -287,11 +282,11 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
             {/* Main content */}
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
                 {/* Header */}
-                <header className="flex items-center gap-4 px-4 sm:px-6 h-16 bg-white border-b border-gray-200 flex-shrink-0">
+                <header className="flex items-center gap-4 px-4 sm:px-6 h-16 bg-white border-b border-warm-200 flex-shrink-0">
                     {/* Hamburger (mobile) */}
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="text-gray-500 hover:text-gray-700 lg:hidden"
+                        className="text-warm-500 hover:text-warm-600 lg:hidden"
                     >
                         <IconMenu />
                     </button>
@@ -301,19 +296,19 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                         {breadcrumbs.map((crumb, idx) => (
                             <React.Fragment key={idx}>
                                 {idx > 0 && (
-                                    <span className="text-gray-400 flex-shrink-0">
+                                    <span className="text-warm-400 flex-shrink-0">
                                         <IconChevronRight />
                                     </span>
                                 )}
                                 {crumb.href ? (
                                     <Link
                                         href={crumb.href}
-                                        className="text-gray-500 hover:text-indigo-600 transition-colors truncate"
+                                        className="text-warm-500 hover:text-kintsugi-600 transition-colors truncate"
                                     >
                                         {crumb.label}
                                     </Link>
                                 ) : (
-                                    <span className="text-gray-800 font-medium truncate">
+                                    <span className="text-warm-700 font-medium truncate">
                                         {crumb.label}
                                     </span>
                                 )}
@@ -324,16 +319,16 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                     {/* Right side: user info (desktop) */}
                     <div className="ml-auto flex items-center gap-3">
                         <div className="hidden sm:block text-right">
-                            <p className="text-sm font-medium text-gray-800 leading-tight">{userName}</p>
-                            <p className="text-xs text-gray-500">{userEmail}</p>
+                            <p className="text-sm font-medium text-warm-700 leading-tight">{userName}</p>
+                            <p className="text-xs text-warm-500">{userEmail}</p>
                         </div>
-                        <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-bold">
+                        <div className="w-9 h-9 rounded-full bg-kintsugi-600 flex items-center justify-center text-white text-sm font-bold">
                             {getUserInitials(userName)}
                         </div>
                         <button
                             onClick={handleLogout}
                             title="Sair"
-                            className="hidden sm:flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors"
+                            className="hidden sm:flex items-center gap-1.5 text-sm text-warm-500 hover:text-red-500 transition-colors"
                         >
                             <IconLogout />
                             <span>Sair</span>

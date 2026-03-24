@@ -17,7 +17,7 @@ const statusConfig: Record<OrderStatus, { label: string; classes: string }> = {
     },
     shipped: {
         label: 'Enviado',
-        classes: 'bg-indigo-100 text-indigo-700 ring-indigo-200',
+        classes: 'bg-kintsugi-100 text-kintsugi-700 ring-kintsugi-200',
     },
     delivered: {
         label: 'Entregue',
@@ -32,7 +32,7 @@ const statusConfig: Record<OrderStatus, { label: string; classes: string }> = {
 const dotColor: Record<OrderStatus, string> = {
     pending: 'bg-amber-500',
     processing: 'bg-blue-500',
-    shipped: 'bg-indigo-500',
+    shipped: 'bg-kintsugi-500',
     delivered: 'bg-emerald-500',
     cancelled: 'bg-red-500',
 };
@@ -40,7 +40,7 @@ const dotColor: Record<OrderStatus, string> = {
 export default function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
     const config = statusConfig[status] ?? {
         label: status,
-        classes: 'bg-gray-100 text-gray-600 ring-gray-200',
+        classes: 'bg-gray-100 text-warm-600 ring-gray-200',
     };
     const dot = dotColor[status] ?? 'bg-gray-400';
 

@@ -82,8 +82,8 @@ export default function ProductsIndex({
             sortable: true,
             render: (row) => (
                 <div>
-                    <p className="font-medium text-gray-900">{row.name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{row.category?.name ?? 'Sem categoria'}</p>
+                    <p className="font-medium text-warm-700">{row.name}</p>
+                    <p className="text-xs text-warm-400 mt-0.5">{row.category?.name ?? 'Sem categoria'}</p>
                 </div>
             ),
         },
@@ -93,9 +93,9 @@ export default function ProductsIndex({
             sortable: true,
             render: (row) => (
                 <div>
-                    <p className="font-medium text-gray-800">{formatCurrency(row.price)}</p>
+                    <p className="font-medium text-warm-700">{formatCurrency(row.price)}</p>
                     {row.cost_price && (
-                        <p className="text-xs text-gray-400">Custo: {formatCurrency(row.cost_price)}</p>
+                        <p className="text-xs text-warm-400">Custo: {formatCurrency(row.cost_price)}</p>
                     )}
                 </div>
             ),
@@ -111,7 +111,7 @@ export default function ProductsIndex({
                     <div className="flex items-center gap-2">
                         <span className={[
                             'font-semibold',
-                            isOut ? 'text-red-600' : isLow ? 'text-amber-600' : 'text-gray-800',
+                            isOut ? 'text-red-600' : isLow ? 'text-amber-600' : 'text-warm-700',
                         ].join(' ')}>
                             {row.quantity}
                         </span>
@@ -131,7 +131,7 @@ export default function ProductsIndex({
             render: (row) => (
                 <span className={[
                     'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full',
-                    row.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500',
+                    row.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-warm-500',
                 ].join(' ')}>
                     <span className={['h-1.5 w-1.5 rounded-full', row.active ? 'bg-emerald-500' : 'bg-gray-400'].join(' ')} />
                     {row.active ? 'Ativo' : 'Inativo'}
@@ -145,13 +145,13 @@ export default function ProductsIndex({
                 <div className="flex items-center gap-2">
                     <Link
                         href={`/admin/products/${row.id}`}
-                        className="text-xs font-medium text-gray-600 hover:text-indigo-600 transition-colors px-2.5 py-1.5 rounded-md hover:bg-indigo-50"
+                        className="text-xs font-medium text-warm-600 hover:text-kintsugi-600 transition-colors px-2.5 py-1.5 rounded-md hover:bg-kintsugi-50"
                     >
                         Ver
                     </Link>
                     <Link
                         href={`/admin/products/${row.id}/edit`}
-                        className="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors px-2.5 py-1.5 rounded-md hover:bg-indigo-50"
+                        className="text-xs font-medium text-kintsugi-600 hover:text-kintsugi-700 transition-colors px-2.5 py-1.5 rounded-md hover:bg-kintsugi-50"
                     >
                         Editar
                     </Link>
@@ -172,14 +172,14 @@ export default function ProductsIndex({
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Produtos</h1>
-                        <p className="text-sm text-gray-500 mt-0.5">
+                        <h1 className="text-2xl font-bold text-warm-700">Produtos</h1>
+                        <p className="text-sm text-warm-500 mt-0.5">
                             {paginationMeta.total} produto{paginationMeta.total !== 1 ? 's' : ''} cadastrado{paginationMeta.total !== 1 ? 's' : ''}
                         </p>
                     </div>
                     <Link
                         href="/admin/products/create"
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm"
+                        className="flex items-center gap-2 bg-kintsugi-600 hover:bg-kintsugi-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -199,7 +199,7 @@ export default function ProductsIndex({
                     <select
                         value={categoryFilter}
                         onChange={(e) => handleCategoryChange(e.target.value)}
-                        className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        className="rounded-lg border border-warm-300 bg-white px-3 py-2 text-sm text-warm-600 focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20"
                     >
                         <option value="">Todas as categorias</option>
                         {categories.map((cat) => (
@@ -209,7 +209,7 @@ export default function ProductsIndex({
                     <select
                         value={activeFilter}
                         onChange={(e) => handleActiveChange(e.target.value)}
-                        className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        className="rounded-lg border border-warm-300 bg-white px-3 py-2 text-sm text-warm-600 focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20"
                     >
                         <option value="">Todos os status</option>
                         <option value="1">Ativos</option>
@@ -237,12 +237,12 @@ export default function ProductsIndex({
                 confirmDestructive
                 loading={deleting}
             >
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-warm-600">
                     Tem certeza que deseja excluir o produto{' '}
                     <strong className="font-semibold">{deleteModal.product?.name}</strong>?
                     Esta ação não pode ser desfeita.
                 </p>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-warm-500 mt-2">
                     Todos os dados relacionados (movimentações de estoque, itens em pedidos) serão mantidos para histórico.
                 </p>
             </Modal>

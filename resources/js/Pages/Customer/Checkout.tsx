@@ -72,15 +72,15 @@ function AddressFields({ prefix, register, errors }: AddressFieldsProps) {
         colSpan = 'col-span-2',
     ) => (
         <div className={colSpan}>
-            <label htmlFor={String(key)} className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label htmlFor={String(key)} className="block text-sm font-semibold text-warm-600 mb-1.5">
                 {label}
             </label>
             <input
                 id={String(key)}
                 {...register(f(key))}
                 placeholder={placeholder}
-                className={`w-full rounded-xl border px-4 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all
-                    ${err(key) ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}
+                className={`w-full rounded-xl border px-4 py-2.5 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all
+                    ${err(key) ? 'border-red-300 bg-red-50' : 'border-warm-200 bg-warm-50'}`}
             />
             {err(key) && <p role="alert" className="mt-1 text-xs text-red-600">{err(key)}</p>}
         </div>
@@ -107,40 +107,40 @@ interface OrderSummaryProps {
 
 function OrderSummary({ cart, onSubmit, submitting = false, showButton = false }: OrderSummaryProps) {
     return (
-        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sticky top-24">
-            <h2 className="text-base font-bold text-gray-900 mb-5">Resumo do pedido</h2>
+        <div className="rounded-2xl bg-white border border-warm-200 shadow-sm p-6 sticky top-24">
+            <h2 className="text-base font-bold text-warm-700 mb-5">Resumo do pedido</h2>
             <div className="space-y-3 mb-5">
                 {cart.items.map((item) => (
                     <div key={item.id} className="flex items-center gap-3">
-                        <div className="h-12 w-12 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                        <div className="h-12 w-12 rounded-lg overflow-hidden bg-warm-50 shrink-0">
                             <img
-                                src={`https://picsum.photos/seed/${item.product.id}/96/96`}
+                                src={`/storage/products/${item.product.id}.webp`}
                                 alt={item.product.name}
                                 className="h-full w-full object-cover"
                             />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-gray-800 truncate">{item.product.name}</p>
-                            <p className="text-xs text-gray-400">Qtd: {item.quantity}</p>
+                            <p className="text-xs font-medium text-warm-700 truncate">{item.product.name}</p>
+                            <p className="text-xs text-warm-400">Qtd: {item.quantity}</p>
                         </div>
-                        <p className="text-xs font-semibold text-gray-800 shrink-0">
+                        <p className="text-xs font-semibold text-warm-700 shrink-0">
                             {formatPrice(item.product.price * item.quantity)}
                         </p>
                     </div>
                 ))}
             </div>
-            <div className="border-t border-gray-100 pt-4 space-y-2 text-sm">
-                <div className="flex justify-between text-gray-600">
+            <div className="border-t border-warm-200 pt-4 space-y-2 text-sm">
+                <div className="flex justify-between text-warm-600">
                     <span>Subtotal</span><span>{formatPrice(cart.subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-warm-600">
                     <span>Impostos</span><span>{formatPrice(cart.tax)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-warm-600">
                     <span>Frete</span>
                     <span>{cart.shipping_cost === 0 ? 'Grátis' : formatPrice(cart.shipping_cost)}</span>
                 </div>
-                <div className="flex justify-between font-bold text-base text-gray-900 pt-2 border-t border-gray-100">
+                <div className="flex justify-between font-bold text-base text-warm-700 pt-2 border-t border-warm-200">
                     <span>Total</span><span>{formatPrice(cart.total)}</span>
                 </div>
             </div>
@@ -149,7 +149,7 @@ function OrderSummary({ cart, onSubmit, submitting = false, showButton = false }
                     type="submit"
                     onClick={onSubmit}
                     disabled={submitting}
-                    className="mt-6 w-full rounded-2xl bg-violet-600 py-3.5 text-sm font-bold text-white hover:bg-violet-700 active:scale-[.98] transition-all shadow-lg shadow-violet-200 disabled:opacity-60 flex items-center justify-center gap-2"
+                    className="mt-6 w-full rounded-2xl bg-kintsugi-500 py-3.5 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-lg shadow-kintsugi-200 disabled:opacity-60 flex items-center justify-center gap-2"
                 >
                     {submitting && (
                         <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
@@ -182,10 +182,10 @@ function StepBar({ current }: { current: number }) {
                                 <div
                                     className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold border-2 transition-all ${
                                         done
-                                            ? 'bg-violet-600 border-violet-600 text-white'
+                                            ? 'bg-kintsugi-600 border-kintsugi-600 text-white'
                                             : active
-                                            ? 'bg-white border-violet-600 text-violet-600'
-                                            : 'bg-white border-gray-200 text-gray-400'
+                                            ? 'bg-white border-kintsugi-600 text-kintsugi-600'
+                                            : 'bg-white border-warm-200 text-warm-400'
                                     }`}
                                 >
                                     {done ? (
@@ -194,12 +194,12 @@ function StepBar({ current }: { current: number }) {
                                         </svg>
                                     ) : stepNum}
                                 </div>
-                                <span className={`text-xs font-medium hidden sm:block ${active ? 'text-violet-600' : done ? 'text-gray-500' : 'text-gray-400'}`}>
+                                <span className={`text-xs font-medium hidden sm:block ${active ? 'text-kintsugi-600' : done ? 'text-warm-500' : 'text-warm-400'}`}>
                                     {label}
                                 </span>
                             </li>
                             {idx < STEPS.length - 1 && (
-                                <div className={`flex-1 h-0.5 mx-2 mb-5 transition-colors ${done ? 'bg-violet-600' : 'bg-gray-200'}`} aria-hidden="true" />
+                                <div className={`flex-1 h-0.5 mx-2 mb-5 transition-colors ${done ? 'bg-kintsugi-600' : 'bg-warm-200'}`} aria-hidden="true" />
                             )}
                         </React.Fragment>
                     );
@@ -286,8 +286,8 @@ export default function Checkout({ cart }: CheckoutPageProps) {
     return (
         <PublicLayout title="Checkout">
             <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">Finalizar Compra</h1>
-                <p className="text-sm text-gray-500 mb-8">Complete as etapas abaixo para concluir seu pedido.</p>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-warm-700 mb-2">Finalizar Compra</h1>
+                <p className="text-sm text-warm-500 mb-8">Complete as etapas abaixo para concluir seu pedido.</p>
 
                 <StepBar current={step} />
 
@@ -298,9 +298,9 @@ export default function Checkout({ cart }: CheckoutPageProps) {
 
                             {/* Step 1 — Shipping */}
                             {step === 1 && (
-                                <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sm:p-8">
-                                    <h2 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white">1</span>
+                                <div className="rounded-2xl bg-white border border-warm-200 shadow-sm p-6 sm:p-8">
+                                    <h2 className="text-base font-bold text-warm-700 mb-6 flex items-center gap-2">
+                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-kintsugi-600 text-xs font-bold text-white">1</span>
                                         Endereço de Entrega
                                     </h2>
                                     <AddressFields prefix="shipping" register={register} errors={errors} />
@@ -308,7 +308,7 @@ export default function Checkout({ cart }: CheckoutPageProps) {
                                         <button
                                             type="button"
                                             onClick={goNext}
-                                            className="rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-violet-700 active:scale-[.98] transition-all shadow-md shadow-violet-200"
+                                            className="rounded-xl bg-kintsugi-500 px-6 py-2.5 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-md shadow-kintsugi-200"
                                         >
                                             Próximo →
                                         </button>
@@ -318,29 +318,29 @@ export default function Checkout({ cart }: CheckoutPageProps) {
 
                             {/* Step 2 — Billing */}
                             {step === 2 && (
-                                <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sm:p-8">
+                                <div className="rounded-2xl bg-white border border-warm-200 shadow-sm p-6 sm:p-8">
                                     <div className="flex items-center justify-between mb-6">
-                                        <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white">2</span>
+                                        <h2 className="text-base font-bold text-warm-700 flex items-center gap-2">
+                                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-kintsugi-600 text-xs font-bold text-white">2</span>
                                             Endereço de Cobrança
                                         </h2>
-                                        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                                        <label className="flex items-center gap-2 text-sm text-warm-600 cursor-pointer select-none">
                                             <input
                                                 type="checkbox"
                                                 checked={sameBilling}
                                                 onChange={(e) => handleSameBillingChange(e.target.checked)}
-                                                className="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                                                className="h-4 w-4 rounded border-warm-300 text-kintsugi-500 focus:ring-kintsugi-500"
                                             />
                                             Mesmo que entrega
                                         </label>
                                     </div>
 
                                     {sameBilling ? (
-                                        <div className="rounded-xl bg-violet-50 border border-violet-100 p-4 flex items-center gap-3">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                        <div className="rounded-xl bg-kintsugi-50 border border-kintsugi-100 p-4 flex items-center gap-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-kintsugi-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
-                                            <p className="text-sm text-violet-700 font-medium">Usando o mesmo endereço de entrega para cobrança.</p>
+                                            <p className="text-sm text-kintsugi-700 font-medium">Usando o mesmo endereço de entrega para cobrança.</p>
                                         </div>
                                     ) : (
                                         <AddressFields prefix="billing" register={register} errors={errors} />
@@ -350,14 +350,14 @@ export default function Checkout({ cart }: CheckoutPageProps) {
                                         <button
                                             type="button"
                                             onClick={goBack}
-                                            className="rounded-xl border border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 active:scale-[.98] transition-all"
+                                            className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 hover:bg-warm-50 active:scale-[.98] transition-all"
                                         >
                                             ← Anterior
                                         </button>
                                         <button
                                             type="button"
                                             onClick={goNext}
-                                            className="rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-violet-700 active:scale-[.98] transition-all shadow-md shadow-violet-200"
+                                            className="rounded-xl bg-kintsugi-500 px-6 py-2.5 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-md shadow-kintsugi-200"
                                         >
                                             Próximo →
                                         </button>
@@ -367,13 +367,13 @@ export default function Checkout({ cart }: CheckoutPageProps) {
 
                             {/* Step 3 — Notes + submit */}
                             {step === 3 && (
-                                <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sm:p-8">
-                                    <h2 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white">3</span>
+                                <div className="rounded-2xl bg-white border border-warm-200 shadow-sm p-6 sm:p-8">
+                                    <h2 className="text-base font-bold text-warm-700 mb-6 flex items-center gap-2">
+                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-kintsugi-600 text-xs font-bold text-white">3</span>
                                         Observações e Confirmação
                                     </h2>
 
-                                    <label htmlFor="notes" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                                    <label htmlFor="notes" className="block text-sm font-semibold text-warm-600 mb-1.5">
                                         Observações (opcional)
                                     </label>
                                     <textarea
@@ -381,21 +381,21 @@ export default function Checkout({ cart }: CheckoutPageProps) {
                                         {...register('notes')}
                                         placeholder="Instruções especiais para entrega, etc."
                                         rows={4}
-                                        className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none"
+                                        className="w-full rounded-xl border border-warm-200 bg-warm-50 px-4 py-2.5 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent resize-none"
                                     />
 
                                     <div className="flex justify-between mt-6">
                                         <button
                                             type="button"
                                             onClick={goBack}
-                                            className="rounded-xl border border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 active:scale-[.98] transition-all"
+                                            className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 hover:bg-warm-50 active:scale-[.98] transition-all"
                                         >
                                             ← Anterior
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={submitting}
-                                            className="rounded-xl bg-violet-600 px-8 py-2.5 text-sm font-bold text-white hover:bg-violet-700 active:scale-[.98] transition-all shadow-md shadow-violet-200 disabled:opacity-60 flex items-center gap-2"
+                                            className="rounded-xl bg-kintsugi-500 px-8 py-2.5 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-md shadow-kintsugi-200 disabled:opacity-60 flex items-center gap-2"
                                         >
                                             {submitting && (
                                                 <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">

@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
             'quantity' => $this->quantity,
             'min_quantity' => $this->min_quantity,
             'active' => $this->active,
+            'image_url' => $this->image_url,
             'in_stock' => $this->quantity > 0,
             'low_stock' => $this->quantity <= $this->min_quantity,
             'category' => $this->whenLoaded('category', fn () => (new CategoryResource($this->category))->resolve($request)),

@@ -1,7 +1,7 @@
 import React from 'react';
 
 type TrendDirection = 'up' | 'down' | 'neutral';
-type StatCardColor = 'indigo' | 'emerald' | 'amber' | 'rose' | 'sky' | 'violet';
+type StatCardColor = 'kintsugi' | 'emerald' | 'amber' | 'rose' | 'sky';
 
 interface StatCardProps {
     title: string;
@@ -16,9 +16,9 @@ interface StatCardProps {
 }
 
 const colorMap: Record<StatCardColor, { bg: string; icon: string; trendUp: string; trendDown: string }> = {
-    indigo: {
-        bg: 'bg-indigo-50',
-        icon: 'text-indigo-600 bg-indigo-100',
+    kintsugi: {
+        bg: 'bg-kintsugi-50',
+        icon: 'text-kintsugi-600 bg-kintsugi-100',
         trendUp: 'text-emerald-600',
         trendDown: 'text-rose-600',
     },
@@ -46,12 +46,6 @@ const colorMap: Record<StatCardColor, { bg: string; icon: string; trendUp: strin
         trendUp: 'text-emerald-600',
         trendDown: 'text-rose-600',
     },
-    violet: {
-        bg: 'bg-violet-50',
-        icon: 'text-violet-600 bg-violet-100',
-        trendUp: 'text-emerald-600',
-        trendDown: 'text-rose-600',
-    },
 };
 
 function TrendIcon({ direction }: { direction: TrendDirection }) {
@@ -76,17 +70,17 @@ function TrendIcon({ direction }: { direction: TrendDirection }) {
     );
 }
 
-export default function StatCard({ title, value, icon, trend, color = 'indigo' }: StatCardProps) {
+export default function StatCard({ title, value, icon, trend, color = 'kintsugi' }: StatCardProps) {
     const colors = colorMap[color];
     const trendColor =
         trend?.direction === 'up'
             ? colors.trendUp
             : trend?.direction === 'down'
               ? colors.trendDown
-              : 'text-gray-500';
+              : 'text-warm-500';
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-xs p-5 flex items-start gap-4 hover:shadow-md transition-shadow duration-200">
+        <div className="bg-white rounded-xl border border-warm-200 shadow-xs p-5 flex items-start gap-4 hover:shadow-md transition-shadow duration-200">
             {/* Icon */}
             <div className={['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', colors.icon].join(' ')}>
                 {icon}
@@ -94,8 +88,8 @@ export default function StatCard({ title, value, icon, trend, color = 'indigo' }
 
             {/* Content */}
             <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-500 font-medium truncate">{title}</p>
-                <p className="mt-0.5 text-2xl font-bold text-gray-900 leading-tight">
+                <p className="text-sm text-warm-500 font-medium truncate">{title}</p>
+                <p className="mt-0.5 text-2xl font-bold text-warm-700 leading-tight">
                     {value}
                 </p>
                 {trend && (
@@ -103,7 +97,7 @@ export default function StatCard({ title, value, icon, trend, color = 'indigo' }
                         <TrendIcon direction={trend.direction} />
                         <span>{trend.value}</span>
                         {trend.label && (
-                            <span className="text-gray-400 font-normal">{trend.label}</span>
+                            <span className="text-warm-400 font-normal">{trend.label}</span>
                         )}
                     </div>
                 )}

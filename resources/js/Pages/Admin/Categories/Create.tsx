@@ -61,21 +61,21 @@ export default function CategoriesCreate({ categories }: CategoriesCreateProps) 
                         <button
                             type="button"
                             onClick={() => router.visit('/admin/categories')}
-                            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-indigo-600 mb-3 transition-colors"
+                            className="flex items-center gap-1.5 text-sm text-warm-500 hover:text-kintsugi-600 mb-3 transition-colors"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                             </svg>
                             Voltar para Categorias
                         </button>
-                        <h1 className="text-2xl font-bold text-gray-900">Nova Categoria</h1>
-                        <p className="text-sm text-gray-500 mt-0.5">Preencha os dados para criar uma nova categoria</p>
+                        <h1 className="text-2xl font-bold text-warm-700">Nova Categoria</h1>
+                        <p className="text-sm text-warm-500 mt-0.5">Preencha os dados para criar uma nova categoria</p>
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                         {/* Main form card */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-xs p-6 space-y-5">
-                            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-100 pb-3">
+                        <div className="bg-white rounded-xl border border-warm-200 shadow-xs p-6 space-y-5">
+                            <h2 className="text-sm font-semibold text-warm-600 uppercase tracking-wider border-b border-warm-200 pb-3">
                                 Informações
                             </h2>
 
@@ -99,19 +99,19 @@ export default function CategoriesCreate({ categories }: CategoriesCreateProps) 
                             />
 
                             <div>
-                                <label htmlFor="parent_id" className="block text-sm font-medium text-gray-700 mb-1.5">
+                                <label htmlFor="parent_id" className="block text-sm font-medium text-warm-600 mb-1.5">
                                     Categoria Pai
                                 </label>
                                 <select
                                     id="parent_id"
                                     {...register('parent_id', { setValueAs: (v) => v === '' ? null : parseInt(String(v), 10) })}
-                                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+                                    className="w-full rounded-lg border border-warm-300 bg-white px-3 py-2 text-sm text-warm-700 focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20 transition-colors"
                                 >
                                     {parentOptions.map((opt) => (
                                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                                     ))}
                                 </select>
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-warm-500 mt-1">
                                     Deixe em branco para criar uma categoria de nível raiz
                                 </p>
                                 {errors.parent_id && (
@@ -121,7 +121,7 @@ export default function CategoriesCreate({ categories }: CategoriesCreateProps) 
                         </div>
 
                         {/* Status card */}
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-xs p-6">
+                        <div className="bg-white rounded-xl border border-warm-200 shadow-xs p-6">
                             <FormField
                                 label="Categoria Ativa"
                                 name="active"
@@ -137,14 +137,14 @@ export default function CategoriesCreate({ categories }: CategoriesCreateProps) 
                             <button
                                 type="button"
                                 onClick={() => router.visit('/admin/categories')}
-                                className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="px-5 py-2.5 text-sm font-medium text-warm-600 bg-white border border-warm-300 rounded-lg hover:bg-warm-50 transition-colors"
                             >
                                 Cancelar
                             </button>
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-kintsugi-600 hover:bg-kintsugi-700 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
                             >
                                 {submitting && (
                                     <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

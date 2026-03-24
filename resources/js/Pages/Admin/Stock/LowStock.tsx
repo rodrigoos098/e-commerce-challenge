@@ -93,17 +93,17 @@ export default function LowStock({ products }: LowStockProps) {
         <AdminLayout title="Estoque Baixo">
             <div className="space-y-6 p-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Relatorio de Estoque Baixo</h1>
-                    <p className="mt-0.5 text-sm text-gray-500">
+                    <h1 className="text-2xl font-bold text-warm-700">Relatorio de Estoque Baixo</h1>
+                    <p className="mt-0.5 text-sm text-warm-500">
                         Produtos com quantidade abaixo do minimo configurado
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-xs">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total de Alertas</p>
-                        <p className="mt-1 text-3xl font-bold text-gray-900">{products.length}</p>
-                        <p className="mt-1 text-xs text-gray-500">produtos abaixo do minimo</p>
+                    <div className="rounded-xl border border-warm-200 bg-white p-5 shadow-xs">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-warm-500">Total de Alertas</p>
+                        <p className="mt-1 text-3xl font-bold text-warm-700">{products.length}</p>
+                        <p className="mt-1 text-xs text-warm-500">produtos abaixo do minimo</p>
                     </div>
                     <div className="rounded-xl border border-red-200 bg-red-50 p-5">
                         <p className="text-xs font-semibold uppercase tracking-wider text-red-600">Esgotados</p>
@@ -118,23 +118,23 @@ export default function LowStock({ products }: LowStockProps) {
                 </div>
 
                 {sortedProducts.length === 0 ? (
-                    <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-xs">
+                    <div className="rounded-xl border border-warm-200 bg-white p-12 text-center shadow-xs">
                         <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto mb-4 h-12 w-12 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <p className="text-base font-semibold text-gray-900">Tudo em dia!</p>
-                        <p className="mt-1 text-sm text-gray-500">Nenhum produto com estoque abaixo do minimo.</p>
+                        <p className="text-base font-semibold text-warm-700">Tudo em dia!</p>
+                        <p className="mt-1 text-sm text-warm-500">Nenhum produto com estoque abaixo do minimo.</p>
                     </div>
                 ) : (
-                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
-                        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-                            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-700">
+                    <div className="overflow-hidden rounded-xl border border-warm-200 bg-white shadow-xs">
+                        <div className="flex items-center justify-between border-b border-warm-200 px-6 py-4">
+                            <h2 className="text-sm font-semibold uppercase tracking-wider text-warm-600">
                                 Produtos em Alerta
                             </h2>
                             <button
                                 type="button"
                                 onClick={() => router.visit('/admin/products')}
-                                className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+                                className="text-xs font-medium text-kintsugi-600 hover:text-kintsugi-700"
                             >
                                 Ver todos os produtos
                             </button>
@@ -149,32 +149,32 @@ export default function LowStock({ products }: LowStockProps) {
                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                             <div className="min-w-0">
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    <p className="text-sm font-semibold text-gray-900">{product.name}</p>
+                                                    <p className="text-sm font-semibold text-warm-700">{product.name}</p>
                                                     {getSeverityBadge(product)}
                                                 </div>
-                                                <p className="mt-0.5 text-xs text-gray-500">
+                                                <p className="mt-0.5 text-xs text-warm-500">
                                                     {product.category?.name ?? 'Sem categoria'} · <code className="font-mono">{product.slug}</code>
                                                 </p>
                                             </div>
 
                                             <div className="flex shrink-0 items-center gap-5">
                                                 <div className="text-center">
-                                                    <p className="text-xs text-gray-500">Atual</p>
-                                                    <p className={`text-lg font-bold ${product.quantity === 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                                                    <p className="text-xs text-warm-500">Atual</p>
+                                                    <p className={`text-lg font-bold ${product.quantity === 0 ? 'text-red-600' : 'text-warm-700'}`}>
                                                         {product.quantity}
                                                     </p>
                                                 </div>
                                                 <div className="text-center">
-                                                    <p className="text-xs text-gray-500">Minimo</p>
-                                                    <p className="text-lg font-bold text-gray-400">{product.min_quantity}</p>
+                                                    <p className="text-xs text-warm-500">Minimo</p>
+                                                    <p className="text-lg font-bold text-warm-400">{product.min_quantity}</p>
                                                 </div>
                                                 <div className="text-center">
-                                                    <p className="text-xs text-gray-500">Deficit</p>
+                                                    <p className="text-xs text-warm-500">Deficit</p>
                                                     <p className="text-lg font-bold text-red-600">-{getDeficit(product)}</p>
                                                 </div>
 
                                                 <div className="hidden w-20 sm:block">
-                                                    <p className="mb-1 text-right text-xs text-gray-500">{Math.round(percentage)}%</p>
+                                                    <p className="mb-1 text-right text-xs text-warm-500">{Math.round(percentage)}%</p>
                                                     <div className="h-2 overflow-hidden rounded-full bg-gray-200">
                                                         <div
                                                             className={`h-2 rounded-full transition-all ${barClass(product)}`}
@@ -186,7 +186,7 @@ export default function LowStock({ products }: LowStockProps) {
                                                 <button
                                                     type="button"
                                                     onClick={() => router.visit(`/admin/products/${product.id}/edit`)}
-                                                    className="whitespace-nowrap rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-700 transition-colors hover:bg-indigo-50"
+                                                    className="whitespace-nowrap rounded-lg border border-kintsugi-200 bg-white px-3 py-1.5 text-xs font-medium text-kintsugi-700 transition-colors hover:bg-kintsugi-50"
                                                 >
                                                     Restock
                                                 </button>

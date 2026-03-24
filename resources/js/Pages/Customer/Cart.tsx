@@ -21,21 +21,21 @@ export default function Cart({ cart }: CartPageProps) {
         return (
             <PublicLayout title="Carrinho">
                 <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-20 text-center">
-                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 mx-auto mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2} aria-hidden="true">
+                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-warm-50 mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-warm-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2} aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-9H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Seu carrinho está vazio</h1>
-                    <p className="text-gray-500 mb-8">Adicione produtos para começar a comprar.</p>
+                    <h1 className="text-2xl font-bold text-warm-700 mb-2">Sua sacola esta vazia</h1>
+                    <p className="text-warm-500 mb-8">Descubra pecas artesanais unicas para adicionar.</p>
                     <Link
                         href="/products"
-                        className="inline-flex items-center gap-2 rounded-2xl bg-violet-600 px-8 py-3 text-sm font-bold text-white hover:bg-violet-700 transition-colors shadow-lg"
+                        className="inline-flex items-center gap-2 rounded-2xl bg-kintsugi-500 px-8 py-3 text-sm font-bold text-white hover:bg-kintsugi-600 transition-colors shadow-lg"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
-                        Ver Produtos
+                        Explorar Colecao
                     </Link>
                 </div>
             </PublicLayout>
@@ -46,9 +46,9 @@ export default function Cart({ cart }: CartPageProps) {
         <PublicLayout title="Carrinho">
             <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
                 <div className="mb-6 flex items-center justify-between">
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-                        Meu Carrinho
-                        <span className="ml-2 text-base font-normal text-gray-400">({cart.item_count} {cart.item_count === 1 ? 'item' : 'itens'})</span>
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-warm-700">
+                        Sua Sacola
+                        <span className="ml-2 text-base font-normal text-warm-400">({cart.item_count} {cart.item_count === 1 ? 'item' : 'itens'})</span>
                     </h1>
                     <button
                         type="button"
@@ -62,7 +62,7 @@ export default function Cart({ cart }: CartPageProps) {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Items */}
                     <div className="lg:col-span-2">
-                        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm px-6">
+                        <div className="rounded-2xl bg-white border border-warm-200 shadow-sm px-6">
                             {cart.items.map((item) => (
                                 <CartItemComponent key={item.id} item={item} />
                             ))}
@@ -71,7 +71,7 @@ export default function Cart({ cart }: CartPageProps) {
                         <div className="mt-4">
                             <Link
                                 href="/products"
-                                className="inline-flex items-center gap-2 text-sm text-violet-600 hover:text-violet-800 font-medium transition-colors"
+                                className="inline-flex items-center gap-2 text-sm text-kintsugi-500 hover:text-kintsugi-600 font-medium transition-colors"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -83,25 +83,25 @@ export default function Cart({ cart }: CartPageProps) {
 
                     {/* Summary */}
                     <div className="lg:col-span-1">
-                        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sticky top-24">
-                            <h2 className="text-lg font-bold text-gray-900 mb-5">Resumo do pedido</h2>
+                        <div className="rounded-2xl bg-white border border-warm-200 shadow-sm p-6 sticky top-24">
+                            <h2 className="text-lg font-bold text-warm-700 mb-5">Resumo do pedido</h2>
 
                             <div className="space-y-3 text-sm">
-                                <div className="flex justify-between text-gray-600">
+                                <div className="flex justify-between text-warm-600">
                                     <span>Subtotal</span>
                                     <span>{formatPrice(cart.subtotal)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-600">
+                                <div className="flex justify-between text-warm-600">
                                     <span>Impostos</span>
                                     <span>{formatPrice(cart.tax)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-600">
+                                <div className="flex justify-between text-warm-600">
                                     <span>Frete</span>
                                     <span className={cart.shipping_cost === 0 ? 'text-green-600 font-medium' : ''}>
                                         {cart.shipping_cost === 0 ? 'Grátis' : formatPrice(cart.shipping_cost)}
                                     </span>
                                 </div>
-                                <div className="border-t border-gray-100 pt-3 flex justify-between font-bold text-base text-gray-900">
+                                <div className="border-t border-warm-200 pt-3 flex justify-between font-bold text-base text-warm-700">
                                     <span>Total</span>
                                     <span>{formatPrice(cart.total)}</span>
                                 </div>
@@ -109,12 +109,12 @@ export default function Cart({ cart }: CartPageProps) {
 
                             <Link
                                 href="/customer/checkout"
-                                className="mt-6 block w-full rounded-2xl bg-violet-600 py-3.5 text-center text-sm font-bold text-white hover:bg-violet-700 active:scale-[.98] transition-all shadow-lg shadow-violet-200"
+                                className="mt-6 block w-full rounded-2xl bg-kintsugi-500 py-3.5 text-center text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-lg shadow-kintsugi-200"
                             >
                                 Finalizar Compra
                             </Link>
 
-                            <div className="mt-4 flex items-center justify-center gap-4 text-xs text-gray-400">
+                            <div className="mt-4 flex items-center justify-center gap-4 text-xs text-warm-400">
                                 <span>🔒 Compra segura</span>
                                 <span>•</span>
                                 <span>✓ SSL</span>

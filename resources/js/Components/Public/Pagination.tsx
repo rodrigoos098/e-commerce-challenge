@@ -48,16 +48,16 @@ export default function Pagination({ meta, onPageChange }: PaginationProps) {
     const endItem = Math.min(current_page * per_page, total);
 
     const btnBase = 'flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-colors duration-150 border';
-    const btnActive = 'bg-violet-600 text-white border-violet-600 shadow-sm';
-    const btnInactive = 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-violet-600 hover:border-violet-200';
-    const btnDisabled = 'border-gray-100 text-gray-300 cursor-not-allowed';
+    const btnActive = 'bg-kintsugi-500 text-white border-kintsugi-500 shadow-sm';
+    const btnInactive = 'border-warm-200 text-warm-600 hover:bg-warm-50 hover:text-kintsugi-500 hover:border-kintsugi-200';
+    const btnDisabled = 'border-warm-200 text-warm-300 cursor-not-allowed';
 
     return (
         <nav aria-label="Paginação" className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
             {/* Info */}
-            <p className="text-sm text-gray-500">
-                Mostrando <span className="font-semibold text-gray-800">{startItem}–{endItem}</span> de{' '}
-                <span className="font-semibold text-gray-800">{total}</span> resultados
+            <p className="text-sm text-warm-500">
+                Mostrando <span className="font-semibold text-warm-700">{startItem}–{endItem}</span> de{' '}
+                <span className="font-semibold text-warm-700">{total}</span> resultados
             </p>
 
             {/* Pages */}
@@ -78,7 +78,7 @@ export default function Pagination({ meta, onPageChange }: PaginationProps) {
                 {/* Numbers */}
                 {pages.map((page, idx) =>
                     page === '...' ? (
-                        <span key={`ellipsis-${idx}`} className="flex h-9 w-9 items-center justify-center text-gray-400 text-sm">
+                        <span key={`ellipsis-${idx}`} className="flex h-9 w-9 items-center justify-center text-warm-400 text-sm">
                             …
                         </span>
                     ) : (

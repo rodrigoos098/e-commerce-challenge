@@ -56,7 +56,7 @@ export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) 
             label: 'Pedido',
             sortable: true,
             render: (o: OrderRow) => (
-                <span className="font-mono font-medium text-gray-900">#{String(o.id).padStart(5, '0')}</span>
+                <span className="font-mono font-medium text-warm-700">#{String(o.id).padStart(5, '0')}</span>
             ),
         },
         {
@@ -64,8 +64,8 @@ export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) 
             label: 'Cliente',
             render: (o: OrderRow) => (
                 <div>
-                    <p className="text-sm font-medium text-gray-900">{o.user?.name ?? '—'}</p>
-                    <p className="text-xs text-gray-500">{o.user?.email ?? ''}</p>
+                    <p className="text-sm font-medium text-warm-700">{o.user?.name ?? '—'}</p>
+                    <p className="text-xs text-warm-500">{o.user?.email ?? ''}</p>
                 </div>
             ),
         },
@@ -78,13 +78,13 @@ export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) 
             key: 'total',
             label: 'Total',
             sortable: true,
-            render: (o: OrderRow) => <span className="font-semibold text-gray-900">{formatCurrency(o.total)}</span>,
+            render: (o: OrderRow) => <span className="font-semibold text-warm-700">{formatCurrency(o.total)}</span>,
         },
         {
             key: 'created_at',
             label: 'Data',
             sortable: true,
-            render: (o: OrderRow) => <span className="text-sm text-gray-500">{formatDate(o.created_at)}</span>,
+            render: (o: OrderRow) => <span className="text-sm text-warm-500">{formatDate(o.created_at)}</span>,
         },
         {
             key: 'actions',
@@ -95,7 +95,7 @@ export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) 
                         <button
                             type="button"
                             onClick={() => router.visit(`/admin/orders/${o.id}`)}
-                            className="px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors"
+                            className="px-3 py-1.5 text-xs font-medium text-kintsugi-700 bg-kintsugi-50 hover:bg-kintsugi-100 rounded-md transition-colors"
                         >
                             Gerenciar
                         </button>
@@ -103,7 +103,7 @@ export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) 
                         <button
                             type="button"
                             onClick={() => router.visit(`/admin/orders/${o.id}`)}
-                            className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                            className="px-3 py-1.5 text-xs font-medium text-warm-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
                         >
                             Ver Detalhes
                         </button>
@@ -118,8 +118,8 @@ export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) 
             <div className="p-6 space-y-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Pedidos</h1>
-                    <p className="text-sm text-gray-500 mt-0.5">{orders.meta.total} pedidos encontrados</p>
+                    <h1 className="text-2xl font-bold text-warm-700">Pedidos</h1>
+                    <p className="text-sm text-warm-500 mt-0.5">{orders.meta.total} pedidos encontrados</p>
                 </div>
 
                 {/* Status pills */}
@@ -138,8 +138,8 @@ export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) 
                                 }}
                                 className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
                                     active
-                                        ? 'bg-indigo-600 text-white border-indigo-600'
-                                        : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-600'
+                                        ? 'bg-kintsugi-600 text-white border-kintsugi-600'
+                                        : 'bg-white text-warm-600 border-warm-300 hover:border-kintsugi-400 hover:text-kintsugi-600'
                                 }`}
                             >
                                 {s.label} <span className="ml-1 opacity-75">{count}</span>
@@ -163,7 +163,7 @@ export default function OrdersIndex({ orders, filters = {} }: OrdersIndexProps) 
                             setStatusFilter(e.target.value);
                             applyFilters({ status: e.target.value, page: '1' });
                         }}
-                        className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        className="px-3 py-2 text-sm border border-warm-300 rounded-lg bg-white text-warm-600 focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20"
                     >
                         {STATUS_OPTIONS.map((o) => (
                             <option key={o.value} value={o.value}>{o.label}</option>
