@@ -51,7 +51,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     const isOutOfStock = product.quantity === 0;
 
     return (
-        <article className="group relative flex flex-col rounded-2xl bg-white border border-warm-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
+        <article className="group relative flex flex-col rounded-2xl bg-white border border-warm-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-kintsugi-200 transition-all duration-300 overflow-hidden">
             {/* Image */}
             <Link href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-warm-100">
                 {product.category && (

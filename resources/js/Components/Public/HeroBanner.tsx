@@ -24,7 +24,7 @@ export default function HeroBanner({
 
             <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
                 {/* Badge */}
-                <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm px-4 py-1.5 text-xs font-medium text-white/80 ring-1 ring-white/15">
+                <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-kintsugi-500/20 backdrop-blur-sm px-4 py-1.5 text-xs font-medium text-kintsugi-100 ring-1 ring-kintsugi-400/30">
                     Novas peças artesanais toda semana
                 </span>
 

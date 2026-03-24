@@ -71,7 +71,7 @@ export default function Home({ featured_products, categories }: HomePageProps) {
             <HeroBanner />
 
             {/* Categories */}
-            <section className="bg-white py-14" aria-labelledby="categories-heading">
+            <section className="bg-parchment py-14" aria-labelledby="categories-heading">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex items-end justify-between mb-8">
                         <div>
@@ -159,7 +159,7 @@ export default function Home({ featured_products, categories }: HomePageProps) {
                         </Link>
                         <Link
                             href="/products"
-                            className="rounded-full border border-warm-600 px-8 py-3 text-sm font-semibold text-warm-400 hover:border-warm-400 hover:text-white transition-colors"
+                            className="rounded-full border border-warm-500 px-8 py-3 text-sm font-semibold text-warm-300 hover:border-warm-300 hover:text-white transition-colors"
                         >
                             Ver produtos
                         </Link>
