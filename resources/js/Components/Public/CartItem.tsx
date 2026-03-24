@@ -67,6 +67,7 @@ export default function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
                     alt={item.product.name}
                     className="h-full w-full object-cover"
                     loading="lazy"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
             </div>
 
@@ -76,7 +77,7 @@ export default function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
                     <div className="min-w-0">
                         <h4 className="text-sm font-semibold text-warm-700 truncate">{item.product.name}</h4>
                         {item.product.category && (
-                            <p className="text-xs text-warm-400 mt-0.5">{item.product.category.name}</p>
+                            <p className="text-xs text-warm-400 mt-0.5 truncate">{item.product.category.name}</p>
                         )}
                     </div>
                     {/* Remove */}

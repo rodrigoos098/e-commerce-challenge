@@ -22,6 +22,13 @@ export default function SearchBar({
         setValue(initialValue);
     }, [initialValue]);
 
+    // Clear pending debounce timer on unmount
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) { clearTimeout(timerRef.current); }
+        };
+    }, []);
+
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const newVal = e.target.value;
         setValue(newVal);

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Button from '@/Components/Shared/Button';
 
 interface ModalProps {
@@ -21,6 +21,8 @@ const sizeMap = {
     xl: 'max-w-2xl',
 };
 
+const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export default function Modal({
     isOpen,
     onClose,
@@ -33,6 +35,9 @@ export default function Modal({
     loading = false,
     size = 'md',
 }: ModalProps) {
+    const panelRef = useRef<HTMLDivElement>(null);
+    const previousFocusRef = useRef<HTMLElement | null>(null);
+
     // Close on Escape key
     useEffect(() => {
         if (!isOpen) { return; }
@@ -43,15 +48,35 @@ export default function Modal({
         return () => window.removeEventListener('keydown', handler);
     }, [isOpen, onClose]);
 
-    // Prevent body scroll
+    // Prevent body scroll + manage focus
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
+            previousFocusRef.current = document.activeElement as HTMLElement;
+            const timer = setTimeout(() => {
+                const first = panelRef.current?.querySelector<HTMLElement>(FOCUSABLE);
+                first?.focus();
+            }, 10);
+            return () => clearTimeout(timer);
         } else {
             document.body.style.overflow = '';
+            previousFocusRef.current?.focus();
         }
-        return () => { document.body.style.overflow = ''; };
     }, [isOpen]);
+
+    // Focus trap
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key !== 'Tab' || !panelRef.current) { return; }
+        const focusable = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE));
+        if (focusable.length === 0) { return; }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+            if (document.activeElement === first) { last.focus(); e.preventDefault(); }
+        } else {
+            if (document.activeElement === last) { first.focus(); e.preventDefault(); }
+        }
+    };
 
     if (!isOpen) { return null; }
 
@@ -61,6 +86,7 @@ export default function Modal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
+            onKeyDown={handleKeyDown}
         >
             {/* Backdrop */}
             <div
@@ -70,6 +96,7 @@ export default function Modal({
 
             {/* Panel */}
             <div
+                ref={panelRef}
                 className={[
                     'relative w-full bg-white rounded-xl shadow-xl border border-warm-200 flex flex-col max-h-[90vh]',
                     sizeMap[size],

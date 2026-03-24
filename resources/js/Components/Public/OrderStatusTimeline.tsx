@@ -71,7 +71,7 @@ export default function OrderStatusTimeline({ status }: OrderStatusTimelineProps
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     ) : isCurrent ? (
-                                        <span className="h-2 w-2 rounded-full bg-white animate-pulse" aria-hidden="true" />
+                                        <span className="h-2 w-2 rounded-full bg-white motion-safe:animate-pulse" aria-hidden="true" />
                                     ) : (
                                         <span className="h-2 w-2 rounded-full bg-warm-300" aria-hidden="true" />
                                     )}

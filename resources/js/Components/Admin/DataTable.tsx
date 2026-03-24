@@ -1,6 +1,32 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 
+/** Decode &laquo; / &raquo; / &hellip; HTML entities from Laravel's paginator labels. */
+function decodePaginationLabel(label: string): string {
+    return label
+        .replace(/&laquo;\s*/g, '«\u00A0')
+        .replace(/\s*&raquo;/g, '\u00A0»')
+        .replace(/&hellip;/g, '…')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>');
+}
+
+/** Return page numbers to show with null gaps representing ellipsis. */
+function windowedPages(current: number, last: number): (number | null)[] {
+    if (last <= 7) {
+        return Array.from({ length: last }, (_, i) => i + 1);
+    }
+    const pages: (number | null)[] = [1];
+    if (current > 3) { pages.push(null); }
+    for (let p = Math.max(2, current - 1); p <= Math.min(last - 1, current + 1); p++) {
+        pages.push(p);
+    }
+    if (current < last - 2) { pages.push(null); }
+    pages.push(last);
+    return pages;
+}
+
 export interface Column<T> {
     key: keyof T | string;
     label: string;
@@ -107,7 +133,7 @@ export default function DataTable<T extends { id: number | string }>({
                                 <tr key={i}>
                                     {columns.map((col) => (
                                         <td key={String(col.key)} className="px-4 py-3">
-                                            <div className="h-4 bg-warm-100 rounded animate-pulse w-3/4" />
+                                            <div className="h-4 bg-warm-100 rounded motion-safe:animate-pulse w-3/4" />
                                         </td>
                                     ))}
                                 </tr>
@@ -160,12 +186,14 @@ export default function DataTable<T extends { id: number | string }>({
                             ? pagination.links.map((link, idx) => {
                                 const isDisabled = !link.url;
                                 const isActive = link.active;
+                                const label = decodePaginationLabel(link.label);
                                 return isDisabled ? (
                                     <span
                                         key={idx}
                                         className="px-2.5 py-1.5 text-xs rounded text-warm-400 cursor-default"
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
+                                    >
+                                        {label}
+                                    </span>
                                 ) : (
                                     <Link
                                         key={idx}
@@ -176,19 +204,26 @@ export default function DataTable<T extends { id: number | string }>({
                                                 ? 'bg-kintsugi-600 text-white font-semibold'
                                                 : 'text-warm-600 hover:bg-warm-100',
                                         ].join(' ')}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
+                                    >
+                                        {label}
+                                    </Link>
                                 );
                             })
-                            : Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => {
+                            : windowedPages(pagination.current_page, pagination.last_page).map((page, idx) => {
+                                if (page === null) {
+                                    return (
+                                        <span key={`gap-${idx}`} className="px-1.5 py-1.5 text-xs text-warm-400 cursor-default">
+                                            …
+                                        </span>
+                                    );
+                                }
                                 const isActive = page === pagination.current_page;
-                                const href = baseUrl
-                                    ? `${baseUrl}?page=${page}`
-                                    : `?page=${page}`;
+                                const href = baseUrl ? `${baseUrl}?page=${page}` : `?page=${page}`;
                                 return isActive ? (
                                     <span
                                         key={page}
                                         className="px-2.5 py-1.5 text-xs rounded bg-kintsugi-600 text-white font-semibold"
+                                        aria-current="page"
                                     >
                                         {page}
                                     </span>

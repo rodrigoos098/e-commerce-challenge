@@ -6,7 +6,7 @@ interface SkeletonLoaderProps {
 }
 
 function SkeletonItem({ type }: { type: SkeletonLoaderProps['type'] }) {
-    const baseClasses = 'animate-pulse bg-warm-200 rounded';
+    const baseClasses = 'motion-safe:animate-pulse bg-warm-200 rounded';
 
     switch (type) {
         case 'card':
