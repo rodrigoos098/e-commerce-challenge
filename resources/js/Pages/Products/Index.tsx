@@ -118,7 +118,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
                 {/* Page header */}
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 className="font-display text-2xl sm:text-3xl font-bold text-warm-700">Nossa Coleção</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700">Nossa Coleção</h1>
                         <p className="mt-1 text-sm text-warm-500">
                             {products.meta.total} resultado{products.meta.total !== 1 ? 's' : ''}
                             {search && <> para "<strong>{search}</strong>"</>}

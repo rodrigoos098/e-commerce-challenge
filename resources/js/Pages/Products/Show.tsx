@@ -119,13 +119,13 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                         </div>
 
                         {/* Name */}
-                        <h1 className="text-2xl sm:text-3xl font-extrabold text-warm-700 leading-tight mb-4">
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700 leading-tight mb-4">
                             {product.name}
                         </h1>
 
                         {/* Price */}
                         <div className="mb-6">
-                            <p className="text-4xl font-extrabold text-warm-700">{formatPrice(product.price)}</p>
+                            <p className="font-display text-4xl font-extrabold text-warm-700">{formatPrice(product.price)}</p>
                         </div>
 
                         {/* Stock indicator */}
@@ -134,7 +134,7 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                         </div>
 
                         {/* Description */}
-                        <p className="text-sm text-warm-600 leading-relaxed mb-8">{product.description}</p>
+                        <p className="text-base text-warm-600 leading-relaxed mb-8">{product.description}</p>
 
                         {/* Quantity + Add to cart */}
                         {!isOutOfStock && (
@@ -207,7 +207,7 @@ export default function ProductShow({ product, related_products }: ProductShowPa
                 {/* Related products */}
                 {related_products && related_products.length > 0 && (
                     <section className="mt-16" aria-labelledby="related-heading">
-                        <h2 id="related-heading" className="text-xl font-bold text-warm-700 mb-6">Você também pode gostar</h2>
+                        <h2 id="related-heading" className="font-display text-xl font-extrabold text-warm-700 mb-6">Você também pode gostar</h2>
                         <ProductGrid products={related_products} />
                     </section>
                 )}

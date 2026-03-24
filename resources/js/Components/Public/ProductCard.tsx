@@ -74,7 +74,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </Link>
 
             {/* Content */}
-            <div className="flex flex-1 flex-col p-4">
+            <div className="flex flex-1 flex-col p-5">
                 {/* Tags */}
                 {product.tags && product.tags.length > 0 && (
                     <div className="mb-2 flex flex-wrap gap-1">
@@ -101,7 +101,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 {/* Price + CTA */}
                 <div className="mt-auto pt-4 flex items-center justify-between gap-2">
                     <div>
-                        <p className="text-lg font-extrabold text-warm-700">{formatPrice(product.price)}</p>
+                        <p className="font-display text-lg font-extrabold text-warm-700">{formatPrice(product.price)}</p>
                     </div>
                     <button
                         onClick={handleAddToCart}

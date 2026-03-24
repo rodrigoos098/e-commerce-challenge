@@ -28,7 +28,7 @@ export default function HeroBanner({
                     Novas peças artesanais toda semana
                 </span>
 
-                <h1 className="mt-4 whitespace-pre-line font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl" style={{ lineHeight: 1.08 }}>
+                <h1 className="mt-4 whitespace-pre-line font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl" style={{ lineHeight: 1.08 }}>
                     {title}
                 </h1>
 
@@ -55,14 +55,14 @@ export default function HeroBanner({
                 </div>
 
                 {/* Stats */}
-                <div className="mt-14 grid grid-cols-3 gap-6 border-t border-white/10 pt-10">
+                <div className="mt-14 grid grid-cols-3 gap-x-10 gap-y-6 border-t border-white/10 pt-10">
                     {[
                         { value: '500+', label: 'Artesãos' },
                         { value: '2k+', label: 'Peças únicas' },
                         { value: '4.9★', label: 'Avaliação' },
                     ].map((stat) => (
                         <div key={stat.label}>
-                            <div className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</div>
+                            <div className="font-display text-2xl sm:text-3xl font-bold text-white">{stat.value}</div>
                             <div className="text-xs sm:text-sm text-white/60 mt-1">{stat.label}</div>
                         </div>
                     ))}

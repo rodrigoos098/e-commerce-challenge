@@ -76,13 +76,13 @@ export default function Home({ featured_products, categories }: HomePageProps) {
                     <div className="flex items-end justify-between mb-8">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Browse</p>
-                            <h2 id="categories-heading" className="font-display text-2xl sm:text-3xl font-bold text-warm-700">Categorias</h2>
+                            <h2 id="categories-heading" className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700">Categorias</h2>
                         </div>
                         <Link href="/products" className="text-sm font-semibold text-kintsugi-500 hover:text-kintsugi-600 transition-colors">
                             Ver todos →
                         </Link>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
                         {categories.map((cat) => (
                             <Link
                                 key={cat.id}
@@ -104,12 +104,12 @@ export default function Home({ featured_products, categories }: HomePageProps) {
             </section>
 
             {/* Featured products */}
-            <section className="py-14" aria-labelledby="featured-heading">
+            <section className="py-20" aria-labelledby="featured-heading">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-end justify-between mb-8">
+                    <div className="flex items-end justify-between mb-10">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Selecionados</p>
-                            <h2 id="featured-heading" className="font-display text-2xl sm:text-3xl font-bold text-warm-700">Pecas em Destaque</h2>
+                            <h2 id="featured-heading" className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700">Pecas em Destaque</h2>
                         </div>
                         <Link href="/products" className="text-sm font-semibold text-kintsugi-500 hover:text-kintsugi-600 transition-colors">
                             Ver todos →
@@ -124,9 +124,9 @@ export default function Home({ featured_products, categories }: HomePageProps) {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-10">
                         <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Diferenciais</p>
-                        <h2 id="features-heading" className="font-display text-2xl sm:text-3xl font-bold text-warm-700">Por que escolher Shopsugi&#x30C4;?</h2>
+                        <h2 id="features-heading" className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700">Por que escolher Shopsugi&#x30C4;?</h2>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                         {FEATURES.map((feature) => (
                             <div
                                 key={feature.title}
@@ -146,7 +146,7 @@ export default function Home({ featured_products, categories }: HomePageProps) {
             {/* CTA bottom */}
             <section className="bg-warm-800 py-16">
                 <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">Junte-se a comunidade</h2>
+                    <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white mb-4">Junte-se a comunidade</h2>
                     <p className="text-warm-400 mb-8 leading-relaxed">
                         Cadastre-se e receba acesso antecipado a novas colecoes e edicoes limitadas.
                     </p>
