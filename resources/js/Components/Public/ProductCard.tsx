@@ -51,7 +51,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     const isOutOfStock = product.quantity === 0;
 
     return (
-        <article className="group relative flex flex-col rounded-2xl bg-white border border-warm-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+        <article className="group relative flex flex-col rounded-2xl bg-white border border-warm-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
             {/* Image */}
             <Link href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-warm-100">
                 {product.category && (
@@ -88,7 +88,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
                 {/* Name */}
                 <Link href={`/products/${product.slug}`} className="block">
-                    <h3 className="text-sm font-semibold text-warm-700 line-clamp-2 leading-snug hover:text-kintsugi-500 transition-colors">
+                    <h3 className="text-base font-semibold text-warm-700 line-clamp-2 leading-snug hover:text-kintsugi-500 transition-colors">
                         {product.name}
                     </h3>
                 </Link>

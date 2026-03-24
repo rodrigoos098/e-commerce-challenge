@@ -109,7 +109,7 @@ export default function Cart({ cart }: CartPageProps) {
 
                             <Link
                                 href="/customer/checkout"
-                                className="mt-6 block w-full rounded-2xl bg-kintsugi-500 py-3.5 text-center text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-lg shadow-kintsugi-200"
+                                className="mt-6 block w-full rounded-2xl bg-kintsugi-500 py-3.5 text-center text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-sm"
                             >
                                 Finalizar Compra
                             </Link>

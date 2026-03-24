@@ -159,7 +159,7 @@ export default function Register() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full rounded-xl bg-kintsugi-500 py-3 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-lg shadow-kintsugi-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full rounded-xl bg-kintsugi-500 py-3 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {processing && <Spinner />}
                             Criar conta

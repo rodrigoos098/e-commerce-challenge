@@ -22,20 +22,22 @@ export default function ProductGrid({ products, loading = false, emptyMessage = 
 
     if (products.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-16 w-16 text-warm-200 mb-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1}
-                    aria-hidden="true"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-                <p className="text-lg font-semibold text-warm-500">{emptyMessage}</p>
-                <p className="text-sm text-warm-400 mt-1">Tente ajustar os filtros ou busca.</p>
+            <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-warm-100 mb-6">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-9 w-9 text-warm-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.2}
+                        aria-hidden="true"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+                <p className="font-display text-xl font-bold text-warm-700">{emptyMessage}</p>
+                <p className="text-sm text-warm-400 mt-2">Tente ajustar os filtros ou busca.</p>
             </div>
         );
     }

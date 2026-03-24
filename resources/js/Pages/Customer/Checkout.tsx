@@ -150,7 +150,7 @@ function OrderSummary({ cart, onSubmit, submitting = false, showButton = false }
                     type="submit"
                     onClick={onSubmit}
                     disabled={submitting}
-                    className="mt-6 w-full rounded-2xl bg-kintsugi-500 py-3.5 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-lg shadow-kintsugi-200 disabled:opacity-60 flex items-center justify-center gap-2"
+                    className="mt-6 w-full rounded-2xl bg-kintsugi-500 py-3.5 text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-[.98] transition-all shadow-sm disabled:opacity-60 flex items-center justify-center gap-2"
                 >
                     {submitting && <Spinner />}
                     Confirmar Pedido

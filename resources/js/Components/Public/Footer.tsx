@@ -13,8 +13,9 @@ export default function Footer() {
                                 Shopsugi<span className="text-kintsugi-300">ツ</span>
                             </span>
                         </Link>
-                        <p className="text-sm text-warm-400 leading-relaxed">
-                            Arte feita à mão, entregue com carinho. Cada peça conta uma história.
+                        <p className="font-display text-base italic text-warm-300 leading-relaxed">
+                            Arte feita à mão, entregue com carinho.<br />
+                            Cada peça conta uma história.
                         </p>
                     </div>
 

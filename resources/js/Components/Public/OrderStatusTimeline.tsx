@@ -60,7 +60,7 @@ export default function OrderStatusTimeline({ status }: OrderStatusTimelineProps
                                 {/* Dot */}
                                 <div
                                     className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors
-                                        ${isCurrent ? 'border-kintsugi-500 bg-kintsugi-500 shadow-lg shadow-kintsugi-200' : ''}
+                                        ${isCurrent ? 'border-kintsugi-500 bg-kintsugi-500 shadow-sm shadow-kintsugi-100' : ''}
                                         ${isDone ? 'border-kintsugi-500 bg-kintsugi-500' : ''}
                                         ${isUpcoming ? 'border-warm-200 bg-white' : ''}
                                     `}
