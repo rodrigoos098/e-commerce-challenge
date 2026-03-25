@@ -5,6 +5,7 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import QuantitySelector from '@/Components/Public/QuantitySelector';
 import ProductGrid from '@/Components/Public/ProductGrid';
 import Spinner from '@/Components/Shared/Spinner';
+import { useCartSound } from '@/hooks/useCartSound';
 import type { ProductShowPageProps } from '@/types/public';
 
 // ——— Helpers ————————————————————————————————————————————————
@@ -43,6 +44,7 @@ function StockIndicator({ quantity, minQuantity }: { quantity: number; minQuanti
 export default function ProductShow({ product, related_products }: ProductShowPageProps) {
     const [quantity, setQuantity] = useState(1);
     const [adding, setAdding] = useState(false);
+    const { playCartSound } = useCartSound();
 
     const isOutOfStock = product.quantity === 0;
 
@@ -55,6 +57,7 @@ export default function ProductShow({ product, related_products }: ProductShowPa
             {
                 preserveScroll: true,
                 onSuccess: () => {
+                    playCartSound();
                     toast.success(`"${product.name}" adicionado ao carrinho!`);
                     setAdding(false);
                 },

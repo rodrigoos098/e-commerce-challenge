@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
 import { formatPrice } from '@/utils/format';
+import { useCartSound } from '@/hooks/useCartSound';
 import type { Product } from '@/types/public';
 
 interface ProductCardProps {
     product: Product;
 }
-
-
 
 function StockBadge({ quantity, minQuantity }: { quantity: number; minQuantity: number }) {
     if (quantity === 0) {
@@ -22,6 +21,7 @@ function StockBadge({ quantity, minQuantity }: { quantity: number; minQuantity: 
 
 export default function ProductCard({ product }: ProductCardProps) {
     const [adding, setAdding] = useState(false);
+    const { playCartSound } = useCartSound();
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -36,6 +36,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             {
                 preserveScroll: true,
                 onSuccess: () => {
+                    playCartSound();
                     toast.success(`"${product.name}" adicionado ao carrinho!`);
                     setAdding(false);
                 },
