@@ -111,18 +111,24 @@ export default function DataTable<T extends { id: number | string }>({
                                     className={[
                                         'px-4 py-3 text-left text-xs font-semibold text-warm-500 uppercase tracking-wider whitespace-nowrap',
                                         col.className ?? '',
-                                        col.sortable && onSort ? 'cursor-pointer select-none hover:text-warm-600' : '',
                                     ].join(' ')}
-                                    onClick={() => col.sortable && onSort?.(String(col.key))}
                                 >
-                                    <span className="flex items-center gap-1.5">
-                                        {col.label}
-                                        {col.sortable && (
+                                    {col.sortable && onSort ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => onSort(String(col.key))}
+                                            className="flex items-center gap-1.5 hover:text-warm-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-kintsugi-500 focus-visible:ring-offset-1 rounded"
+                                        >
+                                            {col.label}
                                             <SortIcon
                                                 direction={sortKey === col.key ? (sortDir ?? null) : null}
                                             />
-                                        )}
-                                    </span>
+                                        </button>
+                                    ) : (
+                                        <span className="flex items-center gap-1.5">
+                                            {col.label}
+                                        </span>
+                                    )}
                                 </th>
                             ))}
                         </tr>
@@ -172,7 +178,7 @@ export default function DataTable<T extends { id: number | string }>({
 
             {/* Pagination */}
             {pagination && pagination.last_page > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-warm-200 bg-warm-50">
+                <nav aria-label="Paginação da tabela" className="flex items-center justify-between px-4 py-3 border-t border-warm-200 bg-warm-50">
                     <p className="text-sm text-warm-500">
                         Mostrando{' '}
                         <span className="font-medium text-warm-600">
@@ -238,7 +244,7 @@ export default function DataTable<T extends { id: number | string }>({
                                 );
                             })}
                     </div>
-                </div>
+                </nav>
             )}
         </div>
     );

@@ -75,6 +75,7 @@ export default function FormField({
             return (
                 <button
                     type="button"
+                    id={name}
                     role="switch"
                     aria-checked={checked}
                     disabled={disabled}
@@ -161,7 +162,7 @@ export default function FormField({
         <div className={['space-y-1.5', className].join(' ')}>
             <div className={type === 'toggle' ? 'flex items-center justify-between' : ''}>
                 <label
-                    htmlFor={type !== 'toggle' ? name : undefined}
+                    htmlFor={name}
                     className="block text-sm font-medium text-warm-600"
                 >
                     {label}

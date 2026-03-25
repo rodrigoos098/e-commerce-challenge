@@ -80,14 +80,22 @@ function Header({ cartCount }: { cartCount: number }) {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Debounced search
+    // Close dropdown on Escape key
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (searchQuery.trim()) {
-                router.get('/products', { search: searchQuery }, { preserveScroll: true, preserveState: true });
-            }
-        }, 400);
-        return () => clearTimeout(timer);
+        if (!userDropdownOpen) { return; }
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') { setUserDropdownOpen(false); }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [userDropdownOpen]);
+
+    // Search handler — navigate on Enter instead of debounced auto-nav
+    const handleSearchSubmit = useCallback((e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            router.get('/products', { search: searchQuery }, { preserveScroll: true, preserveState: true });
+        }
     }, [searchQuery]);
 
     const handleLogout = useCallback(() => {
@@ -127,7 +135,7 @@ function Header({ cartCount }: { cartCount: number }) {
                     </nav>
 
                     {/* Search */}
-                    <div className="hidden sm:flex flex-1 max-w-xs lg:max-w-sm">
+                    <form onSubmit={handleSearchSubmit} className="hidden sm:flex flex-1 max-w-xs lg:max-w-sm">
                         <div className="relative w-full">
                             <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                                 <IconSearch />
@@ -140,7 +148,7 @@ function Header({ cartCount }: { cartCount: number }) {
                                 className="w-full rounded-full border border-warm-200 bg-warm-50 py-2 pl-10 pr-4 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent transition-all"
                             />
                         </div>
-                    </div>
+                    </form>
 
                     {/* Right actions */}
                     <div className="flex items-center gap-3 shrink-0">
@@ -245,7 +253,7 @@ function Header({ cartCount }: { cartCount: number }) {
                 </div>
 
                 {/* Mobile search */}
-                <div className="sm:hidden pb-3">
+                <form onSubmit={handleSearchSubmit} className="sm:hidden pb-3">
                     <div className="relative w-full">
                         <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                             <IconSearch />
@@ -258,7 +266,7 @@ function Header({ cartCount }: { cartCount: number }) {
                             className="w-full rounded-full border border-warm-200 bg-warm-50 py-2 pl-10 pr-4 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-kintsugi-500 focus:border-transparent"
                         />
                     </div>
-                </div>
+                </form>
             </div>
 
             {/* Mobile menu */}
@@ -342,9 +350,16 @@ export default function PublicLayout({ children, title, cartCount = 0 }: PublicL
 
     return (
         <div className="min-h-screen flex flex-col bg-warm-50">
+            {/* Skip navigation */}
+            <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-2 focus:left-2 focus:rounded-lg focus:bg-kintsugi-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+            >
+                Pular para conteúdo
+            </a>
             <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
             <Header cartCount={effectiveCartCount} />
-            <main className="flex-1">
+            <main id="main-content" className="flex-1">
                 {children}
             </main>
             <Footer />

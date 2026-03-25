@@ -56,7 +56,7 @@ export default function QuantitySelector({
                 max={max}
                 disabled={disabled}
                 aria-label="Quantidade"
-                className="w-10 text-center text-sm font-semibold text-warm-700 bg-transparent border-0 focus:outline-none disabled:opacity-40 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-12 text-center text-sm font-semibold text-warm-700 bg-transparent border-0 focus:outline-none disabled:opacity-40 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
 
             <button

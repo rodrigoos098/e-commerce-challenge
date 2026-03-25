@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
+import { formatPrice } from '@/utils/format';
 import type { Product } from '@/types/public';
 
 interface ProductCardProps {
     product: Product;
 }
 
-function formatPrice(value: number): string {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
+
 
 function StockBadge({ quantity, minQuantity }: { quantity: number; minQuantity: number }) {
     if (quantity === 0) {
@@ -69,8 +68,18 @@ export default function ProductCard({ product }: ProductCardProps) {
                     alt={product.name}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = 'none';
+                        const fallback = target.parentElement?.querySelector('.product-placeholder');
+                        if (fallback) { (fallback as HTMLElement).style.display = 'flex'; }
+                    }}
                 />
+                <div className="product-placeholder hidden h-full w-full items-center justify-center bg-warm-100" style={{ display: 'none' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-warm-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1} aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21zM8.25 8.25h.008v.008H8.25V8.25z" />
+                    </svg>
+                </div>
             </Link>
 
             {/* Content */}

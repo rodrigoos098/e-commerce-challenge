@@ -52,7 +52,7 @@ export default function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
                 size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs',
             ].join(' ')}
         >
-            <span className={['rounded-full flex-shrink-0', dot, size === 'sm' ? 'h-1.5 w-1.5' : 'h-2 w-2'].join(' ')} />
+            <span className={['rounded-full flex-shrink-0', dot, size === 'sm' ? 'h-1.5 w-1.5' : 'h-2 w-2'].join(' ')} aria-hidden="true" />
             {config.label}
         </span>
     );

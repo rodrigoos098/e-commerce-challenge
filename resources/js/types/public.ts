@@ -40,6 +40,10 @@ export interface ProductFilters {
 export interface HomePageProps {
     featured_products: Product[];
     categories: Category[];
+    stats?: {
+        product_count: number;
+        category_count: number;
+    };
 }
 
 export interface ProductsPageProps {

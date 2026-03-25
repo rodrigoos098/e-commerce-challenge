@@ -46,7 +46,7 @@ export default function OrderStatusTimeline({ status }: OrderStatusTimelineProps
     const currentIndex = STATUS_ORDER[status] ?? 0;
 
     return (
-        <nav aria-label="Status do pedido">
+        <div role="group" aria-label="Status do pedido">
             <ol className="flex flex-col sm:flex-row gap-2 sm:gap-0">
                 {STEPS.map((step, idx) => {
                     const isDone = idx < currentIndex;
@@ -104,6 +104,6 @@ export default function OrderStatusTimeline({ status }: OrderStatusTimelineProps
                     );
                 })}
             </ol>
-        </nav>
+        </div>
     );
 }

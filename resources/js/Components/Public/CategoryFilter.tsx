@@ -25,6 +25,7 @@ function CategoryItem({
             <button
                 type="button"
                 onClick={() => onChange(isSelected ? null : category.id)}
+                aria-pressed={isSelected}
                 className={`w-full text-left rounded-lg px-3 py-2 text-sm transition-colors duration-150 flex items-center gap-2
                     ${depth > 0 ? 'pl-6' : ''}
                     ${isSelected

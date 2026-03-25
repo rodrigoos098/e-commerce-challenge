@@ -71,6 +71,7 @@ export default function SearchBar({
                 value={value}
                 onChange={handleChange}
                 placeholder={placeholder}
+                aria-label={placeholder}
                 className="w-full rounded-lg border border-warm-300 bg-white py-2 pl-9 pr-9 text-sm text-warm-700 placeholder-warm-400 focus:border-kintsugi-500 focus:outline-none focus:ring-2 focus:ring-kintsugi-500/20 transition-colors"
             />
 
@@ -79,6 +80,7 @@ export default function SearchBar({
                 <button
                     type="button"
                     onClick={handleClear}
+                    aria-label="Limpar pesquisa"
                     className="absolute inset-y-0 right-3 flex items-center text-warm-400 hover:text-warm-600 transition-colors"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

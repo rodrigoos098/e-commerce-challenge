@@ -33,6 +33,7 @@ export interface Category {
     parent_id: number | null;
     active: boolean;
     children?: Category[];
+    products_count?: number;
 }
 
 export interface Tag {

@@ -102,16 +102,3 @@ php artisan l5-swagger:generate
 // Error
 { "success": false, "message": "...", "errors": { "field": ["..."] } }
 ```
-
-## Design Context
-
-Full design guidelines live in `.impeccable.md` at the project root. Key points:
-
-- **Brand**: Shopsugi — inspired by Kintsugi. Personality: sofisticada, curada, poetica.
-- **Audience**: Women 28-45, decoration enthusiasts seeking unique handcrafted pieces.
-- **Fonts**: Playfair Display (`font-display`) for headings, DM Sans (`font-sans`) for body/UI.
-- **Colors**: Kintsugi gold (`kintsugi-500: #D4A017`) as primary accent; warm neutrals for surfaces/text; `warm-50` page bg; `cream`/`parchment` for auth pages.
-- **Components**: `rounded-2xl` cards, `rounded-full` buttons, `border-warm-200` borders, `shadow-sm` resting states, inline SVG icons (no icon library).
-- **Theme**: Light mode only. No dark mode.
-- **Accessibility**: WCAG 2.1 AA. Keyboard navigation, visible focus rings, semantic HTML, meaningful alt text.
-- **Anti-patterns**: No neon colors, no aggressive CTAs, no countdown timers, no sterile gray-on-white. The interface should feel like a quiet atelier, not a loud marketplace.

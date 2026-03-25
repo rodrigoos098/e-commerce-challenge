@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { formatPrice } from '@/utils/format';
 
 interface PriceFilterProps {
     min: number;
@@ -8,13 +9,17 @@ interface PriceFilterProps {
     onChange: (min: number, max: number) => void;
 }
 
-function formatPrice(value: number): string {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
+
 
 export default function PriceFilter({ min, max, currentMin, currentMax, onChange }: PriceFilterProps) {
     const [localMin, setLocalMin] = useState(currentMin);
     const [localMax, setLocalMax] = useState(currentMax);
+
+    // Sync state when props change externally (e.g. "clear all filters")
+    useEffect(() => {
+        setLocalMin(currentMin);
+        setLocalMax(currentMax);
+    }, [currentMin, currentMax]);
 
     const handleMinChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {

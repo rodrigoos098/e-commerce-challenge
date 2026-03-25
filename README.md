@@ -73,6 +73,15 @@ Esse comando sobe em paralelo:
 
 ---
 
+## E-mail Local (Mailpit)
+
+O projeto usa o **Mailpit** para interceptar envios de e-mail assíncronos no ambiente de desenvolvimento (como a confirmação de pedido).
+
+1. **Rodar**: Execute o arquivo `mailpit.exe` presente no seu sistema (ex: `C:\Users\seu_usuario\mailpit.exe`).
+2. **Caixa de Entrada (Web UI)**: Com o Mailpit rodando, acesse no navegador: `http://localhost:8025`
+
+---
+
 ## Credenciais seedadas
 
 Depois de `php artisan migrate --seed`:

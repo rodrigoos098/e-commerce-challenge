@@ -238,6 +238,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                     </div>
                     <button
                         onClick={handleLogout}
+                        aria-label="Sair"
                         title="Sair"
                         className="text-warm-400 hover:text-red-400 transition-colors flex-shrink-0"
                     >
@@ -251,6 +252,14 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     return (
         <div className="flex h-screen bg-warm-50 overflow-hidden">
             <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+
+            {/* Skip navigation */}
+            <a
+                href="#admin-main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:rounded-lg focus:bg-kintsugi-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+            >
+                Pular para conteúdo
+            </a>
 
             {/* Mobile overlay */}
             {sidebarOpen && (
@@ -271,6 +280,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                 {/* Mobile close button */}
                 <button
                     onClick={() => setSidebarOpen(false)}
+                    aria-label="Fechar menu lateral"
                     className="absolute top-4 right-4 text-warm-400 hover:text-white lg:hidden"
                 >
                     <IconClose />
@@ -286,6 +296,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                     {/* Hamburger (mobile) */}
                     <button
                         onClick={() => setSidebarOpen(true)}
+                        aria-label="Abrir menu"
                         className="text-warm-500 hover:text-warm-600 lg:hidden"
                     >
                         <IconMenu />
@@ -327,6 +338,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                         </div>
                         <button
                             onClick={handleLogout}
+                            aria-label="Sair"
                             title="Sair"
                             className="hidden sm:flex items-center gap-1.5 text-sm text-warm-500 hover:text-red-500 transition-colors"
                         >
@@ -337,7 +349,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                 </header>
 
                 {/* Page content */}
-                <main className="flex-1 overflow-y-auto">
+                <main id="admin-main-content" className="flex-1 overflow-y-auto">
                     {children}
                 </main>
             </div>

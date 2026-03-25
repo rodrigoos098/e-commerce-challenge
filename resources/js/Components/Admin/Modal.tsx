@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import Button from '@/Components/Shared/Button';
 
 interface ModalProps {
@@ -35,6 +35,7 @@ export default function Modal({
     loading = false,
     size = 'md',
 }: ModalProps) {
+    const modalTitleId = useId();
     const panelRef = useRef<HTMLDivElement>(null);
     const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -85,7 +86,7 @@ export default function Modal({
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="modal-title"
+            aria-labelledby={modalTitleId}
             onKeyDown={handleKeyDown}
         >
             {/* Backdrop */}
@@ -104,7 +105,7 @@ export default function Modal({
             >
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-warm-200 flex-shrink-0">
-                    <h2 id="modal-title" className="text-base font-semibold text-warm-700">
+                    <h2 id={modalTitleId} className="text-base font-semibold text-warm-700">
                         {title}
                     </h2>
                     <button
