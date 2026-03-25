@@ -33,10 +33,10 @@ const FiltersPanel = React.memo(function FiltersPanel({
                 <SearchInput value={search} onChange={onSearchChange} />
             </div>
             <div className="border-t border-warm-200 pt-6">
-                <CategoryFilter categories={categories} selected={categoryId} onChange={onCategoryChange} />
+                <PriceFilter min={0} max={10000} currentMin={priceMin} currentMax={priceMax} onChange={onPriceChange} />
             </div>
             <div className="border-t border-warm-200 pt-6">
-                <PriceFilter min={0} max={10000} currentMin={priceMin} currentMax={priceMax} onChange={onPriceChange} />
+                <CategoryFilter categories={categories} selected={categoryId} onChange={onCategoryChange} />
             </div>
             {hasActiveFilters && (
                 <button

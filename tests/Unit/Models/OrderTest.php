@@ -23,7 +23,7 @@ class OrderTest extends TestCase
             'shipping_cost', 'shipping_address', 'billing_address', 'notes',
         ];
 
-        $order = new Order;
+        $order = new Order();
 
         $this->assertEquals($expected, $order->getFillable());
     }
@@ -107,7 +107,7 @@ class OrderTest extends TestCase
 
     public function test_user_relationship_returns_belongs_to(): void
     {
-        $order = new Order;
+        $order = new Order();
 
         $this->assertInstanceOf(BelongsTo::class, $order->user());
     }
@@ -121,7 +121,7 @@ class OrderTest extends TestCase
 
     public function test_items_relationship_returns_has_many(): void
     {
-        $order = new Order;
+        $order = new Order();
 
         $this->assertInstanceOf(HasMany::class, $order->items());
     }

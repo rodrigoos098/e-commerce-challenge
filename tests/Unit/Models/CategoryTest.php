@@ -19,7 +19,7 @@ class CategoryTest extends TestCase
     {
         $expected = ['name', 'slug', 'description', 'parent_id', 'active'];
 
-        $category = new Category;
+        $category = new Category();
 
         $this->assertEquals($expected, $category->getFillable());
     }
@@ -69,7 +69,7 @@ class CategoryTest extends TestCase
 
     public function test_parent_relationship_returns_belongs_to(): void
     {
-        $category = new Category;
+        $category = new Category();
 
         $this->assertInstanceOf(BelongsTo::class, $category->parent());
     }
@@ -85,7 +85,7 @@ class CategoryTest extends TestCase
 
     public function test_children_relationship_returns_has_many(): void
     {
-        $category = new Category;
+        $category = new Category();
 
         $this->assertInstanceOf(HasMany::class, $category->children());
     }
@@ -102,7 +102,7 @@ class CategoryTest extends TestCase
 
     public function test_products_relationship_returns_has_many(): void
     {
-        $category = new Category;
+        $category = new Category();
 
         $this->assertInstanceOf(HasMany::class, $category->products());
     }

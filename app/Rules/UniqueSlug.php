@@ -10,7 +10,8 @@ class UniqueSlug implements ValidationRule
 {
     public function __construct(
         private readonly ?int $exceptId = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Run the validation rule.

@@ -14,7 +14,8 @@ class SendOrderConfirmationEmail implements ShouldQueue
 
     public function __construct(
         public readonly Order $order,
-    ) {}
+    ) {
+    }
 
     /**
      * Execute the job.

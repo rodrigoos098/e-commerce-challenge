@@ -98,9 +98,69 @@ export default function Home({ featured_products, categories, stats }: HomePageP
             {/* Hero */}
             <HeroBanner stats={stats} />
 
-            {/* ——— Kintsugi divider: hero → categories ——— */}
+            {/* ——— Kintsugi divider: hero → featured ——— */}
             <div className="mx-auto max-w-5xl px-8">
                 <KintsugiDivider className="my-0" />
+            </div>
+
+            {/* Featured products */}
+            <section className="bg-warm-50 py-24 sm:py-32 organic-section-fade" aria-labelledby="featured-heading">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <RevealSection>
+                        <div className="flex items-end justify-between mb-12">
+                            <div>
+                                <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Selecionados</p>
+                                <h2 id="featured-heading" className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-warm-700">Peças em Destaque</h2>
+                            </div>
+                            <Link href="/products" className="text-sm font-semibold text-kintsugi-500 hover:text-kintsugi-600 transition-colors">
+                                Ver todos →
+                            </Link>
+                        </div>
+                    </RevealSection>
+                    <RevealSection delay={100}>
+                        <ProductGrid products={featured_products.slice(0, 8)} />
+                    </RevealSection>
+                </div>
+            </section>
+
+            {/* ——— Kintsugi divider: products → features ——— */}
+            <div className="mx-auto max-w-5xl px-8">
+                <KintsugiDivider className="my-0" />
+            </div>
+
+            {/* Why us — Issue #4 /clarify: rewritten copy, larger icons, left-aligned */}
+            <section className="bg-warm-50 py-20 sm:py-28 organic-section-fade" aria-labelledby="features-heading">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <RevealSection>
+                        <div className="text-center mb-12">
+                            <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Diferenciais</p>
+                            <h2 id="features-heading" className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-warm-700">
+                                A Essência do Feito à Mão
+                            </h2>
+                        </div>
+                    </RevealSection>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+                        {FEATURES.map((feature, idx) => (
+                            <RevealSection key={feature.title} delay={idx * 120}>
+                                <div className="relative group flex flex-col items-center text-center rounded-2xl bg-white border border-warm-100 p-8 sm:p-10 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                                    {/* Accent Kintsugi crack */}
+                                    <KintsugiDivider variant="corner" className="top-right opacity-[0.08] group-hover:opacity-15 transition-opacity" />
+                                    
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-kintsugi-50 mb-5 relative z-10 transition-colors group-hover:bg-kintsugi-100">
+                                        {feature.icon}
+                                    </div>
+                                    <h3 className="font-display text-lg font-bold text-warm-700 mb-2 relative z-10">{feature.title}</h3>
+                                    <p className="text-sm text-warm-500 leading-relaxed relative z-10">{feature.description}</p>
+                                </div>
+                            </RevealSection>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ——— Kintsugi divider: features → categories ——— */}
+            <div className="mx-auto max-w-5xl px-8">
+                <KintsugiDivider />
             </div>
 
             {/* Categories — Issue #3 /arrange: hierarchical layout */}
@@ -112,9 +172,6 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                                 <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Explorar</p>
                                 <h2 id="categories-heading" className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-warm-700">Categorias</h2>
                             </div>
-                            <Link href="/products" className="text-sm font-semibold text-kintsugi-500 hover:text-kintsugi-600 transition-colors">
-                                Ver todos →
-                            </Link>
                         </div>
                     </RevealSection>
 
@@ -169,66 +226,6 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                 </div>
             </section>
 
-            {/* ——— Kintsugi divider: categories → products ——— */}
-            <div className="mx-auto max-w-5xl px-8">
-                <KintsugiDivider />
-            </div>
-
-            {/* Featured products */}
-            <section className="bg-warm-50 py-24 sm:py-32 organic-section-fade" aria-labelledby="featured-heading">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <RevealSection>
-                        <div className="flex items-end justify-between mb-12">
-                            <div>
-                                <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Selecionados</p>
-                                <h2 id="featured-heading" className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-warm-700">Peças em Destaque</h2>
-                            </div>
-                            <Link href="/products" className="text-sm font-semibold text-kintsugi-500 hover:text-kintsugi-600 transition-colors">
-                                Ver todos →
-                            </Link>
-                        </div>
-                    </RevealSection>
-                    <RevealSection delay={100}>
-                        <ProductGrid products={featured_products.slice(0, 8)} />
-                    </RevealSection>
-                </div>
-            </section>
-
-            {/* ——— Kintsugi divider: products → features ——— */}
-            <div className="mx-auto max-w-5xl px-8">
-                <KintsugiDivider className="my-0" />
-            </div>
-
-            {/* Why us — Issue #4 /clarify: rewritten copy, larger icons, left-aligned */}
-            <section className="bg-warm-50 py-20 sm:py-28 organic-section-fade" aria-labelledby="features-heading">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <RevealSection>
-                        <div className="text-center mb-12">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Diferenciais</p>
-                            <h2 id="features-heading" className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-warm-700">
-                                Por que escolher Shopsugi&#x30C4;?
-                            </h2>
-                        </div>
-                    </RevealSection>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-                        {FEATURES.map((feature, idx) => (
-                            <RevealSection key={feature.title} delay={idx * 120}>
-                                <div className="relative group flex flex-col items-center text-center rounded-2xl bg-white border border-kintsugi-100 p-8 sm:p-10 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
-                                    {/* Accent Kintsugi crack */}
-                                    <KintsugiDivider variant="corner" className="top-right opacity-[0.08] group-hover:opacity-15 transition-opacity" />
-                                    
-                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-kintsugi-50 mb-5 relative z-10">
-                                        {feature.icon}
-                                    </div>
-                                    <h3 className="font-display text-lg font-bold text-warm-700 mb-2 relative z-10">{feature.title}</h3>
-                                    <p className="text-sm text-warm-500 leading-relaxed relative z-10">{feature.description}</p>
-                                </div>
-                            </RevealSection>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
             {/* CTA bottom */}
             <section className="bg-warm-800 py-16 sm:py-20">
                 <RevealSection>
@@ -237,7 +234,7 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                             Junte-se à comunidade
                         </h2>
                         <p className="text-warm-400 mb-10 leading-relaxed text-lg">
-                            Cadastre-se e receba acesso antecipado a novas coleções e edições limitadas.
+                            Cadastre-se para acompanhar nossas coleções e valorizar o trabalho artesanal.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link

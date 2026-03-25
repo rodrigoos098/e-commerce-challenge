@@ -10,7 +10,8 @@ class SufficientStock implements ValidationRule
 {
     public function __construct(
         private readonly ?int $productId = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Run the validation rule.

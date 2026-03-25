@@ -13,7 +13,8 @@ readonly class StockMovementDTO
         public string $reason,
         public ?string $referenceType = null,
         public ?int $referenceId = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a StockMovementDTO from a Form Request.

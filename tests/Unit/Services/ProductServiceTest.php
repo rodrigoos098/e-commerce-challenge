@@ -161,7 +161,7 @@ class ProductServiceTest extends TestCase
 
     public function test_low_stock_delegates_to_repository(): void
     {
-        $collection = new Collection;
+        $collection = new Collection();
 
         $repo = Mockery::mock(ProductRepositoryInterface::class);
         $repo->shouldReceive('lowStock')->once()->andReturn($collection);

@@ -19,7 +19,7 @@ class OrderItemTest extends TestCase
     {
         $expected = ['order_id', 'product_id', 'quantity', 'unit_price', 'total_price'];
 
-        $orderItem = new OrderItem;
+        $orderItem = new OrderItem();
 
         $this->assertEquals($expected, $orderItem->getFillable());
     }
@@ -54,7 +54,7 @@ class OrderItemTest extends TestCase
 
     public function test_order_relationship_returns_belongs_to(): void
     {
-        $orderItem = new OrderItem;
+        $orderItem = new OrderItem();
 
         $this->assertInstanceOf(BelongsTo::class, $orderItem->order());
     }
@@ -68,7 +68,7 @@ class OrderItemTest extends TestCase
 
     public function test_product_relationship_returns_belongs_to(): void
     {
-        $orderItem = new OrderItem;
+        $orderItem = new OrderItem();
 
         $this->assertInstanceOf(BelongsTo::class, $orderItem->product());
     }

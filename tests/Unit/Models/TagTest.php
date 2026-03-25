@@ -18,7 +18,7 @@ class TagTest extends TestCase
     {
         $expected = ['name', 'slug'];
 
-        $tag = new Tag;
+        $tag = new Tag();
 
         $this->assertEquals($expected, $tag->getFillable());
     }
@@ -49,7 +49,7 @@ class TagTest extends TestCase
 
     public function test_products_relationship_returns_belongs_to_many(): void
     {
-        $tag = new Tag;
+        $tag = new Tag();
 
         $this->assertInstanceOf(BelongsToMany::class, $tag->products());
     }

@@ -26,6 +26,7 @@ class HomeController extends Controller
         // Add product counts for homepage category cards
         $categoryModels = \App\Models\Category::query()
             ->where('active', true)
+            ->whereNull('parent_id')
             ->withCount('products')
             ->orderByDesc('products_count')
             ->get();

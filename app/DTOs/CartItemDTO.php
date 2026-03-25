@@ -9,7 +9,8 @@ readonly class CartItemDTO
     public function __construct(
         public int $productId,
         public int $quantity,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a CartItemDTO from a Form Request.

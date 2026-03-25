@@ -14,7 +14,8 @@ class CartService
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
         private readonly ProductRepositoryInterface $productRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the cart for a user (create if not exists).

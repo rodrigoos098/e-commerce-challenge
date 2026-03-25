@@ -10,7 +10,8 @@ class ValidParentCategory implements ValidationRule
 {
     public function __construct(
         private readonly ?int $currentCategoryId = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Run the validation rule.

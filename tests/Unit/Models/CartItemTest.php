@@ -19,7 +19,7 @@ class CartItemTest extends TestCase
     {
         $expected = ['cart_id', 'product_id', 'quantity'];
 
-        $cartItem = new CartItem;
+        $cartItem = new CartItem();
 
         $this->assertEquals($expected, $cartItem->getFillable());
     }
@@ -38,7 +38,7 @@ class CartItemTest extends TestCase
 
     public function test_cart_relationship_returns_belongs_to(): void
     {
-        $cartItem = new CartItem;
+        $cartItem = new CartItem();
 
         $this->assertInstanceOf(BelongsTo::class, $cartItem->cart());
     }
@@ -52,7 +52,7 @@ class CartItemTest extends TestCase
 
     public function test_product_relationship_returns_belongs_to(): void
     {
-        $cartItem = new CartItem;
+        $cartItem = new CartItem();
 
         $this->assertInstanceOf(BelongsTo::class, $cartItem->product());
     }

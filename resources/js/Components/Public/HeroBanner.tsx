@@ -41,8 +41,8 @@ export default function HeroBanner({
 
             <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
                 {/* Badge */}
-                <span className="mb-8 inline-flex items-center gap-2 rounded-full bg-kintsugi-100 px-4 py-1.5 text-xs font-bold text-kintsugi-700 ring-1 ring-kintsugi-300 animate-fade-up">
-                    Novas peças artesanais toda semana
+                <span className="mb-4 block text-sm font-semibold tracking-widest text-kintsugi-600 uppercase animate-fade-up">
+                    Feito à Mão no Brasil
                 </span>
 
                 {/* Title with shimmer on accent line */}

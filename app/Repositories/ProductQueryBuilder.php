@@ -35,7 +35,13 @@ class ProductQueryBuilder
         }
 
         if (isset($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
+            $categoryId = $filters['category_id'];
+            $query->whereIn('category_id', function ($query) use ($categoryId) {
+                $query->select('id')
+                      ->from('categories')
+                      ->where('id', $categoryId)
+                      ->orWhere('parent_id', $categoryId);
+            });
         }
 
         if (array_key_exists('active', $filters) && $filters['active'] !== null && $filters['active'] !== '') {

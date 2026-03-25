@@ -36,8 +36,8 @@ class PolicyTest extends TestCase
         $this->customer = User::factory()->create();
         $this->customer->assignRole('customer');
 
-        $this->productPolicy = new ProductPolicy;
-        $this->orderPolicy = new OrderPolicy;
+        $this->productPolicy = new ProductPolicy();
+        $this->orderPolicy = new OrderPolicy();
     }
 
     // ── ProductPolicy ──────────────────────────────────────────────────────────────

@@ -20,7 +20,8 @@ readonly class ProductDTO
         public ?int $categoryId = null,
         public ?array $tagIds = null,
         public ?string $slug = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a ProductDTO from a Form Request.

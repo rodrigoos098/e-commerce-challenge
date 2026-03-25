@@ -105,7 +105,6 @@ function Header({ cartCount }: { cartCount: number }) {
     const navLinks = [
         { label: 'Início', href: '/' },
         { label: 'Coleção', href: '/products' },
-        { label: 'Categorias', href: '/products?category=all' },
     ];
 
     return (

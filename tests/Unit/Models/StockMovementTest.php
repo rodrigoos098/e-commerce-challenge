@@ -21,7 +21,7 @@ class StockMovementTest extends TestCase
             'reference_type', 'reference_id',
         ];
 
-        $stockMovement = new StockMovement;
+        $stockMovement = new StockMovement();
 
         $this->assertEquals($expected, $stockMovement->getFillable());
     }
@@ -58,7 +58,7 @@ class StockMovementTest extends TestCase
 
     public function test_product_relationship_returns_belongs_to(): void
     {
-        $stockMovement = new StockMovement;
+        $stockMovement = new StockMovement();
 
         $this->assertInstanceOf(BelongsTo::class, $stockMovement->product());
     }

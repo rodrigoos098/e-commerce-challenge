@@ -20,7 +20,7 @@ class CartTest extends TestCase
     {
         $expected = ['user_id', 'session_id'];
 
-        $cart = new Cart;
+        $cart = new Cart();
 
         $this->assertEquals($expected, $cart->getFillable());
     }
@@ -29,7 +29,7 @@ class CartTest extends TestCase
 
     public function test_user_relationship_returns_belongs_to(): void
     {
-        $cart = new Cart;
+        $cart = new Cart();
 
         $this->assertInstanceOf(BelongsTo::class, $cart->user());
     }
@@ -45,7 +45,7 @@ class CartTest extends TestCase
 
     public function test_items_relationship_returns_has_many(): void
     {
-        $cart = new Cart;
+        $cart = new Cart();
 
         $this->assertInstanceOf(HasMany::class, $cart->items());
     }
