@@ -23,25 +23,25 @@ export default function HeroBanner({
     const titleLines = title.split('\n');
 
     return (
-        <section className="relative overflow-hidden bg-gradient-to-br from-warm-800 via-warm-900 to-warm-900 py-24 sm:py-32 lg:py-40">
+        <section className="relative overflow-hidden bg-gradient-to-br from-cream via-parchment to-warm-100 py-24 sm:py-32 lg:py-40">
             {/* Background: organic kintsugi-inspired decorative cracks */}
             <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-                <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-kintsugi-500/8 blur-3xl" />
-                <div className="absolute bottom-0 left-1/4 h-72 w-72 rounded-full bg-kintsugi-400/8 blur-3xl" />
+                <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-kintsugi-400/10 blur-3xl" />
+                <div className="absolute bottom-0 left-1/4 h-72 w-72 rounded-full bg-kintsugi-300/10 blur-3xl" />
                 {/* Diagonal decorative gold line — subtle organic feel */}
-                <svg className="absolute top-1/3 left-0 w-full h-24 opacity-[0.07]" viewBox="0 0 1200 80" preserveAspectRatio="none">
+                <svg className="absolute top-1/3 left-0 w-full h-24 opacity-20" viewBox="0 0 1200 80" preserveAspectRatio="none">
                     <path d="M0,40 C150,10 300,70 450,35 C600,0 750,60 900,30 C1050,0 1150,50 1200,40" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-kintsugi-400" />
                 </svg>
             </div>
 
             <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
                 {/* Badge */}
-                <span className="mb-8 inline-flex items-center gap-2 rounded-full bg-kintsugi-500/20 backdrop-blur-sm px-4 py-1.5 text-xs font-medium text-kintsugi-100 ring-1 ring-kintsugi-400/30 animate-fade-up">
+                <span className="mb-8 inline-flex items-center gap-2 rounded-full bg-kintsugi-100 px-4 py-1.5 text-xs font-bold text-kintsugi-700 ring-1 ring-kintsugi-300 animate-fade-up">
                     Novas peças artesanais toda semana
                 </span>
 
                 {/* Title with shimmer on accent line */}
-                <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-7xl animate-fade-up" style={{ lineHeight: 1.05, animationDelay: '100ms' }}>
+                <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-warm-800 sm:text-5xl lg:text-7xl animate-fade-up" style={{ lineHeight: 1.05, animationDelay: '100ms' }}>
                     {titleLines[0]}
                     {titleLines[1] && (
                         <>
@@ -51,7 +51,7 @@ export default function HeroBanner({
                     )}
                 </h1>
 
-                <p className="mt-8 text-lg text-white/80 sm:text-xl max-w-2xl mx-auto leading-relaxed animate-fade-up" style={{ animationDelay: '250ms' }}>
+                <p className="mt-8 text-lg text-warm-500 sm:text-xl max-w-2xl mx-auto leading-relaxed animate-fade-up" style={{ animationDelay: '250ms' }}>
                     {subtitle}
                 </p>
 
@@ -67,7 +67,7 @@ export default function HeroBanner({
                     </Link>
                     <Link
                         href="/register"
-                        className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm px-9 py-4 text-sm font-semibold text-white hover:bg-white/20 transition-all duration-200"
+                        className="inline-flex items-center gap-2 rounded-full border border-warm-300 bg-warm-100 px-9 py-4 text-sm font-semibold text-warm-700 hover:bg-warm-200 transition-all duration-200"
                     >
                         Criar conta grátis
                     </Link>
@@ -75,15 +75,15 @@ export default function HeroBanner({
 
                 {/* Stats — only rendered when real data is available */}
                 {stats && (
-                    <div className="mt-16 inline-flex items-center gap-8 sm:gap-12 border-t border-white/10 pt-10 animate-fade-up" style={{ animationDelay: '500ms' }}>
+                    <div className="mt-16 inline-flex items-center gap-8 sm:gap-12 border-t border-warm-200 pt-10 animate-fade-up" style={{ animationDelay: '500ms' }}>
                         <div className="text-center">
-                            <div className="font-display text-3xl sm:text-4xl font-bold text-kintsugi-300">{stats.product_count}</div>
-                            <div className="text-xs sm:text-sm text-white/50 mt-1">Peças no catálogo</div>
+                            <div className="font-display text-3xl sm:text-4xl font-bold text-kintsugi-600">{stats.product_count}</div>
+                            <div className="text-xs sm:text-sm text-warm-400 mt-1">Peças no catálogo</div>
                         </div>
-                        <div className="h-10 w-px bg-white/10" aria-hidden="true" />
+                        <div className="h-10 w-px bg-warm-200" aria-hidden="true" />
                         <div className="text-center">
-                            <div className="font-display text-3xl sm:text-4xl font-bold text-kintsugi-300">{stats.category_count}</div>
-                            <div className="text-xs sm:text-sm text-white/50 mt-1">Categorias</div>
+                            <div className="font-display text-3xl sm:text-4xl font-bold text-kintsugi-600">{stats.category_count}</div>
+                            <div className="text-xs sm:text-sm text-warm-400 mt-1">Categorias</div>
                         </div>
                     </div>
                 )}

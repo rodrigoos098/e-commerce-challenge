@@ -113,11 +113,11 @@
 .kintsugi-shimmer {
     background: linear-gradient(
         90deg,
-        var(--color-kintsugi-500) 0%,
-        var(--color-kintsugi-300) 25%,
-        var(--color-kintsugi-500) 50%,
-        var(--color-kintsugi-300) 75%,
-        var(--color-kintsugi-500) 100%
+        var(--color-kintsugi-600) 0%,
+        var(--color-kintsugi-400) 25%,
+        var(--color-kintsugi-700) 50%,
+        var(--color-kintsugi-400) 75%,
+        var(--color-kintsugi-600) 100%
     );
     background-size: 200% auto;
     -webkit-background-clip: text;
