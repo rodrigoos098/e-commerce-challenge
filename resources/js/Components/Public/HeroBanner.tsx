@@ -24,25 +24,25 @@ export default function HeroBanner({
 
             <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
                 {/* Badge */}
-                <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-kintsugi-500/20 backdrop-blur-sm px-4 py-1.5 text-xs font-medium text-kintsugi-100 ring-1 ring-kintsugi-400/30">
+                <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-kintsugi-500/20 backdrop-blur-sm px-4 py-1.5 text-xs font-medium text-kintsugi-100 ring-1 ring-kintsugi-400/30 animate-fade-up">
                     Novas peças artesanais toda semana
                 </span>
 
-                <h1 className="mt-4 whitespace-pre-line font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl" style={{ lineHeight: 1.08 }}>
+                <h1 className="mt-4 whitespace-pre-line font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl animate-fade-up" style={{ lineHeight: 1.08, animationDelay: '100ms' }}>
                     {title}
                 </h1>
 
-                <p className="mt-6 text-lg text-white/80 sm:text-xl max-w-2xl mx-auto leading-relaxed">
+                <p className="mt-6 text-lg text-white/80 sm:text-xl max-w-2xl mx-auto leading-relaxed animate-fade-up" style={{ animationDelay: '250ms' }}>
                     {subtitle}
                 </p>
 
-                <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: '400ms' }}>
                     <Link
                         href={ctaHref}
-                        className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-kintsugi-700 shadow-md hover:bg-kintsugi-50 transition-colors duration-200"
+                        className="group inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-kintsugi-700 shadow-md hover:bg-kintsugi-50 transition-colors duration-200"
                     >
                         {ctaLabel}
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </Link>
@@ -55,7 +55,7 @@ export default function HeroBanner({
                 </div>
 
                 {/* Stats */}
-                <div className="mt-14 grid grid-cols-3 gap-x-10 gap-y-6 border-t border-white/10 pt-10">
+                <div className="mt-14 grid grid-cols-3 gap-x-4 sm:gap-x-10 gap-y-6 border-t border-white/10 pt-10 animate-fade-up" style={{ animationDelay: '500ms' }}>
                     {[
                         { value: '500+', label: 'Artesãos' },
                         { value: '2k+', label: 'Peças únicas' },

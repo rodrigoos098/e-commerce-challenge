@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import ProductGrid from '@/Components/Public/ProductGrid';
@@ -6,7 +6,50 @@ import CategoryFilter from '@/Components/Public/CategoryFilter';
 import PriceFilter from '@/Components/Public/PriceFilter';
 import SearchInput from '@/Components/Public/SearchInput';
 import Pagination from '@/Components/Public/Pagination';
-import type { ProductsPageProps } from '@/types/public';
+import type { ProductsPageProps, Category } from '@/types/public';
+
+// ——— Filters Panel (extracted to avoid remount on every parent render) ————
+
+interface FiltersPanelProps {
+    search: string;
+    onSearchChange: (v: string) => void;
+    categories: Category[];
+    categoryId: number | string | null;
+    onCategoryChange: (id: number | string | null) => void;
+    priceMin: number;
+    priceMax: number;
+    onPriceChange: (min: number, max: number) => void;
+    hasActiveFilters: boolean;
+    onClearFilters: () => void;
+}
+
+const FiltersPanel = React.memo(function FiltersPanel({
+    search, onSearchChange, categories, categoryId, onCategoryChange,
+    priceMin, priceMax, onPriceChange, hasActiveFilters, onClearFilters,
+}: FiltersPanelProps) {
+    return (
+        <aside className="space-y-8">
+            <div>
+                <SearchInput value={search} onChange={onSearchChange} />
+            </div>
+            <div className="border-t border-warm-200 pt-6">
+                <CategoryFilter categories={categories} selected={categoryId} onChange={onCategoryChange} />
+            </div>
+            <div className="border-t border-warm-200 pt-6">
+                <PriceFilter min={0} max={10000} currentMin={priceMin} currentMax={priceMax} onChange={onPriceChange} />
+            </div>
+            {hasActiveFilters && (
+                <button
+                    type="button"
+                    onClick={onClearFilters}
+                    className="w-full rounded-xl border border-warm-200 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50 transition-colors"
+                >
+                    Limpar todos os filtros
+                </button>
+            )}
+        </aside>
+    );
+});
 
 // ——— Page Component ———————————————————————————————————————
 
@@ -19,8 +62,9 @@ export default function ProductsIndex({ products, categories, filters }: Product
     const [priceMax, setPriceMax] = useState(Number(currentFilters.price_max ?? 10000));
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const applyFilters = useCallback(
-        (overrides: Record<string, unknown> = {}) => {
+    // Search debounce — only reacts to search changes; other filters call router.get directly
+    useEffect(() => {
+        const timer = setTimeout(() => {
             router.get(
                 '/products',
                 {
@@ -28,22 +72,13 @@ export default function ProductsIndex({ products, categories, filters }: Product
                     category_id: categoryId || undefined,
                     price_min: priceMin > 0 ? priceMin : undefined,
                     price_max: priceMax < 10000 ? priceMax : undefined,
-                    ...overrides,
                 },
                 { preserveScroll: true, preserveState: true, replace: true },
             );
-        },
-        [search, categoryId, priceMin, priceMax],
-    );
-
-    // Search debounce
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            applyFilters({ search });
         }, 400);
-
         return () => clearTimeout(timer);
-    }, [applyFilters, search]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search]);
 
     const handleCategoryChange = (id: number | string | null) => {
         setCategoryId(id);
@@ -82,43 +117,26 @@ export default function ProductsIndex({ products, categories, filters }: Product
         router.get('/products', {}, { preserveState: false, replace: true });
     };
 
-    // Sidebar filters
-    const FiltersPanel = () => (
-        <aside className="space-y-8">
-            <div>
-                <SearchInput value={search} onChange={setSearch} />
-            </div>
-            <div className="border-t border-warm-200 pt-6">
-                <CategoryFilter categories={categories} selected={categoryId} onChange={handleCategoryChange} />
-            </div>
-            <div className="border-t border-warm-200 pt-6">
-                <PriceFilter
-                    min={0}
-                    max={10000}
-                    currentMin={priceMin}
-                    currentMax={priceMax}
-                    onChange={handlePriceChange}
-                />
-            </div>
-            {hasActiveFilters && (
-                <button
-                    type="button"
-                    onClick={clearFilters}
-                    className="w-full rounded-xl border border-warm-200 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50 transition-colors"
-                >
-                    Limpar todos os filtros
-                </button>
-            )}
-        </aside>
-    );
+    const filtersPanelProps: FiltersPanelProps = {
+        search,
+        onSearchChange: setSearch,
+        categories,
+        categoryId,
+        onCategoryChange: handleCategoryChange,
+        priceMin,
+        priceMax,
+        onPriceChange: handlePriceChange,
+        hasActiveFilters,
+        onClearFilters: clearFilters,
+    };
 
     return (
-        <PublicLayout title="Colecao">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+        <PublicLayout title="Coleção">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
                 {/* Page header */}
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700">Nossa Coleção</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700">Nossa coleção</h1>
                         <p className="mt-1 text-sm text-warm-500">
                             {products.meta.total} resultado{products.meta.total !== 1 ? 's' : ''}
                             {search && <> para "<strong>{search}</strong>"</>}
@@ -139,7 +157,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
                         Filtros
                         {hasActiveFilters && (
                             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-kintsugi-500 text-xs text-white font-bold">
-                                !
+                                {[categoryId, search, priceMin > 0, priceMax < 10000].filter(Boolean).length}
                             </span>
                         )}
                     </button>
@@ -149,7 +167,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
                     {/* Desktop sidebar */}
                     <div className="hidden lg:block w-56 shrink-0">
                         <div className="sticky top-24">
-                            <FiltersPanel />
+                            <FiltersPanel {...filtersPanelProps} />
                         </div>
                     </div>
 
@@ -157,13 +175,13 @@ export default function ProductsIndex({ products, categories, filters }: Product
                     {sidebarOpen && (
                         <>
                             <div
-                                className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
+                                className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden animate-fade-in"
                                 onClick={() => setSidebarOpen(false)}
                                 aria-hidden="true"
                             />
                             <div
                                 id="filters-sidebar"
-                                className="fixed inset-y-0 left-0 z-50 w-72 overflow-y-auto bg-white p-6 shadow-2xl lg:hidden"
+                                className="fixed inset-y-0 left-0 z-50 w-72 overflow-y-auto bg-white p-6 shadow-2xl lg:hidden animate-slide-in-left"
                             >
                                 <div className="flex items-center justify-between mb-6">
                                     <h2 className="text-base font-bold text-warm-700">Filtros</h2>
@@ -178,14 +196,14 @@ export default function ProductsIndex({ products, categories, filters }: Product
                                         </svg>
                                     </button>
                                 </div>
-                                <FiltersPanel />
+                                <FiltersPanel {...filtersPanelProps} />
                             </div>
                         </>
                     )}
 
                     {/* Products grid */}
                     <div className="flex-1 min-w-0">
-                        <ProductGrid products={products.data} emptyMessage="Nenhum produto encontrado para os filtros selecionados." />
+                        <ProductGrid products={products.data} emptyMessage="Nenhum produto encontrado para os filtros selecionados." onClearFilters={hasActiveFilters ? clearFilters : undefined} />
                         <Pagination meta={products.meta} onPageChange={handlePageChange} />
                     </div>
                 </div>

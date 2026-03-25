@@ -25,7 +25,7 @@ const IconShoppingCart = ({ count }: { count: number }) => (
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-9H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
         {count > 0 && (
-            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-kintsugi-500 text-xs font-bold text-white">
+            <span key={count} className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-kintsugi-500 text-xs font-bold text-white animate-badge-pop">
                 {count > 99 ? '99+' : count}
             </span>
         )}
@@ -107,9 +107,9 @@ function Header({ cartCount }: { cartCount: number }) {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between gap-4">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2 shrink-0">
+                    <Link href="/" className="flex items-center gap-2 shrink-0 group">
                         <span className="font-display text-2xl font-bold text-kintsugi-600 tracking-tight">
-                            Shopsugi<span className="text-kintsugi-400">ツ</span>
+                            Shopsugi<span className="inline-block text-kintsugi-400 transition-all duration-300 group-hover:text-kintsugi-500 group-hover:scale-125 group-hover:rotate-6">ツ</span>
                         </span>
                     </Link>
 
@@ -119,7 +119,7 @@ function Header({ cartCount }: { cartCount: number }) {
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className="text-sm font-medium text-warm-600 hover:text-kintsugi-500 transition-colors duration-150"
+                                className="relative text-sm font-medium text-warm-600 hover:text-kintsugi-500 transition-colors duration-150 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-kintsugi-500 after:transition-all after:duration-300 hover:after:w-full"
                             >
                                 {link.label}
                             </Link>
@@ -178,7 +178,7 @@ function Header({ cartCount }: { cartCount: number }) {
                                         />
                                         <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl bg-white shadow-xl border border-warm-200 py-1 overflow-hidden">
                                             <div className="px-4 py-2 border-b border-warm-200">
-                                                <p className="text-xs text-warm-500">Conectado como</p>
+                                                <p className="text-xs text-warm-500">Olá, <span className="font-medium text-warm-600">{user.name.split(' ')[0]}</span></p>
                                                 <p className="text-sm font-semibold text-warm-700 truncate">{user.email}</p>
                                             </div>
                                             <Link
@@ -237,7 +237,7 @@ function Header({ cartCount }: { cartCount: number }) {
                         <button
                             className="md:hidden text-warm-600 hover:text-kintsugi-500 transition-colors p-1"
                             onClick={() => setMobileOpen((v) => !v)}
-                            aria-label="Abrir menu"
+                            aria-label={mobileOpen ? 'Fechar menu' : 'Abrir menu'}
                         >
                             {mobileOpen ? <IconClose /> : <IconMenu />}
                         </button>
@@ -263,7 +263,7 @@ function Header({ cartCount }: { cartCount: number }) {
 
             {/* Mobile menu */}
             {mobileOpen && (
-                <div className="md:hidden border-t border-warm-200 bg-white shadow-lg">
+                <div className="md:hidden border-t border-warm-200 bg-white shadow-lg animate-slide-down">
                     <nav className="flex flex-col px-4 py-3 gap-1">
                         {navLinks.map((link) => (
                             <Link

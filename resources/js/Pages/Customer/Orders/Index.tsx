@@ -48,22 +48,22 @@ export default function OrdersIndex({ orders }: OrdersPageProps) {
     return (
         <PublicLayout title="Meus Pedidos">
             <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-warm-700 mb-8">Meus Pedidos</h1>
+                <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700 mb-8">Meus Pedidos</h1>
 
                 {orders.data.length === 0 ? (
                     <div className="text-center py-20">
-                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-warm-50 mx-auto mb-5">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-warm-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2} aria-hidden="true">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-kintsugi-50 mx-auto mb-5">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-kintsugi-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2} aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
                         </div>
-                        <h2 className="text-lg font-bold text-warm-600 mb-2">Nenhum pedido ainda</h2>
-                        <p className="text-warm-500 mb-6">Quando você fizer um pedido, ele aparecerá aqui.</p>
+                        <h2 className="font-display text-xl font-extrabold text-warm-700 mb-2">Ainda sem pedidos</h2>
+                        <p className="text-warm-500 mb-6 max-w-xs mx-auto leading-relaxed">Cada peça tem uma história. Comece a escrever a sua.</p>
                         <Link
                             href="/products"
-                            className="inline-flex items-center gap-2 rounded-2xl bg-kintsugi-500 px-6 py-2.5 text-sm font-bold text-white hover:bg-kintsugi-600 transition-colors"
+                            className="inline-flex items-center gap-2 rounded-full bg-kintsugi-500 px-6 py-2.5 text-sm font-bold text-white hover:bg-kintsugi-600 transition-colors"
                         >
-                            Ir para a loja
+                            Explorar a coleção
                         </Link>
                     </div>
                 ) : (
@@ -87,7 +87,7 @@ export default function OrdersIndex({ orders }: OrdersPageProps) {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4 ml-14 sm:ml-0">
+                                    <div className="flex items-center gap-4 pl-14 sm:pl-0">
                                         <StatusBadge status={order.status} />
                                         <p className="text-sm font-bold text-warm-700">{formatPrice(order.total)}</p>
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-warm-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
