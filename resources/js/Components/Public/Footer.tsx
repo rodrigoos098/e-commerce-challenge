@@ -10,8 +10,8 @@ export default function Footer() {
                     {/* Brand — elevated Kintsugi tagline */}
                     <div className="sm:col-span-1">
                         <Link href="/" className="inline-block mb-4">
-                            <span className="font-display text-2xl font-bold text-kintsugi-400">
-                                Shopsugi<span className="text-kintsugi-300">ツ</span>
+                            <span className="font-display text-2xl font-bold text-white tracking-tight">
+                                Shopsugi<span className="ml-0.5 text-kintsugi-400">ツ</span>
                             </span>
                         </Link>
                         <p className="font-display text-base italic text-warm-300 leading-relaxed mb-3">

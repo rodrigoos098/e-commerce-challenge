@@ -158,17 +158,17 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-display: 'Playfair Display', Georgia, serif;
 
-    /* Kintsugi Gold */
-    --color-kintsugi-50: #FFF9E6;
-    --color-kintsugi-100: #FFF0BF;
-    --color-kintsugi-200: #FFE08A;
-    --color-kintsugi-300: #FFD054;
-    --color-kintsugi-400: #F5BD3C;
-    --color-kintsugi-500: #D4A017;
-    --color-kintsugi-600: #B8860B;
-    --color-kintsugi-700: #96700A;
-    --color-kintsugi-800: #6B4F07;
-    --color-kintsugi-900: #4A3705;
+    /* Kintsugi Gold - Refined Antique Gold Palette */
+    --color-kintsugi-50: #FCF7E3;
+    --color-kintsugi-100: #F8E8B0;
+    --color-kintsugi-200: #EDD581;
+    --color-kintsugi-300: #DBBA56;
+    --color-kintsugi-400: #C29A30;
+    --color-kintsugi-500: #A67C1F; /* Main Brand Gold - Richer and deeper */
+    --color-kintsugi-600: #8A6416;
+    --color-kintsugi-700: #6B4E10;
+    --color-kintsugi-800: #4D380B;
+    --color-kintsugi-900: #332506;
 
     /* Warm Neutrals */
     --color-warm-50: #FDFAF5;

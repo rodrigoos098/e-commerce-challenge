@@ -186,9 +186,11 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     const SidebarContent = () => (
         <div className="flex flex-col h-full">
             {/* Logo */}
-            <div className="flex items-center gap-3 px-6 py-5 border-b border-warm-800/60">
-                <span className="font-display text-xl font-bold text-kintsugi-400">Shopsugiツ</span>
-                <span className="text-warm-400 text-xs ml-1">Backoffice</span>
+            <div className="flex items-center gap-2 px-6 py-5 border-b border-warm-800/60">
+                <span className="font-display text-xl font-bold text-white tracking-tight">
+                    Shopsugi<span className="ml-0.5 text-kintsugi-400">ツ</span>
+                </span>
+                <span className="text-warm-500 text-[10px] uppercase tracking-widest ml-auto font-bold">Admin</span>
             </div>
 
             {/* Navigation */}

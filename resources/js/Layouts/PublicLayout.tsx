@@ -116,8 +116,8 @@ function Header({ cartCount }: { cartCount: number }) {
                 <div className="flex h-16 items-center justify-between gap-4">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 shrink-0 group">
-                        <span className="font-display text-2xl font-bold text-kintsugi-600 tracking-tight">
-                            Shopsugi<span className="inline-block text-kintsugi-400 transition-all duration-300 group-hover:text-kintsugi-500 group-hover:scale-125 group-hover:rotate-6">ツ</span>
+                        <span className="font-display text-2xl font-bold text-warm-800 tracking-tight">
+                            Shopsugi<span className="ml-0.5 inline-block text-kintsugi-500 transition-all duration-300 group-hover:text-kintsugi-600 group-hover:scale-125 group-hover:rotate-6">ツ</span>
                         </span>
                     </Link>
 
