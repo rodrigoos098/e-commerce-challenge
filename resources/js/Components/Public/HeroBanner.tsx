@@ -78,18 +78,13 @@ export default function HeroBanner({
                     </Link>
                 </div>
 
-                {/* Stats — only rendered when real data is available */}
-                {stats && (
-                    <div className="mt-16 inline-flex items-center gap-8 sm:gap-12 border-t border-warm-200 pt-10 animate-fade-up" style={{ animationDelay: '500ms' }}>
-                        <div className="text-center">
-                            <div className="font-display text-3xl sm:text-4xl font-bold text-kintsugi-600">{stats.product_count}</div>
-                            <div className="text-xs sm:text-sm text-warm-400 mt-1">Peças no catálogo</div>
-                        </div>
-                        <div className="h-10 w-px bg-warm-200" aria-hidden="true" />
-                        <div className="text-center">
-                            <div className="font-display text-3xl sm:text-4xl font-bold text-kintsugi-600">{stats.category_count}</div>
-                            <div className="text-xs sm:text-sm text-warm-400 mt-1">Categorias</div>
-                        </div>
+                {/* Stats — integrated naturally into copy as per clarify/anti-patterns guidelines */}
+                {stats && stats.product_count > 0 && (
+                    <div className="mt-16 border-t border-warm-200 pt-8 animate-fade-up" style={{ animationDelay: '500ms' }}>
+                        <p className="text-sm font-medium text-warm-500 sm:text-base">
+                            Explore uma curadoria de <span className="font-bold text-warm-700">{stats.product_count} peças exclusivas</span>{' '}
+                            distribuídas em <span className="font-bold text-warm-700">{stats.category_count} modalidades artesanais</span>.
+                        </p>
                     </div>
                 )}
             </div>
