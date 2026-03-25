@@ -99,14 +99,12 @@ export default function Home({ featured_products, categories, stats }: HomePageP
             <HeroBanner stats={stats} />
 
             {/* ——— Kintsugi divider: hero → categories ——— */}
-            <div className="bg-parchment">
-                <div className="mx-auto max-w-5xl px-8">
-                    <KintsugiDivider className="my-0" />
-                </div>
+            <div className="mx-auto max-w-5xl px-8">
+                <KintsugiDivider className="my-0" />
             </div>
 
             {/* Categories — Issue #3 /arrange: hierarchical layout */}
-            <section className="bg-parchment py-16 sm:py-20" aria-labelledby="categories-heading">
+            <section className="bg-warm-50 py-20 sm:py-28 organic-section-fade" aria-labelledby="categories-heading">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <RevealSection>
                         <div className="flex items-end justify-between mb-10">
@@ -127,7 +125,7 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                                 <RevealSection key={cat.id} delay={idx * 80}>
                                     <Link
                                         href={`/products?category_id=${cat.id}`}
-                                        className="group flex items-center gap-5 rounded-2xl border border-warm-200 bg-warm-50 p-6 sm:p-8 hover:border-kintsugi-200 hover:bg-kintsugi-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                                        className="group flex items-center gap-5 rounded-2xl border border-warm-200 bg-white p-6 sm:p-8 hover:border-kintsugi-200 hover:bg-kintsugi-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                                     >
                                         <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-kintsugi-50 text-kintsugi-500 group-hover:text-kintsugi-600 group-hover:bg-kintsugi-100 transition-colors flex-shrink-0">
                                             {CATEGORY_ICONS[cat.slug] ?? DefaultCategoryIcon}
@@ -155,7 +153,7 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                                 <RevealSection key={cat.id} delay={(featuredCategories.length + idx) * 60}>
                                     <Link
                                         href={`/products?category_id=${cat.id}`}
-                                        className="group flex flex-col items-center gap-2 rounded-xl border border-warm-200 bg-warm-50 p-4 text-center hover:border-kintsugi-200 hover:bg-kintsugi-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                                        className="group flex flex-col items-center gap-2 rounded-xl border border-warm-200 bg-white p-4 text-center hover:border-kintsugi-200 hover:bg-kintsugi-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                                     >
                                         <span className="text-kintsugi-500 group-hover:text-kintsugi-600 transition-colors">
                                             {CATEGORY_ICONS[cat.slug] ?? DefaultCategoryIcon}
@@ -177,7 +175,7 @@ export default function Home({ featured_products, categories, stats }: HomePageP
             </div>
 
             {/* Featured products */}
-            <section className="py-20 sm:py-24" aria-labelledby="featured-heading">
+            <section className="bg-warm-50 py-24 sm:py-32 organic-section-fade" aria-labelledby="featured-heading">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <RevealSection>
                         <div className="flex items-end justify-between mb-12">
@@ -197,14 +195,12 @@ export default function Home({ featured_products, categories, stats }: HomePageP
             </section>
 
             {/* ——— Kintsugi divider: products → features ——— */}
-            <div className="bg-kintsugi-50">
-                <div className="mx-auto max-w-5xl px-8">
-                    <KintsugiDivider className="my-0" />
-                </div>
+            <div className="mx-auto max-w-5xl px-8">
+                <KintsugiDivider className="my-0" />
             </div>
 
             {/* Why us — Issue #4 /clarify: rewritten copy, larger icons, left-aligned */}
-            <section className="bg-kintsugi-50 py-16 sm:py-20" aria-labelledby="features-heading">
+            <section className="bg-warm-50 py-20 sm:py-28 organic-section-fade" aria-labelledby="features-heading">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <RevealSection>
                         <div className="text-center mb-12">

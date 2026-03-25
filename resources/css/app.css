@@ -61,6 +61,8 @@
     width: 100%;
     height: 48px;
     overflow: visible;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 
 .kintsugi-divider path {
@@ -88,6 +90,23 @@
 .reveal-on-scroll.is-visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Organic section fade */
+.organic-section-fade {
+    position: relative;
+}
+
+.organic-section-fade::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to bottom, transparent, var(--color-warm-50));
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* Gold shimmer text accent */
