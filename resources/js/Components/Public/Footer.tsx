@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
+import KintsugiDivider from '@/Components/Shared/KintsugiDivider';
 
 export default function Footer() {
     return (
@@ -60,6 +61,9 @@ export default function Footer() {
                 </div>
 
                 <div className="mt-10 border-t border-warm-700 pt-6 text-center">
+                    <div className="flex justify-center mb-4">
+                        <KintsugiDivider variant="short" className="opacity-30" />
+                    </div>
                     <p className="text-xs text-warm-500">
                         © {new Date().getFullYear()} Shopsugiツ. Todos os direitos reservados.
                     </p>

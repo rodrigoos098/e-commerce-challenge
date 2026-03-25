@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
+import KintsugiDivider from '@/Components/Shared/KintsugiDivider';
 
 interface HeroBannerProps {
     title?: string;
@@ -32,6 +33,10 @@ export default function HeroBanner({
                 <svg className="absolute top-1/3 left-0 w-full h-24 opacity-20" viewBox="0 0 1200 80" preserveAspectRatio="none">
                     <path d="M0,40 C150,10 300,70 450,35 C600,0 750,60 900,30 C1050,0 1150,50 1200,40" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-kintsugi-400" />
                 </svg>
+
+                {/* Kintsugi Corner Accents */}
+                <KintsugiDivider variant="corner" className="top-right" />
+                <KintsugiDivider variant="corner" className="bottom-left" />
             </div>
 
             <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">

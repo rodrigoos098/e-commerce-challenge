@@ -213,12 +213,15 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
                         {FEATURES.map((feature, idx) => (
                             <RevealSection key={feature.title} delay={idx * 120}>
-                                <div className="flex flex-col items-center text-center rounded-2xl bg-white border border-kintsugi-100 p-8 sm:p-10 shadow-sm hover:shadow-md transition-shadow duration-200">
-                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-kintsugi-50 mb-5">
+                                <div className="relative group flex flex-col items-center text-center rounded-2xl bg-white border border-kintsugi-100 p-8 sm:p-10 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                                    {/* Accent Kintsugi crack */}
+                                    <KintsugiDivider variant="corner" className="top-right opacity-[0.08] group-hover:opacity-15 transition-opacity" />
+                                    
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-kintsugi-50 mb-5 relative z-10">
                                         {feature.icon}
                                     </div>
-                                    <h3 className="font-display text-lg font-bold text-warm-700 mb-2">{feature.title}</h3>
-                                    <p className="text-sm text-warm-500 leading-relaxed">{feature.description}</p>
+                                    <h3 className="font-display text-lg font-bold text-warm-700 mb-2 relative z-10">{feature.title}</h3>
+                                    <p className="text-sm text-warm-500 leading-relaxed relative z-10">{feature.description}</p>
                                 </div>
                             </RevealSection>
                         ))}
