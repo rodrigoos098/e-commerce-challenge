@@ -102,3 +102,26 @@ php artisan l5-swagger:generate
 // Error
 { "success": false, "message": "...", "errors": { "field": ["..."] } }
 ```
+
+## Design Context
+
+> Full design spec in `.impeccable.md`. Summary below for quick reference.
+
+**Users:** Presenteadores premium buscando presentes unicos. Emocao: confianca e encantamento.
+
+**Personalidade:** Elegante, Artesanal, Calorosa — sofisticacao com toque humano, como uma galeria acolhedora.
+
+**Estetica:** Warm minimalism + toques organicos + ouro como acento. Refs: Etsy + Aesop. Anti-refs: marketplaces genericos, templates padrao, cores saturadas.
+
+**Cores:** Kintsugi Gold (primary #A67C1F), Warm Neutrals (#FDFAF5 base), cream/parchment. Nunca cinza puro — sempre warm.
+
+**Tipografia:** DM Sans (body) + Playfair Display (headings/display). Headings extrabold, body medium.
+
+**Tema:** Light mode only.
+
+**Principios de design:**
+1. **Warmth over coldness** — tons quentes, bordas suaves, sombras sutis
+2. **Generous breathing room** — espacamento generoso comunica premium
+3. **Gold as punctuation** — ouro como acento, nunca dominante
+4. **Motion with purpose** — animacoes para guiar, nao distrair. Respeitar `prefers-reduced-motion`
+5. **Craft in the details** — cada micro-interacao conta uma historia
