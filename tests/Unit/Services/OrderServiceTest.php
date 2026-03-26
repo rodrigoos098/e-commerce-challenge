@@ -4,9 +4,11 @@ namespace Tests\Unit\Services;
 
 use App\DTOs\OrderDTO;
 use App\Events\OrderCreated;
+use App\Events\StockLow;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Repositories\Contracts\CartRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
@@ -163,6 +165,41 @@ class OrderServiceTest extends TestCase
         $this->makeService($orderRepo, $cartRepo, $productRepo, $stockService)->createFromCart($this->makeDto());
 
         Event::assertDispatched(OrderCreated::class);
+    }
+
+    public function test_create_from_cart_does_not_dispatch_stock_low_when_stock_service_handles_it(): void
+    {
+        Event::fake();
+
+        $product = Product::factory()->make([
+            'id' => 5,
+            'active' => true,
+            'quantity' => 2,
+            'price' => 50.0,
+            'min_quantity' => 2,
+        ]);
+        $cart = $this->makeCart(collect([$this->makeCartItem($product, 1)]));
+        $order = Order::factory()->make(['id' => 100]);
+        $order->setRelation('items', new EloquentCollection([
+            OrderItem::factory()->make(['product_id' => $product->id]),
+        ]));
+
+        $cartRepo = Mockery::mock(CartRepositoryInterface::class);
+        $cartRepo->shouldReceive('findByUserId')->andReturn($cart);
+        $cartRepo->shouldReceive('clear')->once()->andReturn(true);
+
+        $productRepo = Mockery::mock(ProductRepositoryInterface::class);
+        $productRepo->shouldReceive('findByIdsForUpdate')->with([5])->andReturn(new EloquentCollection([$product]));
+
+        $orderRepo = Mockery::mock(OrderRepositoryInterface::class);
+        $orderRepo->shouldReceive('create')->andReturn($order);
+
+        $stockService = Mockery::mock(StockService::class);
+        $stockService->shouldReceive('decreaseStockForLockedProduct')->once()->with($product, 1, 100);
+
+        $this->makeService($orderRepo, $cartRepo, $productRepo, $stockService)->createFromCart($this->makeDto());
+
+        Event::assertNotDispatched(StockLow::class);
     }
 
     public function test_create_from_cart_decreases_stock_synchronously(): void

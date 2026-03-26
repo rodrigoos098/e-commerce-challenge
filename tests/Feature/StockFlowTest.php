@@ -98,6 +98,7 @@ class StockFlowTest extends TestCase
         Event::assertDispatched(StockLow::class, function (StockLow $event) use ($product) {
             return $event->product->id === $product->id;
         });
+        Event::assertDispatched(StockLow::class, 1);
     }
 
     public function test_stock_low_event_not_fired_when_stock_remains_above_minimum(): void

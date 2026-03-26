@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\DTOs\OrderDTO;
 use App\Events\OrderCreated;
-use App\Events\StockLow;
 use App\Models\Order;
 use App\Repositories\Contracts\CartRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
@@ -142,13 +141,6 @@ class OrderService
             $this->cartRepository->clear($cart);
 
             event(new OrderCreated($order));
-
-            foreach ($order->items as $item) {
-                $product = $lockedProducts->get($item->product_id);
-                if ($product && $product->quantity <= $product->min_quantity) {
-                    event(new StockLow($product));
-                }
-            }
 
             return $order;
         });
