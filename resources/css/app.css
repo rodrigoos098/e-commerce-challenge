@@ -131,21 +131,21 @@
     z-index: 1;
 }
 
-/* Gold shimmer text accent */
+/* Gold shimmer text accent — Quieted for elegance */
 .kintsugi-shimmer {
     background: linear-gradient(
-        90deg,
+        110deg,
         var(--color-kintsugi-600) 0%,
-        var(--color-kintsugi-400) 25%,
-        var(--color-kintsugi-700) 50%,
-        var(--color-kintsugi-400) 75%,
+        var(--color-kintsugi-500) 35%,
+        var(--color-kintsugi-300) 50%,
+        var(--color-kintsugi-500) 65%,
         var(--color-kintsugi-600) 100%
     );
-    background-size: 200% auto;
+    background-size: 250% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer 4s linear infinite;
+    animation: shimmer 12s ease-in-out infinite alternate;
 }
 
 /* ——— Reduced motion ————————————————————————————————————— */
