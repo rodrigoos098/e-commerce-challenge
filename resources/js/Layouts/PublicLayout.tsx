@@ -349,10 +349,18 @@ export default function PublicLayout({ children, title, cartCount = 0 }: PublicL
 
     return (
         <div className="min-h-screen flex flex-col bg-warm-50">
+            <div
+                className="pointer-events-none fixed inset-0 z-[9999] h-full w-full opacity-[0.07] mix-blend-multiply"
+                style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                }}
+                aria-hidden="true"
+            />
+
             {/* Skip navigation */}
             <a
                 href="#main-content"
-                className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-2 focus:left-2 focus:rounded-lg focus:bg-kintsugi-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+                className="sr-only focus:not-sr-only focus:absolute focus:z-[10000] focus:top-2 focus:left-2 focus:rounded-lg focus:bg-kintsugi-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
             >
                 Pular para conteúdo
             </a>
