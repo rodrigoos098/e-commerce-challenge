@@ -214,7 +214,7 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                                                 {cat.name}
                                             </span>
                                             {cat.products_count !== undefined && (
-                                                <span className="text-xs text-warm-400 mt-0.5 block">
+                                                <span className="text-xs text-warm-500 mt-0.5 block">
                                                     {cat.products_count} {cat.products_count === 1 ? 'peça' : 'peças'}
                                                 </span>
                                             )}
