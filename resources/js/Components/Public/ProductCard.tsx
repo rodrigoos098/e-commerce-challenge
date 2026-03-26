@@ -7,6 +7,7 @@ import type { Product } from '@/types/public';
 
 interface ProductCardProps {
     product: Product;
+    priority?: boolean;
 }
 
 function StockBadge({ quantity, minQuantity }: { quantity: number; minQuantity: number }) {
@@ -19,7 +20,7 @@ function StockBadge({ quantity, minQuantity }: { quantity: number; minQuantity: 
     return <span className="text-xs font-medium text-green-600">Em estoque</span>;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, priority = false }: ProductCardProps) {
     const [adding, setAdding] = useState(false);
     const { playCartSound } = useCartSound();
 
@@ -60,7 +61,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     const isOutOfStock = product.quantity === 0;
 
     return (
-        <article className="group relative flex flex-col rounded-2xl bg-white border border-warm-100 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 hover:border-warm-200 transition-all duration-300 overflow-hidden">
+        <article className="group relative flex flex-col rounded-2xl bg-white border border-warm-100 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 hover:border-warm-200 transition duration-300 overflow-hidden">
             {/* Image */}
             <Link href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-warm-50 relative">
                 {product.category && (
@@ -77,7 +78,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                     src={product.image_url ?? `/storage/products/${product.id}.webp`}
                     alt={product.name}
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    loading="lazy"
+                    loading={priority ? 'eager' : 'lazy'}
+                    fetchPriority={priority ? 'high' : 'auto'}
                     onError={(e) => {
                         const target = e.currentTarget;
                         target.style.display = 'none';
@@ -126,7 +128,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                         onClick={handleAddToCart}
                         disabled={isOutOfStock || adding}
                         aria-label={adding ? 'Adicionando...' : `Adicionar ${product.name}`}
-                        className="flex h-11 w-11 items-center justify-center rounded-full bg-warm-50 text-warm-600 hover:bg-kintsugi-50 hover:text-kintsugi-600 active:scale-90 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed border border-warm-100 hover:border-kintsugi-200"
+                        className="flex h-11 w-11 items-center justify-center rounded-full bg-warm-50 text-warm-600 hover:bg-kintsugi-50 hover:text-kintsugi-600 active:scale-90 transition duration-300 disabled:opacity-40 disabled:cursor-not-allowed border border-warm-100 hover:border-kintsugi-200"
                         title="Adicionar ao carrinho"
                     >
                         {adding ? (
