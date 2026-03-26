@@ -5,6 +5,8 @@ namespace App\Repositories;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Repositories\Contracts\CartRepositoryInterface;
+use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\QueryException;
 
 class CartRepository implements CartRepositoryInterface
 {
@@ -13,13 +15,37 @@ class CartRepository implements CartRepositoryInterface
      */
     public function findOrCreateForUser(int $userId): Cart
     {
-        /** @var Cart $cart */
-        $cart = Cart::query()->firstOrCreate(
-            ['user_id' => $userId],
-            ['user_id' => $userId]
-        );
+        $cart = $this->findByUserId($userId);
 
-        return $cart->load(['items.product']);
+        if ($cart) {
+            return $cart;
+        }
+
+        try {
+            $cart = $this->createCart($userId);
+        } catch (QueryException $exception) {
+            if (! $this->isUniqueUserCartViolation($exception)) {
+                throw $exception;
+            }
+
+            $cart = $this->findByUserId($userId);
+
+            if ($cart) {
+                return $cart;
+            }
+
+            throw $exception;
+        }
+
+        return $cart->load(['items.product.category']);
+    }
+
+    protected function createCart(int $userId): Cart
+    {
+        /** @var Cart $cart */
+        $cart = Cart::query()->create(['user_id' => $userId]);
+
+        return $cart;
     }
 
     /**
@@ -27,10 +53,23 @@ class CartRepository implements CartRepositoryInterface
      */
     public function findByUserId(int $userId): ?Cart
     {
-        return Cart::query()
+        $carts = Cart::query()
             ->with(['items.product.category'])
             ->where('user_id', $userId)
-            ->first();
+            ->get();
+
+        if ($carts->isEmpty()) {
+            return null;
+        }
+
+        if ($carts->count() > 1) {
+            throw new MultipleRecordsFoundException();
+        }
+
+        /** @var Cart $cart */
+        $cart = $carts->first();
+
+        return $cart;
     }
 
     /**
@@ -93,5 +132,13 @@ class CartRepository implements CartRepositoryInterface
     public function findItemByCartAndProduct(Cart $cart, int $productId): ?CartItem
     {
         return $cart->items()->where('product_id', $productId)->first();
+    }
+
+    protected function isUniqueUserCartViolation(QueryException $exception): bool
+    {
+        $sqlState = $exception->errorInfo[0] ?? null;
+        $driverCode = $exception->errorInfo[1] ?? null;
+
+        return $sqlState === '23000' || $sqlState === '23505' || $driverCode === 19;
     }
 }

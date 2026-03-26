@@ -64,7 +64,13 @@ class CartService
     {
         $product = $this->productRepository->findById($cartItem->product_id);
 
-        if ($product && $product->quantity < $quantity) {
+        if (! $product || ! $product->active) {
+            throw ValidationException::withMessages([
+                'quantity' => ['This cart item is no longer available.'],
+            ]);
+        }
+
+        if ($product->quantity < $quantity) {
             throw ValidationException::withMessages([
                 'quantity' => ["Insufficient stock. Only {$product->quantity} units available."],
             ]);

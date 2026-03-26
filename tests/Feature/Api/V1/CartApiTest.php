@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -155,6 +156,38 @@ class CartApiTest extends TestCase
             ->assertJsonPath('success', false);
     }
 
+    public function test_cannot_update_cart_item_when_product_is_inactive(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create(['quantity' => 20, 'active' => false]);
+        $cart = Cart::factory()->create(['user_id' => $user->id]);
+        $item = CartItem::factory()->create(['cart_id' => $cart->id, 'product_id' => $product->id, 'quantity' => 1]);
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->putJson("/api/v1/cart/items/{$item->id}", ['quantity' => 5]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['errors' => ['quantity']]);
+    }
+
+    public function test_cannot_update_cart_item_when_product_no_longer_exists(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create(['quantity' => 20, 'active' => true]);
+        $cart = Cart::factory()->create(['user_id' => $user->id]);
+        $item = CartItem::factory()->create(['cart_id' => $cart->id, 'product_id' => $product->id, 'quantity' => 1]);
+
+        $product->delete();
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->putJson("/api/v1/cart/items/{$item->id}", ['quantity' => 5]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['errors' => ['quantity']]);
+    }
+
     // ── RemoveItem ────────────────────────────────────────────────────────────
 
     public function test_authenticated_user_can_remove_cart_item(): void
@@ -209,5 +242,16 @@ class CartApiTest extends TestCase
             ->assertJsonPath('success', true);
 
         $this->assertDatabaseMissing('cart_items', ['cart_id' => $cart->id]);
+    }
+
+    public function test_database_allows_only_one_cart_per_user(): void
+    {
+        $user = User::factory()->create();
+
+        Cart::factory()->create(['user_id' => $user->id]);
+
+        $this->expectException(QueryException::class);
+
+        Cart::factory()->create(['user_id' => $user->id]);
     }
 }
