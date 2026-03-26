@@ -128,29 +128,51 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                 <KintsugiDivider className="my-0" />
             </div>
 
-            {/* Why us — Issue #4 /clarify: rewritten copy, larger icons, left-aligned */}
-            <section className="bg-warm-50 py-20 sm:py-28 organic-section-fade" aria-labelledby="features-heading">
+            {/* Why us — Issue #4 /bolder: Asymmetric, heavy typography, staggered list (no cards) */}
+            <section className="bg-warm-50 py-32 sm:py-48 organic-section-fade overflow-hidden" aria-labelledby="features-heading">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <RevealSection>
-                        <div className="text-center mb-12">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Diferenciais</p>
-                            <h2 id="features-heading" className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-warm-700">
-                                A Essência do Feito à Mão
+                        <div className="max-w-4xl mb-24 sm:mb-40">
+                            <h2 id="features-heading" className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold text-warm-800 leading-[1.1] tracking-tight">
+                                A Essência do <span className="text-kintsugi-500">Feito à Mão</span>
                             </h2>
+                            <p className="mt-8 text-xl sm:text-2xl text-warm-500 leading-relaxed max-w-2xl">
+                                Não somos um marketplace convencional. Celebramos a resiliência, o tempo e a dedicação das mãos de quem cria.
+                            </p>
                         </div>
                     </RevealSection>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+
+                    <div className="flex flex-col gap-24 sm:gap-40 relative">
+                        {/* Decorative track line */}
+                        <div className="absolute left-[3rem] sm:left-[4rem] top-0 bottom-0 w-px bg-gradient-to-b from-warm-200 via-kintsugi-200/50 to-warm-200 hidden sm:block opacity-60" />
+
                         {FEATURES.map((feature, idx) => (
-                            <RevealSection key={feature.title} delay={idx * 120}>
-                                <div className="relative group flex flex-col items-center text-center rounded-2xl bg-white border border-warm-100 p-8 sm:p-10 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
-                                    {/* Accent Kintsugi crack */}
-                                    <KintsugiDivider variant="corner" className="top-right opacity-[0.08] group-hover:opacity-15 transition-opacity" />
-                                    
-                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-kintsugi-50 mb-5 relative z-10 transition-colors group-hover:bg-kintsugi-100">
-                                        {feature.icon}
+                            <RevealSection key={feature.title} delay={0} className="relative z-10">
+                                <div className={`flex flex-col sm:flex-row items-start gap-8 sm:gap-24 group ${idx % 2 !== 0 ? 'sm:ml-[15vw]' : ''} ${idx === 2 ? 'sm:ml-[7vw]' : ''}`}>
+                                    {/* Icon / Number anchor */}
+                                    <div className="relative flex-shrink-0">
+                                        {/* Large background number */}
+                                        <div className="text-[10rem] sm:text-[14rem] font-display font-black leading-none text-warm-200/40 select-none absolute top-1/2 -translate-y-1/2 -left-6 sm:-translate-x-1/2 sm:left-1/2 z-0 group-hover:text-kintsugi-200/40 transition-colors duration-700">
+                                            0{idx + 1}
+                                        </div>
+                                        {/* Icon Box */}
+                                        <div className="relative z-10 flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-[2rem] bg-white border border-warm-200 shadow-sm group-hover:border-kintsugi-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_-15px_rgba(166,124,31,0.15)] transition-all duration-500">
+                                            <div className="text-kintsugi-500 transform scale-125 sm:scale-150 group-hover:scale-150 sm:group-hover:scale-[1.7] transition-transform duration-500">
+                                                {feature.icon}
+                                            </div>
+                                            <KintsugiDivider variant="corner" className={`opacity-[0.08] group-hover:opacity-30 transition-opacity duration-500 ${idx % 2 === 0 ? 'top-right' : 'bottom-left'}`} />
+                                        </div>
                                     </div>
-                                    <h3 className="font-display text-lg font-bold text-warm-700 mb-2 relative z-10">{feature.title}</h3>
-                                    <p className="text-sm text-warm-500 leading-relaxed relative z-10">{feature.description}</p>
+                                    
+                                    {/* Text Area */}
+                                    <div className="relative z-10 flex-1 pt-4 sm:pt-6">
+                                        <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-warm-800 mb-6 leading-tight group-hover:text-kintsugi-600 transition-colors duration-500">
+                                            {feature.title}
+                                        </h3>
+                                        <p className="text-lg sm:text-2xl text-warm-500 leading-relaxed max-w-xl">
+                                            {feature.description}
+                                        </p>
+                                    </div>
                                 </div>
                             </RevealSection>
                         ))}
