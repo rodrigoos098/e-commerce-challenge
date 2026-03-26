@@ -143,8 +143,9 @@ class OrderApiTest extends TestCase
         $response = $this->actingAs($customer, 'sanctum')
             ->getJson("/api/v1/orders/{$otherOrder->id}");
 
-        $response->assertStatus(404)
-            ->assertJsonPath('success', false);
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'This action is unauthorized.');
     }
 
     public function test_admin_can_view_any_order(): void
@@ -281,7 +282,9 @@ class OrderApiTest extends TestCase
                 'status' => 'shipped',
             ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'This action is unauthorized.');
     }
 
     public function test_admin_cannot_set_invalid_order_status(): void

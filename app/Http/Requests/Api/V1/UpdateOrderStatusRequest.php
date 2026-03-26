@@ -13,7 +13,13 @@ class UpdateOrderStatusRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->hasRole('admin') ?? false;
+        $order = $this->route('order');
+
+        if (! $order instanceof Order) {
+            return false;
+        }
+
+        return $this->user()?->can('update', $order) ?? false;
     }
 
     /**

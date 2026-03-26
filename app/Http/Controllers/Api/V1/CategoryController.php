@@ -55,7 +55,7 @@ class CategoryController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $category = $this->categoryService->findById($id);
+        $category = $this->categoryService->findPublicById($id);
 
         if (! $category) {
             return $this->notFoundResponse('Category not found.');
@@ -148,12 +148,18 @@ class CategoryController extends Controller
      *     @OA\Response(response=404, description="Categoria não encontrada")
      * )
      */
-    public function products(Request $request, Category $category): JsonResponse
+    public function products(Request $request, int $id): JsonResponse
     {
+        $category = $this->categoryService->findPublicById($id);
+
+        if (! $category) {
+            return $this->notFoundResponse('Category not found.');
+        }
+
         $perPage = (int) $request->input('per_page', 15);
         $filters = array_merge(
             $request->only(['search', 'in_stock', 'min_price', 'max_price', 'sort_by', 'sort_dir']),
-            ['category_id' => $category->id, 'active' => true],
+            ['category_id' => $category->id, 'category_active' => true, 'active' => true],
         );
 
         $products = $this->productService->paginate($filters, $perPage);

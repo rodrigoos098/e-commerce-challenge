@@ -12,6 +12,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderPageController;
 use App\Http\Controllers\ProductPageController;
 use App\Http\Controllers\ProfilePageController;
+use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -50,13 +52,20 @@ Route::middleware('auth')->group(function (): void {
     // Customer area
     Route::prefix('customer')->group(function (): void {
         Route::get('/checkout', [CheckoutPageController::class, 'index'])->name('checkout');
-        Route::get('/orders', [OrderPageController::class, 'index'])->name('orders.index');
-        Route::get('/orders/{order}', [OrderPageController::class, 'show'])->name('orders.show');
-        Route::post('/orders', [OrderPageController::class, 'store'])->name('orders.store');
+        Route::get('/orders', [OrderPageController::class, 'index'])->middleware('can:viewAny,'.Order::class)->name('orders.index');
+        Route::get('/orders/{order}', [OrderPageController::class, 'show'])->middleware('can:view,order')->name('orders.show');
+        Route::post('/orders', [OrderPageController::class, 'store'])->middleware('can:create,'.Order::class)->name('orders.store');
         Route::get('/profile', [ProfilePageController::class, 'index'])->name('profile');
         Route::put('/profile', [ProfilePageController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [ProfilePageController::class, 'updatePassword'])->name('profile.password');
     });
+});
+
+Route::middleware('auth')->prefix('admin')->group(function (): void {
+    Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->middleware('can:update,order')->name('admin.orders.status');
+    Route::post('/products', [AdminProductController::class, 'store'])->middleware('can:create,'.Product::class)->name('admin.products.store');
+    Route::put('/products/{product}', [AdminProductController::class, 'update'])->middleware('can:update,product')->name('admin.products.update');
+    Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->middleware('can:delete,product')->name('admin.products.destroy');
 });
 
 // ── Admin Routes ──────────────────────────────────────────────────────────
@@ -67,11 +76,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function (): v
     // Products CRUD
     Route::get('/products', [AdminProductController::class, 'index'])->name('admin.products.index');
     Route::get('/products/create', [AdminProductController::class, 'create'])->name('admin.products.create');
-    Route::post('/products', [AdminProductController::class, 'store'])->name('admin.products.store');
     Route::get('/products/{product}', [AdminProductController::class, 'show'])->name('admin.products.show');
     Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('admin.products.edit');
-    Route::put('/products/{product}', [AdminProductController::class, 'update'])->name('admin.products.update');
-    Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('admin.products.destroy');
 
     // Categories CRUD
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('admin.categories.index');
@@ -84,7 +90,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function (): v
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
-    Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.status');
 
     // Stock
     Route::get('/stock/low', [AdminStockController::class, 'lowStock'])->name('admin.stock.low');

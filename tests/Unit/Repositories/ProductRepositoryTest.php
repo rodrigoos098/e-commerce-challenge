@@ -56,6 +56,39 @@ class ProductRepositoryTest extends TestCase
         $this->assertCount(1, $result->items());
     }
 
+    public function test_paginate_with_category_filter_includes_deep_descendants(): void
+    {
+        $root = Category::factory()->create();
+        $child = Category::factory()->create(['parent_id' => $root->id]);
+        $grandchild = Category::factory()->create(['parent_id' => $child->id]);
+
+        Product::factory()->create(['category_id' => $grandchild->id, 'name' => 'Deep Product', 'slug' => 'deep-product']);
+        Product::factory()->create(['name' => 'Other Product', 'slug' => 'other-product']);
+
+        $result = $this->repository->paginate(['category_id' => $root->id]);
+
+        $this->assertCount(1, $result->items());
+        $this->assertSame('Deep Product', $result->items()[0]->name);
+    }
+
+    public function test_paginate_with_category_filter_can_exclude_inactive_descendants(): void
+    {
+        $root = Category::factory()->create();
+        $inactiveDescendant = Category::factory()->inactive()->create(['parent_id' => $root->id]);
+        $activeDescendant = Category::factory()->create(['parent_id' => $root->id]);
+
+        Product::factory()->create(['category_id' => $activeDescendant->id, 'name' => 'Visible Product', 'slug' => 'visible-product']);
+        Product::factory()->create(['category_id' => $inactiveDescendant->id, 'name' => 'Hidden Product', 'slug' => 'hidden-product']);
+
+        $result = $this->repository->paginate([
+            'category_id' => $root->id,
+            'category_active' => true,
+        ]);
+
+        $this->assertCount(1, $result->items());
+        $this->assertSame('Visible Product', $result->items()[0]->name);
+    }
+
     public function test_paginate_with_active_filter(): void
     {
         Product::factory()->create(['active' => true]);

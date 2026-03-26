@@ -38,6 +38,8 @@ class OrderController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Order::class);
+
         $perPage = (int) $request->input('per_page', 15);
 
         if ($request->user()->hasRole('admin')) {
@@ -63,17 +65,9 @@ class OrderController extends Controller
      *     @OA\Response(response=404, description="Pedido não encontrado")
      * )
      */
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Order $order): JsonResponse
     {
-        if ($request->user()->hasRole('admin')) {
-            $order = $this->orderService->findById($id);
-        } else {
-            $order = $this->orderService->findByIdForUser($id, $request->user()->id);
-        }
-
-        if (! $order) {
-            return $this->notFoundResponse('Order not found.');
-        }
+        $this->authorize('view', $order);
 
         return $this->successResponse(new OrderResource($order));
     }
@@ -115,6 +109,8 @@ class OrderController extends Controller
      */
     public function store(StoreOrderRequest $request): JsonResponse
     {
+        $this->authorize('create', Order::class);
+
         $order = $this->orderService->createFromCart(OrderDTO::fromRequest($request));
 
         return $this->createdResponse(new OrderResource($order));
@@ -143,6 +139,8 @@ class OrderController extends Controller
      */
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order): JsonResponse
     {
+        $this->authorize('update', $order);
+
         $updated = $this->orderService->updateStatus($order, $request->string('status')->toString());
 
         return $this->successResponse(new OrderResource($updated));

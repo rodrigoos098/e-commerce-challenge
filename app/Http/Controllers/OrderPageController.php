@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DTOs\OrderDTO;
 use App\Http\Resources\Api\V1\OrderResource;
+use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,6 +20,8 @@ class OrderPageController extends Controller
 
     public function index(Request $request): Response
     {
+        $this->authorize('viewAny', Order::class);
+
         $perPage = (int) $request->input('per_page', 15);
         $orders = $this->orderService->paginateForUser($request->user()->id, $perPage);
 
@@ -27,21 +30,19 @@ class OrderPageController extends Controller
         ]);
     }
 
-    public function show(Request $request, int $order): Response
+    public function show(Request $request, Order $order): Response
     {
-        $orderModel = $this->orderService->findByIdForUser($order, $request->user()->id);
-
-        if (! $orderModel) {
-            abort(404);
-        }
+        $this->authorize('view', $order);
 
         return Inertia::render('Customer/Orders/Show', [
-            'order' => (new OrderResource($orderModel))->resolve($request),
+            'order' => (new OrderResource($order))->resolve($request),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Order::class);
+
         $request->validate([
             'shipping_name' => ['required', 'string', 'max:255'],
             'shipping_street' => ['required', 'string', 'max:255'],

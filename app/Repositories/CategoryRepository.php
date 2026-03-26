@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Category;
 use App\Repositories\Contracts\CategoryRepositoryInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class CategoryRepository implements CategoryRepositoryInterface
@@ -13,12 +14,15 @@ class CategoryRepository implements CategoryRepositoryInterface
      */
     public function tree(): Collection
     {
-        return Category::query()
-            ->with(['children.children'])
+        $categories = Category::query()
             ->whereNull('parent_id')
             ->where('active', true)
             ->orderBy('name')
             ->get();
+
+        $this->loadActiveChildrenRecursively($categories);
+
+        return $categories;
     }
 
     /**
@@ -34,7 +38,15 @@ class CategoryRepository implements CategoryRepositoryInterface
      */
     public function findById(int $id): ?Category
     {
-        return Category::query()->with(['parent', 'children'])->find($id);
+        $category = Category::query()->with(['parent'])->find($id);
+
+        if (! $category instanceof Category) {
+            return null;
+        }
+
+        $this->loadActiveChildrenRecursively(new Collection([$category]));
+
+        return $category;
     }
 
     /**
@@ -72,7 +84,11 @@ class CategoryRepository implements CategoryRepositoryInterface
      */
     public function delete(Category $category): bool
     {
-        return (bool) $category->delete();
+        $categoryIds = $this->descendantIdsFor([$category->id]);
+
+        return Category::query()
+            ->whereIn('id', $categoryIds)
+            ->update(['active' => false]) > 0;
     }
 
     /**
@@ -87,5 +103,51 @@ class CategoryRepository implements CategoryRepositoryInterface
         }
 
         return $query->exists();
+    }
+
+    /**
+     * @param  Collection<int, Category>  $categories
+     */
+    private function loadActiveChildrenRecursively(Collection $categories): void
+    {
+        if ($categories->isEmpty()) {
+            return;
+        }
+
+        $categories->load([
+            'children' => function (Builder $query): void {
+                $query->where('active', true)->orderBy('name');
+            },
+        ]);
+
+        $this->loadActiveChildrenRecursively($categories->pluck('children')->flatten());
+    }
+
+    /**
+     * @param  array<int>  $rootIds
+     * @return array<int>
+     */
+    private function descendantIdsFor(array $rootIds): array
+    {
+        $categoryIds = $rootIds;
+        $parentIds = $rootIds;
+
+        while ($parentIds !== []) {
+            $childIds = Category::query()
+                ->whereIn('parent_id', $parentIds)
+                ->pluck('id')
+                ->all();
+
+            $childIds = array_values(array_diff($childIds, $categoryIds));
+
+            if ($childIds === []) {
+                break;
+            }
+
+            $categoryIds = [...$categoryIds, ...$childIds];
+            $parentIds = $childIds;
+        }
+
+        return $categoryIds;
     }
 }

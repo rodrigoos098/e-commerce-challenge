@@ -154,7 +154,10 @@ class ProductApiTest extends TestCase
                 'category_id' => $category->id,
             ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'This action is unauthorized.')
+            ->assertJsonStructure(['success', 'message']);
     }
 
     public function test_admin_can_create_product(): void

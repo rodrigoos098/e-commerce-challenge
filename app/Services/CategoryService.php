@@ -48,13 +48,33 @@ class CategoryService
     }
 
     /**
+     * Find a category by ID for public API responses.
+     */
+    public function findPublicById(int $id): ?Category
+    {
+        $category = $this->categoryRepository->findById($id);
+
+        if (! $category instanceof Category) {
+            return null;
+        }
+
+        if (! $category->active || ! $this->ancestorsAreActive($category)) {
+            return null;
+        }
+
+        return $category;
+    }
+
+    /**
      * Create a new category.
      *
      * @param  array<string, mixed>  $data
      */
     public function create(array $data): Category
     {
-        if (empty($data['slug'])) {
+        if (! empty($data['slug'])) {
+            $data['slug'] = $this->generateUniqueSlug($data['slug']);
+        } else {
             $data['slug'] = $this->generateUniqueSlug($data['name']);
         }
 
@@ -73,6 +93,14 @@ class CategoryService
     {
         if (! empty($data['slug'])) {
             $data['slug'] = $this->generateUniqueSlug($data['slug'], $category->id);
+        } elseif (array_key_exists('slug', $data)) {
+            if (isset($data['name']) && $data['name'] !== $category->name) {
+                $data['slug'] = $this->generateUniqueSlug($data['name'], $category->id);
+            } else {
+                unset($data['slug']);
+            }
+        } elseif (isset($data['name']) && $data['name'] !== $category->name) {
+            $data['slug'] = $this->generateUniqueSlug($data['name'], $category->id);
         }
 
         $updated = $this->categoryRepository->update($category, $data);
@@ -115,6 +143,24 @@ class CategoryService
     private function slugExists(string $slug, ?int $exceptId = null): bool
     {
         return $this->categoryRepository->slugExists($slug, $exceptId);
+    }
+
+    /**
+     * Determine whether every ancestor in the category chain is active.
+     */
+    private function ancestorsAreActive(Category $category): bool
+    {
+        $currentCategory = $category;
+
+        while ($currentCategory->parent instanceof Category) {
+            if (! $currentCategory->parent->active) {
+                return false;
+            }
+
+            $currentCategory = $currentCategory->parent;
+        }
+
+        return true;
     }
 
     /**

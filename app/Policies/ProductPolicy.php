@@ -48,6 +48,14 @@ class ProductPolicy
     }
 
     /**
+     * Determine whether the user can view low-stock products.
+     */
+    public function viewLowStock(User $user): bool
+    {
+        return $user->hasRole('admin');
+    }
+
+    /**
      * Determine whether the user can restore the model.
      */
     public function restore(User $user, Product $product): bool

@@ -62,7 +62,9 @@ class ProductService
     {
         $data = $dto->toArray();
 
-        if (empty($data['slug'])) {
+        if (! empty($data['slug'])) {
+            $data['slug'] = $this->generateUniqueSlug($data['slug']);
+        } else {
             $data['slug'] = $this->generateUniqueSlug($data['name']);
         }
 
@@ -92,6 +94,14 @@ class ProductService
 
         if (! empty($data['slug'])) {
             $data['slug'] = $this->generateUniqueSlug($data['slug'], $product->id);
+        } elseif (array_key_exists('slug', $data)) {
+            if (isset($data['name']) && $data['name'] !== $product->name) {
+                $data['slug'] = $this->generateUniqueSlug($data['name'], $product->id);
+            } else {
+                unset($data['slug']);
+            }
+        } elseif (isset($data['name']) && $data['name'] !== $product->name) {
+            $data['slug'] = $this->generateUniqueSlug($data['name'], $product->id);
         }
 
         $updated = $this->productRepository->update($product, $data);

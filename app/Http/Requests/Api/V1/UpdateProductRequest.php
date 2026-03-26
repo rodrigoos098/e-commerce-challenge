@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Models\Product;
 use App\Rules\UniqueSlug;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,13 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->hasRole('admin') ?? false;
+        $product = $this->route('product');
+
+        if (! $product instanceof Product) {
+            return false;
+        }
+
+        return $this->user()?->can('update', $product) ?? false;
     }
 
     /**

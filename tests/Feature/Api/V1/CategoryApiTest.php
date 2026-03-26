@@ -95,6 +95,68 @@ class CategoryApiTest extends TestCase
             ->assertJsonStructure(['success', 'message']);
     }
 
+    public function test_guest_cannot_view_inactive_category(): void
+    {
+        $category = Category::factory()->inactive()->create();
+
+        $response = $this->getJson("/api/v1/categories/{$category->id}");
+
+        $response->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_guest_cannot_view_active_category_when_an_ancestor_is_inactive(): void
+    {
+        $inactiveParent = Category::factory()->inactive()->create();
+        $category = Category::factory()->create(['parent_id' => $inactiveParent->id, 'active' => true]);
+
+        $response = $this->getJson("/api/v1/categories/{$category->id}");
+
+        $response->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_guest_view_single_category_hides_inactive_children(): void
+    {
+        $category = Category::factory()->create();
+        $activeChild = Category::factory()->create(['parent_id' => $category->id, 'active' => true]);
+        Category::factory()->inactive()->create(['parent_id' => $category->id]);
+
+        $response = $this->getJson("/api/v1/categories/{$category->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data.children')
+            ->assertJsonPath('data.children.0.id', $activeChild->id);
+    }
+
+    public function test_guest_view_single_category_excludes_inactive_child_branch_even_with_active_grandchildren(): void
+    {
+        $category = Category::factory()->create(['active' => true]);
+        $activeChild = Category::factory()->create(['parent_id' => $category->id, 'active' => true]);
+        $inactiveChild = Category::factory()->inactive()->create(['parent_id' => $category->id]);
+        Category::factory()->create(['parent_id' => $inactiveChild->id, 'active' => true]);
+
+        $response = $this->getJson("/api/v1/categories/{$category->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data.children')
+            ->assertJsonPath('data.children.0.id', $activeChild->id);
+
+        $this->assertNotContains($inactiveChild->id, collect($response->json('data.children'))->pluck('id')->all());
+    }
+
+    public function test_guest_cannot_view_active_category_when_a_higher_ancestor_is_inactive(): void
+    {
+        $inactiveAncestor = Category::factory()->inactive()->create();
+        $activeParent = Category::factory()->create(['parent_id' => $inactiveAncestor->id, 'active' => true]);
+        $category = Category::factory()->create(['parent_id' => $activeParent->id, 'active' => true]);
+
+        $response = $this->getJson("/api/v1/categories/{$category->id}");
+
+        $response->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
+
     // ── Store (admin) ─────────────────────────────────────────────────────────
 
     public function test_guest_cannot_create_category(): void
@@ -111,7 +173,10 @@ class CategoryApiTest extends TestCase
         $response = $this->actingAs($customer, 'sanctum')
             ->postJson('/api/v1/categories', ['name' => 'Nova Categoria']);
 
-        $response->assertStatus(403);
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Forbidden. Insufficient permissions.')
+            ->assertJsonStructure(['success', 'message']);
     }
 
     public function test_admin_can_create_category(): void
@@ -183,7 +248,10 @@ class CategoryApiTest extends TestCase
         $response = $this->actingAs($customer, 'sanctum')
             ->putJson("/api/v1/categories/{$category->id}", ['name' => 'Novo Nome']);
 
-        $response->assertStatus(403);
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Forbidden. Insufficient permissions.')
+            ->assertJsonStructure(['success', 'message']);
     }
 
     public function test_admin_can_update_category(): void
@@ -238,13 +306,18 @@ class CategoryApiTest extends TestCase
         $response = $this->actingAs($customer, 'sanctum')
             ->deleteJson("/api/v1/categories/{$category->id}");
 
-        $response->assertStatus(403);
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Forbidden. Insufficient permissions.')
+            ->assertJsonStructure(['success', 'message']);
     }
 
     public function test_admin_can_delete_category(): void
     {
         $admin = $this->createAdmin();
         $category = Category::factory()->create();
+        $child = Category::factory()->create(['parent_id' => $category->id]);
+        $product = Product::factory()->create(['category_id' => $child->id]);
 
         $response = $this->actingAs($admin, 'sanctum')
             ->deleteJson("/api/v1/categories/{$category->id}");
@@ -252,7 +325,9 @@ class CategoryApiTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('success', true);
 
-        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+        $this->assertDatabaseHas('categories', ['id' => $category->id, 'active' => false]);
+        $this->assertDatabaseHas('categories', ['id' => $child->id, 'active' => false]);
+        $this->assertDatabaseHas('products', ['id' => $product->id, 'category_id' => $child->id]);
     }
 
     // ── Products by Category ──────────────────────────────────────────────────
@@ -277,6 +352,39 @@ class CategoryApiTest extends TestCase
         $response = $this->getJson('/api/v1/categories/9999/products');
 
         $response->assertStatus(404);
+    }
+
+    public function test_products_by_category_returns_404_for_inactive_category(): void
+    {
+        $category = Category::factory()->inactive()->create();
+
+        $response = $this->getJson("/api/v1/categories/{$category->id}/products");
+
+        $response->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_products_by_category_returns_404_when_an_ancestor_is_inactive(): void
+    {
+        $inactiveParent = Category::factory()->inactive()->create();
+        $category = Category::factory()->create(['parent_id' => $inactiveParent->id, 'active' => true]);
+
+        $response = $this->getJson("/api/v1/categories/{$category->id}/products");
+
+        $response->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_products_by_category_returns_404_when_a_higher_ancestor_is_inactive(): void
+    {
+        $inactiveAncestor = Category::factory()->inactive()->create();
+        $activeParent = Category::factory()->create(['parent_id' => $inactiveAncestor->id, 'active' => true]);
+        $category = Category::factory()->create(['parent_id' => $activeParent->id, 'active' => true]);
+
+        $response = $this->getJson("/api/v1/categories/{$category->id}/products");
+
+        $response->assertStatus(404)
+            ->assertJsonPath('success', false);
     }
 
     public function test_products_by_category_can_be_searched(): void
@@ -311,5 +419,67 @@ class CategoryApiTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertCount(5, $response->json('data'));
+    }
+
+    public function test_products_by_category_include_only_active_deep_descendants(): void
+    {
+        $root = Category::factory()->create();
+        $child = Category::factory()->create(['parent_id' => $root->id]);
+        $grandchild = Category::factory()->create(['parent_id' => $child->id]);
+        $inactiveDescendant = Category::factory()->inactive()->create(['parent_id' => $child->id]);
+
+        Product::factory()->create([
+            'category_id' => $root->id,
+            'name' => 'Root Product',
+            'slug' => 'root-product',
+            'active' => true,
+        ]);
+        Product::factory()->create([
+            'category_id' => $grandchild->id,
+            'name' => 'Deep Product',
+            'slug' => 'deep-product',
+            'active' => true,
+        ]);
+        Product::factory()->create([
+            'category_id' => $inactiveDescendant->id,
+            'name' => 'Hidden Product',
+            'slug' => 'hidden-product',
+            'active' => true,
+        ]);
+
+        $response = $this->getJson("/api/v1/categories/{$root->id}/products");
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->json('data'));
+        $this->assertSame(['Deep Product', 'Root Product'], collect($response->json('data'))->pluck('name')->sort()->values()->all());
+    }
+
+    public function test_products_by_category_excludes_products_from_active_descendants_inside_inactive_branch(): void
+    {
+        $root = Category::factory()->create(['active' => true]);
+        $activeChild = Category::factory()->create(['parent_id' => $root->id, 'active' => true]);
+        $inactiveChild = Category::factory()->inactive()->create(['parent_id' => $root->id]);
+        $activeGrandchildOfInactiveChild = Category::factory()->create([
+            'parent_id' => $inactiveChild->id,
+            'active' => true,
+        ]);
+
+        Product::factory()->create([
+            'category_id' => $activeChild->id,
+            'name' => 'Visible Product',
+            'slug' => 'visible-product',
+            'active' => true,
+        ]);
+        Product::factory()->create([
+            'category_id' => $activeGrandchildOfInactiveChild->id,
+            'name' => 'Hidden Branch Product',
+            'slug' => 'hidden-branch-product',
+            'active' => true,
+        ]);
+
+        $response = $this->getJson("/api/v1/categories/{$root->id}/products");
+
+        $response->assertStatus(200);
+        $this->assertSame(['Visible Product'], collect($response->json('data'))->pluck('name')->all());
     }
 }
