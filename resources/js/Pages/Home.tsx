@@ -98,7 +98,7 @@ export default function Home({ featured_products, categories, stats }: HomePageP
     return (
         <PublicLayout title="Início">
             {/* Hero */}
-            <HeroBanner stats={stats} />
+            <HeroBanner stats={stats} products={featured_products} />
 
             {/* ——— Kintsugi divider: hero → categories ——— */}
             <div className="mx-auto max-w-5xl px-8">

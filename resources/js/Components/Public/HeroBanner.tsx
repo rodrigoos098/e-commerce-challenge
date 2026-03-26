@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import KintsugiDivider from '@/Components/Shared/KintsugiDivider';
+import KintsugiConstellation from '@/Components/Public/KintsugiConstellation';
+import type { Product } from '@/types/shared';
 
 interface HeroBannerProps {
     title?: string;
@@ -11,6 +13,7 @@ interface HeroBannerProps {
         product_count: number;
         category_count: number;
     };
+    products?: Product[];
 }
 
 export default function HeroBanner({
@@ -19,6 +22,7 @@ export default function HeroBanner({
     ctaLabel = 'Explorar a Coleção',
     ctaHref = '/products',
     stats,
+    products,
 }: HeroBannerProps) {
     // Split title to apply shimmer to the second line
     const titleLines = title.split('\n');
@@ -83,6 +87,16 @@ export default function HeroBanner({
                     )}
                 </div>
             </div>
+
+            {/* Floating product photos constellation — right side, xl+ only */}
+            {products && products.length > 0 && (
+                <div
+                    className="absolute inset-y-0 right-0 hidden xl:block pointer-events-none"
+                    style={{ width: '35%', maxWidth: '500px' }}
+                >
+                    <KintsugiConstellation products={products.filter(p => p.image_url).slice(0, 6)} />
+                </div>
+            )}
         </section>
     );
 }
