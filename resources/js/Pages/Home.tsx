@@ -98,95 +98,13 @@ export default function Home({ featured_products, categories, stats }: HomePageP
             {/* Hero */}
             <HeroBanner stats={stats} />
 
-            {/* ——— Kintsugi divider: hero → featured ——— */}
+            {/* ——— Kintsugi divider: hero → categories ——— */}
             <div className="mx-auto max-w-5xl px-8">
                 <KintsugiDivider className="my-0" />
             </div>
 
-            {/* Featured products */}
-            <section className="bg-warm-50 py-24 sm:py-32 organic-section-fade" aria-labelledby="featured-heading">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <RevealSection>
-                        <div className="flex items-end justify-between mb-12">
-                            <div>
-                                <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Selecionados</p>
-                                <h2 id="featured-heading" className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-warm-700">Peças em Destaque</h2>
-                            </div>
-                            <Link href="/products" className="text-sm font-semibold text-kintsugi-500 hover:text-kintsugi-600 transition-colors">
-                                Ver todos →
-                            </Link>
-                        </div>
-                    </RevealSection>
-                    <RevealSection delay={100}>
-                        <ProductGrid products={featured_products.slice(0, 8)} />
-                    </RevealSection>
-                </div>
-            </section>
-
-            {/* ——— Kintsugi divider: products → features ——— */}
-            <div className="mx-auto max-w-5xl px-8">
-                <KintsugiDivider className="my-0" />
-            </div>
-
-            {/* Why us — Issue #4 /bolder: Asymmetric, heavy typography, staggered list (no cards) */}
-            <section className="bg-warm-50 py-32 sm:py-48 organic-section-fade overflow-hidden" aria-labelledby="features-heading">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <RevealSection>
-                        <div className="max-w-4xl mb-24 sm:mb-40">
-                            <h2 id="features-heading" className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold text-warm-800 leading-[1.1] tracking-tight">
-                                A Essência do <span className="text-kintsugi-500">Feito à Mão</span>
-                            </h2>
-                            <p className="mt-8 text-xl sm:text-2xl text-warm-500 leading-relaxed max-w-2xl">
-                                Não somos um marketplace convencional. Celebramos a resiliência, o tempo e a dedicação das mãos de quem cria.
-                            </p>
-                        </div>
-                    </RevealSection>
-
-                    <div className="flex flex-col gap-24 sm:gap-40 relative">
-                        {/* Decorative track line */}
-                        <div className="absolute left-[3rem] sm:left-[4rem] top-0 bottom-0 w-px bg-gradient-to-b from-warm-200 via-kintsugi-200/50 to-warm-200 hidden sm:block opacity-60" />
-
-                        {FEATURES.map((feature, idx) => (
-                            <RevealSection key={feature.title} delay={0} className="relative z-10">
-                                <div className={`flex flex-col sm:flex-row items-start gap-8 sm:gap-24 group ${idx % 2 !== 0 ? 'sm:ml-[15vw]' : ''} ${idx === 2 ? 'sm:ml-[7vw]' : ''}`}>
-                                    {/* Icon / Number anchor */}
-                                    <div className="relative flex-shrink-0">
-                                        {/* Large background number */}
-                                        <div className="text-[10rem] sm:text-[14rem] font-display font-black leading-none text-warm-200/40 select-none absolute top-1/2 -translate-y-1/2 -left-6 sm:-translate-x-1/2 sm:left-1/2 z-0 group-hover:text-kintsugi-200/40 transition-colors duration-700">
-                                            0{idx + 1}
-                                        </div>
-                                        {/* Icon Box */}
-                                        <div className="relative z-10 flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-[2rem] bg-white border border-warm-200 shadow-sm group-hover:border-kintsugi-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_-15px_rgba(166,124,31,0.15)] transition-all duration-500">
-                                            <div className="text-kintsugi-500 transform scale-125 sm:scale-150 group-hover:scale-150 sm:group-hover:scale-[1.7] transition-transform duration-500">
-                                                {feature.icon}
-                                            </div>
-                                            <KintsugiDivider variant="corner" className={`opacity-[0.08] group-hover:opacity-30 transition-opacity duration-500 ${idx % 2 === 0 ? 'top-right' : 'bottom-left'}`} />
-                                        </div>
-                                    </div>
-                                    
-                                    {/* Text Area */}
-                                    <div className="relative z-10 flex-1 pt-4 sm:pt-6">
-                                        <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-warm-800 mb-6 leading-tight group-hover:text-kintsugi-600 transition-colors duration-500">
-                                            {feature.title}
-                                        </h3>
-                                        <p className="text-lg sm:text-2xl text-warm-500 leading-relaxed max-w-xl">
-                                            {feature.description}
-                                        </p>
-                                    </div>
-                                </div>
-                            </RevealSection>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ——— Kintsugi divider: features → categories ——— */}
-            <div className="mx-auto max-w-5xl px-8">
-                <KintsugiDivider />
-            </div>
-
-            {/* Categories — Issue #3 /arrange: hierarchical layout */}
-            <section className="bg-warm-50 py-20 sm:py-28 organic-section-fade" aria-labelledby="categories-heading">
+            {/* Categories — Promovido para primeira seção pelo @/arrange */}
+            <section className="bg-warm-50 py-12 sm:py-16 organic-section-fade" aria-labelledby="categories-heading">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <RevealSection>
                         <div className="flex items-end justify-between mb-10">
@@ -204,7 +122,7 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                                 <RevealSection key={cat.id} delay={idx * 80}>
                                     <Link
                                         href={`/products?category_id=${cat.id}`}
-                                        className="group flex items-center gap-5 rounded-2xl border border-warm-200 bg-white p-6 sm:p-8 hover:border-kintsugi-200 hover:bg-kintsugi-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                                        className="group flex items-center gap-5 rounded-2xl border border-warm-200 bg-white p-6 sm:p-8 hover:border-kintsugi-200 hover:bg-kintsugi-50 transition-all duration-200 hover:-translate-y-0.5"
                                     >
                                         <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-kintsugi-50 text-kintsugi-500 group-hover:text-kintsugi-600 group-hover:bg-kintsugi-100 transition-colors flex-shrink-0">
                                             {CATEGORY_ICONS[cat.slug] ?? DefaultCategoryIcon}
@@ -232,7 +150,7 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                                 <RevealSection key={cat.id} delay={(featuredCategories.length + idx) * 60}>
                                     <Link
                                         href={`/products?category_id=${cat.id}`}
-                                        className="group flex flex-col items-center gap-2 rounded-xl border border-warm-200 bg-white p-4 text-center hover:border-kintsugi-200 hover:bg-kintsugi-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                                        className="group flex flex-col items-center gap-2 rounded-xl border border-warm-200 bg-white p-4 text-center hover:border-kintsugi-200 hover:bg-kintsugi-50 transition-all duration-200 hover:-translate-y-0.5"
                                     >
                                         <span className="text-kintsugi-500 group-hover:text-kintsugi-600 transition-colors">
                                             {CATEGORY_ICONS[cat.slug] ?? DefaultCategoryIcon}
@@ -248,8 +166,77 @@ export default function Home({ featured_products, categories, stats }: HomePageP
                 </div>
             </section>
 
+            {/* ——— Kintsugi divider: categories → featured ——— */}
+            <div className="mx-auto max-w-5xl px-8">
+                <KintsugiDivider className="my-0" />
+            </div>
+
+            {/* Featured products */}
+            <section className="bg-cream py-12 sm:py-16 organic-section-fade" aria-labelledby="featured-heading">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <RevealSection>
+                        <div className="flex items-end justify-between mb-12">
+                            <div>
+                                <p className="text-xs font-semibold uppercase tracking-widest text-kintsugi-500 mb-1">Selecionados</p>
+                                <h2 id="featured-heading" className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-warm-700">Peças em Destaque</h2>
+                            </div>
+                            <Link href="/products" className="text-sm font-semibold text-kintsugi-500 hover:text-kintsugi-600 transition-colors">
+                                Ver todos →
+                            </Link>
+                        </div>
+                    </RevealSection>
+                    <RevealSection delay={100}>
+                        <ProductGrid products={featured_products.slice(0, 8)} />
+                    </RevealSection>
+                </div>
+            </section>
+
+            {/* ——— Kintsugi divider: products → features ——— */}
+            <div className="mx-auto max-w-5xl px-8">
+                <KintsugiDivider className="my-0" />
+            </div>
+
+            {/* Why us — Issue #3 /arrange: Compact grid instead of massive vertical gaps */}
+            <section className="bg-warm-50 py-12 sm:py-16 organic-section-fade overflow-hidden" aria-labelledby="features-heading">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <RevealSection>
+                        <div className="max-w-3xl mb-12 sm:mb-16">
+                            <h2 id="features-heading" className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-warm-800 leading-tight tracking-tight">
+                                A Essência do <span className="text-kintsugi-500">Feito à Mão</span>
+                            </h2>
+                            <p className="mt-6 text-xl text-warm-500 leading-relaxed">
+                                Não somos um marketplace convencional. Celebramos a resiliência, o tempo e a dedicação das mãos de quem cria.
+                            </p>
+                        </div>
+                    </RevealSection>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
+                        {FEATURES.map((feature, idx) => (
+                            <RevealSection key={feature.title} delay={idx * 100}>
+                                <div className="flex flex-col items-start gap-6 group">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white border border-warm-200 shadow-sm group-hover:border-kintsugi-300 group-hover:-translate-y-1 transition-all duration-500">
+                                        <div className="text-kintsugi-500 transform group-hover:scale-110 transition-transform duration-500">
+                                            {feature.icon}
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="font-display text-2xl font-extrabold text-warm-800 mb-3 leading-tight group-hover:text-kintsugi-600 transition-colors duration-500">
+                                            {feature.title}
+                                        </h3>
+                                        <p className="text-lg text-warm-500 leading-relaxed">
+                                            {feature.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            </RevealSection>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* CTA bottom */}
-            <section className="bg-warm-800 py-16 sm:py-20">
+            <section className="bg-warm-800 py-12 sm:py-16">
                 <RevealSection>
                     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
                         <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-4">

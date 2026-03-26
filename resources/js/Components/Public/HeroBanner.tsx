@@ -24,7 +24,7 @@ export default function HeroBanner({
     const titleLines = title.split('\n');
 
     return (
-        <section className="relative overflow-hidden bg-cream py-24 sm:py-32 lg:py-40">
+        <section className="relative overflow-hidden bg-cream py-16 sm:py-20 lg:py-24">
             {/* Background: organic kintsugi-inspired decorative cracks */}
             <div className="pointer-events-none absolute inset-0" aria-hidden="true">
                 {/* Diagonal decorative gold line — subtle organic feel */}

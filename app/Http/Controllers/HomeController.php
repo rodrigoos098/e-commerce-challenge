@@ -23,13 +23,21 @@ class HomeController extends Controller
         $featuredProducts = $this->productService->paginate(['active' => true, 'in_stock' => true], 8);
         $categories = $this->categoryService->tree();
 
-        // Add product counts for homepage category cards
+        // Add product counts for homepage category cards, including subcategories
         $categoryModels = \App\Models\Category::query()
             ->where('active', true)
             ->whereNull('parent_id')
-            ->withCount('products')
-            ->orderByDesc('products_count')
-            ->get();
+            ->with(['children' => function ($query) {
+                $query->withCount(['products' => fn ($q) => $q->where('active', true)]);
+            }])
+            ->withCount(['products' => fn ($q) => $q->where('active', true)])
+            ->get()
+            ->map(function ($cat) {
+                $cat->total_products_count = $cat->products_count + $cat->children->sum('products_count');
+                return $cat;
+            })
+            ->sortByDesc('total_products_count')
+            ->values();
 
         return Inertia::render('Home', [
             'featured_products' => ProductResource::collection($featuredProducts->items())->toArray($request),
@@ -37,7 +45,7 @@ class HomeController extends Controller
                 'id' => $cat->id,
                 'name' => $cat->name,
                 'slug' => $cat->slug,
-                'products_count' => $cat->products_count,
+                'products_count' => $cat->total_products_count, // Use total included children
             ])->toArray(),
             'stats' => [
                 'product_count' => Product::query()->where('active', true)->count(),
