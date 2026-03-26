@@ -15,8 +15,8 @@ interface HeroBannerProps {
 
 export default function HeroBanner({
     title = 'Beleza nas imperfeições.\nArte em cada detalhe.',
-    subtitle = 'Descubra peças únicas feitas à mão por artesãos independentes. Cerâmicas, têxteis, joias e muito mais.',
-    ctaLabel = 'Explorar Coleção',
+    subtitle = 'Sinta a textura dos encontros e a reverência de quem cria. Uma seleção criteriosa de utilitários e obras que ganham vida longe da produção em massa.',
+    ctaLabel = 'Explorar a Coleção',
     ctaHref = '/products',
     stats,
 }: HeroBannerProps) {
@@ -41,7 +41,7 @@ export default function HeroBanner({
                 <div className="max-w-3xl">
                     {/* Badge */}
                     <span className="mb-6 block text-sm font-semibold tracking-widest text-kintsugi-600 uppercase animate-fade-up">
-                        Feito à Mão no Brasil
+                        Ofício Artesanal • Brasil
                     </span>
 
                     {/* Title with asymmetrical scale and line-height */}
@@ -70,20 +70,14 @@ export default function HeroBanner({
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
                         </Link>
-                        <Link
-                            href="/register"
-                            className="inline-flex items-center justify-center gap-2 rounded-full border border-warm-200 bg-transparent px-8 py-4 text-sm font-semibold text-warm-700 hover:bg-warm-50 transition duration-200"
-                        >
-                            Criar conta grátis
-                        </Link>
                     </div>
 
                     {/* Stats — integrated naturally into copy with deep separation */}
                     {stats && stats.product_count > 0 && (
-                        <div className="mt-20 border-l-2 border-kintsugi-200 pl-6 animate-fade-up" style={{ animationDelay: '500ms' }}>
-                            <p className="text-sm font-medium text-warm-500 sm:text-base max-w-md">
-                                Explore uma curadoria de <span className="font-bold text-warm-700">{stats.product_count} peças exclusivas</span>{' '}
-                                distribuídas em <span className="font-bold text-warm-700">{stats.category_count} modalidades artesanais</span>.
+                        <div className="mt-20 border-l-2 border-kintsugi-200/70 pl-6 animate-fade-up" style={{ animationDelay: '500ms' }}>
+                            <p className="text-sm font-medium text-warm-600 sm:text-base max-w-sm leading-relaxed">
+                                Abrigando atualmente <span className="font-bold text-warm-900">{stats.product_count} obras de autor</span>,{' '}
+                                cultivadas através de <span className="font-bold text-warm-900">{stats.category_count} saberes artesanais</span>.
                             </p>
                         </div>
                     )}
