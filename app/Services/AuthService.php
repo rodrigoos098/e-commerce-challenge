@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Traits\LogsActivity;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -76,6 +77,17 @@ class AuthService
      */
     public function logout(User $user): void
     {
+        $request = request();
+
+        if ($request->hasSession()) {
+            foreach ((array) config('sanctum.guard', ['web']) as $guard) {
+                Auth::guard($guard)->logout();
+            }
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
         $user->currentAccessToken()?->delete();
 
         $this->logActivity('auth', 'User logged out', [
