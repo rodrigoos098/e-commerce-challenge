@@ -63,7 +63,7 @@ class CartRepository implements CartRepositoryInterface
         }
 
         if ($carts->count() > 1) {
-            throw new MultipleRecordsFoundException();
+            throw new MultipleRecordsFoundException($carts->count());
         }
 
         /** @var Cart $cart */

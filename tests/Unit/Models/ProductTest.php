@@ -92,7 +92,7 @@ class ProductTest extends TestCase
         ]);
 
         $product = Product::factory()->create([
-            'name' => 'Produto Teste Incrivel',
+            'name' => 'Produto Teste Incrível',
             'slug' => '',
         ]);
 
@@ -121,7 +121,7 @@ class ProductTest extends TestCase
     public function test_slug_is_updated_uniquely_when_name_changes_without_explicit_slug(): void
     {
         Product::factory()->create([
-            'name' => 'Produto Alterado',
+            'name' => 'Produto Alterado!!!',
             'slug' => 'produto-alterado',
         ]);
 
@@ -299,7 +299,7 @@ class ProductTest extends TestCase
         $deletedProduct->delete();
 
         $replacementProduct = Product::factory()->create([
-            'name' => 'Produto Arquivado',
+            'name' => 'Produto Arquivado!!!',
             'slug' => '',
         ]);
 

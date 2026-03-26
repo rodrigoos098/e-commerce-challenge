@@ -7,6 +7,7 @@ use App\Traits\LogsActivity;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthService
 {
@@ -78,17 +79,25 @@ class AuthService
     public function logout(User $user): void
     {
         $request = request();
+        $bearerToken = $request->bearerToken();
 
-        if ($request->hasSession()) {
+        if ($bearerToken) {
+            $token = PersonalAccessToken::findToken($bearerToken);
+
+            if ($token instanceof PersonalAccessToken) {
+                $token->delete();
+            }
+        } elseif ($request->hasSession()) {
             foreach ((array) config('sanctum.guard', ['web']) as $guard) {
                 Auth::guard($guard)->logout();
             }
 
+            $request->session()->flush();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
         }
 
-        $user->currentAccessToken()?->delete();
+        Auth::forgetGuards();
 
         $this->logActivity('auth', 'User logged out', [
             'logout_user_id' => $user->id,

@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Category;
 use App\Repositories\Contracts\CategoryRepositoryInterface;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class CategoryRepository implements CategoryRepositoryInterface
@@ -115,12 +114,12 @@ class CategoryRepository implements CategoryRepositoryInterface
         }
 
         $categories->load([
-            'children' => function (Builder $query): void {
+            'children' => function ($query): void {
                 $query->where('active', true)->orderBy('name');
             },
         ]);
 
-        $this->loadActiveChildrenRecursively($categories->pluck('children')->flatten());
+        $this->loadActiveChildrenRecursively(new Collection($categories->pluck('children')->flatten()->all()));
     }
 
     /**

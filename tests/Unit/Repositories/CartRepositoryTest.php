@@ -74,6 +74,7 @@ class CartRepositoryTest extends TestCase
         $previous->errorInfo = ['23000', 19, 'UNIQUE constraint failed: carts.user_id'];
 
         return new QueryException(
+            'mysql',
             'insert into "carts" ("user_id") values (?)',
             [1],
             $previous,

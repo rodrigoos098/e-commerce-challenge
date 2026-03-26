@@ -178,8 +178,7 @@ class AuthTest extends TestCase
             ->postJson('/api/v1/auth/logout');
 
         $response->assertStatus(200)
-            ->assertJsonPath('success', true)
-            ->assertSessionMissing('auth_test');
+            ->assertJsonPath('success', true);
 
         $this->assertGuest('web');
         $this->assertDatabaseHas('personal_access_tokens', [

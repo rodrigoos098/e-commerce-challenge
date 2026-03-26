@@ -69,6 +69,8 @@ class OrderController extends Controller
     {
         $this->authorize('view', $order);
 
+        $order->loadMissing(['items.product', 'user']);
+
         return $this->successResponse(new OrderResource($order));
     }
 

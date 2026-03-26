@@ -13,7 +13,10 @@ return new class () extends Migration {
     public function up(): void
     {
         $this->mergeDuplicateUserCarts();
-        $this->dropUserIdIndexes(unique: false);
+
+        if (DB::getDriverName() !== 'mysql') {
+            $this->dropUserIdIndexes(unique: false);
+        }
 
         if (! $this->hasUserIdIndex(unique: true)) {
             Schema::table('carts', function (Blueprint $table): void {
