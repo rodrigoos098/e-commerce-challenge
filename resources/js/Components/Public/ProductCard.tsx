@@ -65,13 +65,13 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
             {/* Image */}
             <Link href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-warm-50 relative">
                 {product.category && (
-                    <span className="absolute top-4 left-4 z-10 max-w-[60%] truncate rounded-full bg-white/90 backdrop-blur-md px-3 py-1 text-xs font-semibold text-warm-700 shadow-sm transition-transform group-hover:scale-105">
+                    <span className="absolute top-4 left-4 z-10 max-w-[60%] truncate rounded-full bg-parchment border border-warm-200 px-3 py-1 text-xs font-semibold text-warm-800 shadow-sm transition-transform group-hover:scale-105">
                         {product.category.name}
                     </span>
                 )}
                 {isOutOfStock && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/20 backdrop-blur-[2px]">
-                        <span className="rounded-full bg-white px-4 py-1.5 text-xs font-bold tracking-wider text-warm-800 shadow-lg">ESGOTADO</span>
+                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-warm-100/40">
+                        <span className="rounded-full bg-warm-800 border border-warm-900 px-4 py-1.5 text-xs font-bold tracking-wider text-warm-50 shadow-sm">ESGOTADO</span>
                     </div>
                 )}
                 <img
@@ -88,9 +88,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
                     }}
                 />
                 <div className="product-placeholder hidden h-full w-full items-center justify-center bg-warm-50" style={{ display: 'none' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-warm-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1} aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21zM8.25 8.25h.008v.008H8.25V8.25z" />
-                    </svg>
+                    <span className="text-xs font-medium text-warm-400 uppercase tracking-widest border border-warm-200 px-4 py-2 rounded-full">Imagem indisponível</span>
                 </div>
             </Link>
 

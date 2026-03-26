@@ -24,11 +24,9 @@ export default function HeroBanner({
     const titleLines = title.split('\n');
 
     return (
-        <section className="relative overflow-hidden bg-gradient-to-br from-cream via-parchment to-warm-100 py-24 sm:py-32 lg:py-40">
+        <section className="relative overflow-hidden bg-cream py-24 sm:py-32 lg:py-40">
             {/* Background: organic kintsugi-inspired decorative cracks */}
             <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-                <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-kintsugi-400/10 blur-3xl" />
-                <div className="absolute bottom-0 left-1/4 h-72 w-72 rounded-full bg-kintsugi-300/10 blur-3xl" />
                 {/* Diagonal decorative gold line — subtle organic feel */}
                 <svg className="absolute top-1/3 left-0 w-full h-24 opacity-20" viewBox="0 0 1200 80" preserveAspectRatio="none">
                     <path d="M0,40 C150,10 300,70 450,35 C600,0 750,60 900,30 C1050,0 1150,50 1200,40" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-kintsugi-400" />
@@ -74,7 +72,7 @@ export default function HeroBanner({
                         </Link>
                         <Link
                             href="/register"
-                            className="inline-flex items-center justify-center gap-2 rounded-full border border-warm-300 bg-white/50 backdrop-blur-sm px-8 py-4 text-sm font-semibold text-warm-700 hover:bg-warm-100 transition duration-200"
+                            className="inline-flex items-center justify-center gap-2 rounded-full border border-warm-200 bg-transparent px-8 py-4 text-sm font-semibold text-warm-700 hover:bg-warm-50 transition duration-200"
                         >
                             Criar conta grátis
                         </Link>
