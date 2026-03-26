@@ -22,6 +22,7 @@ function StockBadge({ quantity, minQuantity }: { quantity: number; minQuantity: 
 
 export default function ProductCard({ product, priority = false }: ProductCardProps) {
     const [adding, setAdding] = useState(false);
+    const [confirmAdd, setConfirmAdd] = useState(false);
     const { playCartSound } = useCartSound();
 
     const { auth } = usePage<any>().props;
@@ -49,6 +50,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
                     playCartSound();
                     toast.success(`"${product.name}" adicionado ao carrinho!`);
                     setAdding(false);
+                    setConfirmAdd(false);
                 },
                 onError: () => {
                     toast.error('Erro ao adicionar ao carrinho.');
@@ -61,9 +63,12 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
     const isOutOfStock = product.quantity === 0;
 
     return (
-        <article className="group relative flex flex-col rounded-2xl bg-white border border-warm-100 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 hover:border-warm-200 transition duration-300 overflow-hidden">
+        <article 
+            className="group relative flex flex-col rounded-2xl border border-warm-200/70 hover:border-warm-200 bg-white/40 p-3 transition duration-300"
+            onMouseLeave={() => setConfirmAdd(false)}
+        >
             {/* Image */}
-            <Link href={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-warm-50 relative">
+            <div className="block overflow-hidden rounded-xl aspect-square bg-warm-50 relative mb-4">
                 {product.category && (
                     <span className="absolute top-4 left-4 z-10 max-w-[60%] truncate rounded-full bg-parchment border border-warm-200 px-3 py-1 text-xs font-semibold text-warm-800 shadow-sm transition-transform group-hover:scale-105">
                         {product.category.name}
@@ -90,16 +95,16 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
                 <div className="product-placeholder hidden h-full w-full items-center justify-center bg-warm-50" style={{ display: 'none' }}>
                     <span className="text-xs font-medium text-warm-400 uppercase tracking-widest border border-warm-200 px-4 py-2 rounded-full">Imagem indisponível</span>
                 </div>
-            </Link>
+            </div>
 
             {/* Content */}
-            <div className="flex flex-1 flex-col p-6">
+            <div className="flex flex-1 flex-col px-1">
                 {/* Name */}
-                <Link href={`/products/${product.slug}`} className="block mb-1">
-                    <h3 className="text-[1.05rem] font-medium text-warm-800 line-clamp-2 leading-relaxed group-hover:text-kintsugi-600 transition-colors">
+                <h3 className="text-base font-medium text-warm-800 line-clamp-2 leading-snug group-hover:text-kintsugi-600 transition-colors mb-1">
+                    <Link href={`/products/${product.slug}`} className="before:absolute before:inset-0 before:z-0 outline-none">
                         {product.name}
-                    </h3>
-                </Link>
+                    </Link>
+                </h3>
 
                 {/* Tags */}
                 {product.tags && product.tags.length > 0 && (
@@ -113,29 +118,45 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
                 )}
 
                 {/* Stock */}
-                <div className="mb-4">
+                <div className="mb-3">
                     <StockBadge quantity={product.quantity} minQuantity={product.min_quantity} />
                 </div>
 
                 {/* Price + CTA */}
-                <div className="mt-auto flex items-end justify-between gap-4 pt-2">
+                <div className="mt-auto flex items-end justify-between gap-4 pt-1">
                     <div>
-                        <p className="font-display text-xl font-bold text-warm-800">{formatPrice(product.price)}</p>
+                        <p className="font-display text-lg font-semibold text-warm-700">{formatPrice(product.price)}</p>
                     </div>
                     <button
-                        onClick={handleAddToCart}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!confirmAdd) {
+                                setConfirmAdd(true);
+                            } else {
+                                handleAddToCart(e);
+                            }
+                        }}
                         disabled={isOutOfStock || adding}
                         aria-label={adding ? 'Adicionando...' : `Adicionar ${product.name}`}
-                        className="flex h-11 w-11 items-center justify-center rounded-full bg-warm-50 text-warm-600 hover:bg-kintsugi-50 hover:text-kintsugi-600 active:scale-90 transition duration-300 disabled:opacity-40 disabled:cursor-not-allowed border border-warm-100 hover:border-kintsugi-200"
+                        className={`relative z-10 flex items-center justify-center rounded-full transition-all duration-300 ${
+                            confirmAdd
+                                ? 'h-9 px-4 bg-kintsugi-50 border border-kintsugi-200 text-kintsugi-600 shadow-sm'
+                                : 'h-10 w-10 bg-transparent text-warm-400 hover:bg-warm-50 hover:text-kintsugi-600 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed'
+                        }`}
                         title="Adicionar ao carrinho"
                     >
-                        {adding ? (
+                        {confirmAdd ? (
+                            <span className="text-xs font-bold whitespace-nowrap">
+                                {adding ? 'Adicionando...' : 'Adicionar ao carrinho'}
+                            </span>
+                        ) : adding ? (
                             <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                         ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-80 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                             </svg>
                         )}
