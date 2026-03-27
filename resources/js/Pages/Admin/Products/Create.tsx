@@ -9,27 +9,71 @@ import FormField from '@/Components/Admin/FormField';
 import Button from '@/Components/Shared/Button';
 import type { Category, Tag } from '@/types/admin';
 
-// — Zod schema ————————————————————————
-const productSchema = z.object({
-  name: z.string().min(3, 'Nome deve ter ao menos 3 caracteres').max(255),
-  description: z.string().min(10, 'Descrição deve ter ao menos 10 caracteres'),
-  price: z.number({ message: 'Preço inválido' }).positive('Preço deve ser maior que zero'),
-  cost_price: z
-    .number({ message: 'Custo inválido' })
-    .nonnegative('Custo não pode ser negativo')
-    .nullable()
-    .optional(),
-  quantity: z
-    .number({ message: 'Quantidade inválida' })
-    .int('Deve ser inteiro')
-    .nonnegative('Não pode ser negativa'),
-  min_quantity: z
-    .number({ message: 'Quantidade mínima inválida' })
-    .int('Deve ser inteiro')
-    .nonnegative('Não pode ser negativa'),
-  category_id: z.number({ message: 'Selecione uma categoria' }).positive('Selecione uma categoria'),
-  active: z.boolean().default(true),
-});
+const toRequiredNumber = (value: unknown): number | undefined => {
+  if (value === '' || value === null || value === undefined) {
+    return undefined;
+  }
+
+  const parsedValue = Number(value);
+
+  return Number.isFinite(parsedValue) ? parsedValue : undefined;
+};
+
+const toNullableNumber = (value: unknown): number | null | undefined => {
+  if (value === '' || value === null || value === undefined) {
+    return null;
+  }
+
+  const parsedValue = Number(value);
+
+  return Number.isFinite(parsedValue) ? parsedValue : undefined;
+};
+
+const productSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, 'Informe o nome do produto')
+      .max(255, 'Nome deve ter no máximo 255 caracteres'),
+    description: z.string().trim().min(1, 'Informe a descrição do produto'),
+    price: z
+      .number({ message: 'Informe um preço de venda válido' })
+      .positive('Preço deve ser maior que zero'),
+    cost_price: z
+      .number({ message: 'Informe um custo válido' })
+      .nonnegative('Custo não pode ser negativo')
+      .nullable()
+      .optional(),
+    quantity: z
+      .number({ message: 'Informe uma quantidade válida' })
+      .int('Deve ser um número inteiro')
+      .nonnegative('Não pode ser negativa'),
+    min_quantity: z
+      .number({ message: 'Informe uma quantidade mínima válida' })
+      .int('Deve ser um número inteiro')
+      .nonnegative('Não pode ser negativa')
+      .nullable()
+      .optional(),
+    category_id: z
+      .number({ message: 'Selecione uma categoria válida' })
+      .int()
+      .positive('Selecione uma categoria válida'),
+    active: z.boolean().default(true),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.cost_price !== null &&
+      data.cost_price !== undefined &&
+      data.cost_price >= data.price
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['cost_price'],
+        message: 'O custo deve ser menor que o preço de venda',
+      });
+    }
+  });
 
 type ProductForm = z.infer<typeof productSchema>;
 
@@ -142,7 +186,8 @@ export default function ProductsCreate({ categories, tags }: ProductsCreateProps
                 type="select"
                 required
                 options={categoryOptions}
-                register={register('category_id', { valueAsNumber: true })}
+                emptyOptionLabel="Selecione uma categoria"
+                register={register('category_id', { setValueAs: toRequiredNumber })}
                 error={errors.category_id?.message}
               />
             </div>
@@ -162,7 +207,7 @@ export default function ProductsCreate({ categories, tags }: ProductsCreateProps
                   placeholder="0,00"
                   min={0.01}
                   step={0.01}
-                  register={register('price', { valueAsNumber: true })}
+                  register={register('price', { setValueAs: toRequiredNumber })}
                   error={errors.price?.message}
                   hint="Preço exibido para o cliente"
                 />
@@ -174,7 +219,7 @@ export default function ProductsCreate({ categories, tags }: ProductsCreateProps
                   min={0}
                   step={0.01}
                   register={register('cost_price', {
-                    setValueAs: (value) => (value === '' ? null : Number(value)),
+                    setValueAs: toNullableNumber,
                   })}
                   error={errors.cost_price?.message}
                   hint="Valor pago pelo produto (interno)"
@@ -196,19 +241,18 @@ export default function ProductsCreate({ categories, tags }: ProductsCreateProps
                   required
                   min={0}
                   step={1}
-                  register={register('quantity', { valueAsNumber: true })}
+                  register={register('quantity', { setValueAs: toRequiredNumber })}
                   error={errors.quantity?.message}
                 />
                 <FormField
                   label="Quantidade Mínima"
                   name="min_quantity"
                   type="number"
-                  required
                   min={0}
                   step={1}
-                  register={register('min_quantity', { valueAsNumber: true })}
+                  register={register('min_quantity', { setValueAs: toNullableNumber })}
                   error={errors.min_quantity?.message}
-                  hint="Alertas de estoque baixo abaixo deste valor"
+                  hint="Opcional. Alertas de estoque baixo abaixo deste valor"
                 />
               </div>
             </div>

@@ -1,72 +1,97 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import type { Resolver } from 'react-hook-form';
 import { router } from '@inertiajs/react';
+import FormField from '@/Components/Admin/FormField';
 import Modal from '@/Components/Shared/Modal';
 import AdminLayout from '@/Layouts/AdminLayout';
 import type { Tag } from '@/types/shared';
 import { appRoutes } from '@/utils/routes';
 
+const tagSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Informe o nome da tag')
+    .max(255, 'Nome deve ter no maximo 255 caracteres'),
+  slug: z.string().trim().max(255, 'Slug deve ter no maximo 255 caracteres').optional(),
+});
+
+type TagForm = z.infer<typeof tagSchema>;
+
 interface TagsIndexProps {
   tags: Tag[];
 }
 
+const emptyTagForm: TagForm = {
+  name: '',
+  slug: '',
+};
+
+const normalizeTagPayload = (data: TagForm): { name: string; slug: string | null } => ({
+  name: data.name.trim(),
+  slug: data.slug?.trim() ? data.slug.trim() : null,
+});
+
 export default function TagsIndex({ tags }: TagsIndexProps) {
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
   const [editingTagId, setEditingTagId] = useState<number | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editSlug, setEditSlug] = useState('');
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; tag: Tag | null }>({
     open: false,
     tag: null,
   });
+  const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  function handleCreate(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TagForm>({
+    resolver: zodResolver(tagSchema) as Resolver<TagForm>,
+    defaultValues: emptyTagForm,
+  });
 
-    router.post(
-      appRoutes.admin.tags.index,
-      { name, slug: slug || null },
-      {
-        onSuccess: () => {
-          setName('');
-          setSlug('');
-        },
-      }
-    );
+  function resetForm(): void {
+    setEditingTagId(null);
+    reset(emptyTagForm);
   }
 
-  function startEditing(tag: Tag) {
-    setEditingTagId(tag.id);
-    setEditName(tag.name);
-    setEditSlug(tag.slug);
-  }
+  function handleSave(data: TagForm): void {
+    setSubmitting(true);
 
-  function handleUpdate(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    const payload = normalizeTagPayload(data);
 
-    if (!editingTagId) {
+    if (editingTagId) {
+      router.put(appRoutes.admin.tags.show(editingTagId), payload, {
+        onSuccess: () => resetForm(),
+        onFinish: () => setSubmitting(false),
+      });
+
       return;
     }
 
-    router.put(
-      appRoutes.admin.tags.show(editingTagId),
-      { name: editName, slug: editSlug || null },
-      {
-        onSuccess: () => {
-          setEditingTagId(null);
-          setEditName('');
-          setEditSlug('');
-        },
-      }
-    );
+    router.post(appRoutes.admin.tags.index, payload, {
+      onSuccess: () => reset(emptyTagForm),
+      onFinish: () => setSubmitting(false),
+    });
   }
 
-  function openDeleteModal(tag: Tag) {
+  function startEditing(tag: Tag): void {
+    setEditingTagId(tag.id);
+    reset({
+      name: tag.name,
+      slug: tag.slug ?? '',
+    });
+  }
+
+  function openDeleteModal(tag: Tag): void {
     setDeleteModal({ open: true, tag });
   }
 
-  function handleDelete() {
+  function handleDelete(): void {
     if (!deleteModal.tag) {
       return;
     }
@@ -97,59 +122,42 @@ export default function TagsIndex({ tags }: TagsIndexProps) {
               {editingTagId ? 'Editar tag' : 'Nova tag'}
             </h2>
 
-            <form onSubmit={editingTagId ? handleUpdate : handleCreate} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="tag-name"
-                  className="mb-1.5 block text-sm font-medium text-warm-600"
-                >
-                  Nome
-                </label>
-                <input
-                  id="tag-name"
-                  value={editingTagId ? editName : name}
-                  onChange={(event) =>
-                    editingTagId ? setEditName(event.target.value) : setName(event.target.value)
-                  }
-                  className="w-full rounded-xl border border-warm-200 bg-warm-50 px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-kintsugi-500"
-                  placeholder="Ex.: lancamento"
-                />
-              </div>
+            <form onSubmit={handleSubmit(handleSave)} className="space-y-4">
+              <FormField
+                label="Nome"
+                name="name"
+                required
+                register={register('name')}
+                error={errors.name?.message}
+                placeholder="Ex.: lancamento"
+                hint="Use um nome curto e facil de reconhecer no admin."
+                disabled={submitting}
+              />
 
-              <div>
-                <label
-                  htmlFor="tag-slug"
-                  className="mb-1.5 block text-sm font-medium text-warm-600"
-                >
-                  Slug
-                </label>
-                <input
-                  id="tag-slug"
-                  value={editingTagId ? editSlug : slug}
-                  onChange={(event) =>
-                    editingTagId ? setEditSlug(event.target.value) : setSlug(event.target.value)
-                  }
-                  className="w-full rounded-xl border border-warm-200 bg-warm-50 px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-kintsugi-500"
-                  placeholder="Opcional"
-                />
-              </div>
+              <FormField
+                label="Slug"
+                name="slug"
+                register={register('slug')}
+                error={errors.slug?.message}
+                placeholder="Opcional"
+                hint="Opcional. Se vazio, o backend segue o comportamento padrao."
+                disabled={submitting}
+              />
 
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="rounded-xl bg-kintsugi-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-kintsugi-600"
+                  disabled={submitting}
+                  className="rounded-xl bg-kintsugi-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-kintsugi-600 disabled:cursor-not-allowed disabled:bg-kintsugi-300"
                 >
                   {editingTagId ? 'Salvar alteracoes' : 'Criar tag'}
                 </button>
                 {editingTagId && (
                   <button
                     type="button"
-                    onClick={() => {
-                      setEditingTagId(null);
-                      setEditName('');
-                      setEditSlug('');
-                    }}
-                    className="rounded-xl border border-warm-200 px-4 py-2.5 text-sm font-semibold text-warm-600 transition-colors hover:bg-warm-50"
+                    onClick={resetForm}
+                    disabled={submitting}
+                    className="rounded-xl border border-warm-200 px-4 py-2.5 text-sm font-semibold text-warm-600 transition-colors hover:bg-warm-50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Cancelar
                   </button>
