@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\Tag;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Role;
@@ -89,6 +90,48 @@ class AdminContractsTest extends TestCase
                 ->where('product.tags.0.id', $tag->id)
                 ->has('categories')
                 ->has('tags'));
+    }
+
+    public function test_admin_products_index_preserves_filters_when_paginating_and_returns_the_correct_page(): void
+    {
+        $admin = $this->createAdmin();
+        $category = Category::factory()->create();
+        $newestMatch = Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Produto Premium Novo',
+            'active' => true,
+            'created_at' => Carbon::parse('2026-01-02 10:00:00'),
+        ]);
+        $olderMatch = Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Produto Premium Antigo',
+            'active' => true,
+            'created_at' => Carbon::parse('2026-01-01 10:00:00'),
+        ]);
+        Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Produto Inativo',
+            'active' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->get("/admin/products?search=Premium&category_id={$category->id}&active=1&per_page=1&page=1")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Admin/Products/Index')
+                ->where('products.meta.current_page', 1)
+                ->where('products.data.0.id', $newestMatch->id));
+
+        $this->actingAs($admin)
+            ->get("/admin/products?search=Premium&category_id={$category->id}&active=1&per_page=1&page=2")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Admin/Products/Index')
+                ->where('filters.search', 'Premium')
+                ->where('filters.category_id', (string) $category->id)
+                ->where('filters.active', '1')
+                ->where('products.meta.current_page', 2)
+                ->where('products.data.0.id', $olderMatch->id));
     }
 
     public function test_admin_can_clear_product_cost_price_explicitly(): void

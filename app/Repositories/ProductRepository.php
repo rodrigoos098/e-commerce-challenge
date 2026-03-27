@@ -21,7 +21,10 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->productQueryBuilder->build($filters)->paginate($perPage);
+        return $this->productQueryBuilder
+            ->build($filters)
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     /**

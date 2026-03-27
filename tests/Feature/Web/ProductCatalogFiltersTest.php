@@ -77,6 +77,38 @@ class ProductCatalogFiltersTest extends TestCase
                 ->where('products.data.0.id', $matchingProduct->id));
     }
 
+    public function test_public_catalog_returns_the_correct_page_even_with_identical_filters_cached(): void
+    {
+        $category = Category::factory()->create();
+        $newestProduct = Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Produto Pagina 1',
+            'slug' => 'produto-pagina-1',
+            'created_at' => Carbon::parse('2026-01-02 10:00:00'),
+        ]);
+        $olderProduct = Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Produto Pagina 2',
+            'slug' => 'produto-pagina-2',
+            'created_at' => Carbon::parse('2026-01-01 10:00:00'),
+        ]);
+
+        $this->get("/products?category_id={$category->id}&per_page=1&page=1")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Products/Index')
+                ->where('products.meta.current_page', 1)
+                ->where('products.data.0.id', $newestProduct->id));
+
+        $this->get("/products?category_id={$category->id}&per_page=1&page=2")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Products/Index')
+                ->where('filters.page', '2')
+                ->where('products.meta.current_page', 2)
+                ->where('products.data.0.id', $olderProduct->id));
+    }
+
     public function test_public_catalog_hides_products_from_inactive_category_branches(): void
     {
         $inactiveRoot = Category::factory()->inactive()->create();

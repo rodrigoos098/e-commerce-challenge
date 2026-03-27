@@ -40,6 +40,15 @@ const FiltersPanel = React.memo(function FiltersPanel({
 }: FiltersPanelProps) {
   return (
     <aside className="space-y-8">
+      {hasActiveFilters && (
+        <button
+          type="button"
+          onClick={onClearFilters}
+          className="w-full rounded-xl border border-warm-200 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50 transition-colors"
+        >
+          Limpar todos os filtros
+        </button>
+      )}
       <div>
         <SearchInput value={search} onChange={onSearchChange} />
       </div>
@@ -55,15 +64,6 @@ const FiltersPanel = React.memo(function FiltersPanel({
       <div className="border-t border-warm-200 pt-6">
         <CategoryFilter categories={categories} selected={categoryId} onChange={onCategoryChange} />
       </div>
-      {hasActiveFilters && (
-        <button
-          type="button"
-          onClick={onClearFilters}
-          className="w-full rounded-xl border border-warm-200 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50 transition-colors"
-        >
-          Limpar todos os filtros
-        </button>
-      )}
     </aside>
   );
 });
@@ -86,17 +86,44 @@ export default function ProductsIndex({ products, categories, filters }: Product
     overrides: Partial<
       Record<
         'search' | 'category_id' | 'price_min' | 'price_max' | 'page',
-        number | string | undefined
+        number | string | null | undefined
       >
     > = {}
   ) => {
-    const nextSearch = (overrides.search ?? search) || undefined;
-    const nextCategoryId = (overrides.category_id ?? categoryId) || undefined;
-    const nextPriceMin =
-      overrides.price_min ?? (priceMin > DEFAULT_MIN_PRICE ? priceMin : undefined);
-    const nextPriceMax =
-      overrides.price_max ?? (priceMax < DEFAULT_MAX_PRICE ? priceMax : undefined);
-    const nextPage = overrides.page ?? (currentPage > 1 ? currentPage : undefined);
+    const hasOverride = <T extends keyof typeof overrides>(key: T): boolean =>
+      Object.prototype.hasOwnProperty.call(overrides, key);
+
+    const nextSearch = hasOverride('search')
+      ? overrides.search
+        ? String(overrides.search)
+        : undefined
+      : search || undefined;
+    const nextCategoryId = hasOverride('category_id')
+      ? overrides.category_id == null || overrides.category_id === ''
+        ? undefined
+        : overrides.category_id
+      : categoryId || undefined;
+    const nextPriceMin = hasOverride('price_min')
+      ? overrides.price_min == null || overrides.price_min === ''
+        ? undefined
+        : overrides.price_min
+      : priceMin > DEFAULT_MIN_PRICE
+        ? priceMin
+        : undefined;
+    const nextPriceMax = hasOverride('price_max')
+      ? overrides.price_max == null || overrides.price_max === ''
+        ? undefined
+        : overrides.price_max
+      : priceMax < DEFAULT_MAX_PRICE
+        ? priceMax
+        : undefined;
+    const nextPage = hasOverride('page')
+      ? overrides.page == null || overrides.page === ''
+        ? undefined
+        : overrides.page
+      : currentPage > 1
+        ? currentPage
+        : undefined;
 
     return {
       search: nextSearch,
@@ -122,7 +149,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
   // Search debounce — only reacts to search changes; other filters call router.get directly
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.get('/products', buildFilterParams(), {
+      router.get('/products', buildFilterParams({ page: undefined }), {
         preserveScroll: true,
         preserveState: true,
         replace: true,
@@ -134,7 +161,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
 
   const handleCategoryChange = (id: number | string | null) => {
     setCategoryId(id);
-    router.get('/products', buildFilterParams({ category_id: id || undefined }), {
+    router.get('/products', buildFilterParams({ category_id: id, page: undefined }), {
       preserveScroll: true,
       preserveState: true,
       replace: true,
@@ -149,6 +176,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
       buildFilterParams({
         price_min: min > DEFAULT_MIN_PRICE ? min : undefined,
         price_max: max < DEFAULT_MAX_PRICE ? max : undefined,
+        page: undefined,
       }),
       { preserveScroll: true, preserveState: true, replace: true }
     );

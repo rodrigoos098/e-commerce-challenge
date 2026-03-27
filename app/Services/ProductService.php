@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
@@ -26,7 +27,8 @@ class ProductService
      */
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $cacheKey = 'products.list.'.md5(serialize($filters)).'.'.$perPage;
+        $currentPage = (int) ($filters['page'] ?? Paginator::resolveCurrentPage());
+        $cacheKey = 'products.list.'.md5(serialize($filters)).'.'.$perPage.'.page.'.$currentPage;
 
         return Cache::tags(['products'])->remember($cacheKey, now()->addHour(), fn () => $this->productRepository->paginate($filters, $perPage));
     }
