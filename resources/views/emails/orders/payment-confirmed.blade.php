@@ -3,7 +3,7 @@
 
 Ola, **{{ $order->user->name }}**!
 
-Confirmamos o pagamento mock do seu pedido. Agora seguimos com a preparacao da entrega.
+Confirmamos o pagamento do seu pedido. Agora seguimos com a preparacao da entrega.
 
 @include('emails.orders.partials.order-details', ['order' => $order])
 

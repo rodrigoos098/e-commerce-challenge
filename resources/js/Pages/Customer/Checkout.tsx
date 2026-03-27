@@ -7,8 +7,9 @@ import { toast } from 'react-hot-toast';
 import { z } from 'zod';
 import PublicLayout from '@/Layouts/PublicLayout';
 import Spinner from '@/Components/Shared/Spinner';
-import type { CheckoutPageProps, Cart, SavedAddress } from '@/types/public';
+import type { CheckoutPageProps, Cart, CheckoutStockIssue, SavedAddress } from '@/types/public';
 import { formatPrice } from '@/utils/format';
+import { lookupZipCode, normalizeZipCode } from '@/utils/cepLookup';
 import { appRoutes } from '@/utils/routes';
 import {
   getProductImageSrc,
@@ -102,6 +103,40 @@ const checkoutSchema = z
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
+function collectErrorMessages(error: unknown): string[] {
+  if (typeof error === 'string') {
+    return [error];
+  }
+
+  if (Array.isArray(error)) {
+    return error.flatMap((value) => collectErrorMessages(value));
+  }
+
+  if (error && typeof error === 'object') {
+    return Object.values(error).flatMap((value) => collectErrorMessages(value));
+  }
+
+  return [];
+}
+
+function resolveCheckoutErrorMessage(errors: Record<string, unknown>): string {
+  const priorityFields = ['cart', 'order', 'payment_simulated'];
+
+  for (const field of priorityFields) {
+    const messages = collectErrorMessages(errors[field]);
+
+    if (messages.length > 0) {
+      return messages[0];
+    }
+  }
+
+  return collectErrorMessages(errors)[0] ?? 'Erro ao finalizar pedido. Verifique os dados.';
+}
+
+function getStockIssueMap(issues: CheckoutStockIssue[]): Map<number, CheckoutStockIssue> {
+  return new Map(issues.map((issue) => [issue.item_id, issue]));
+}
+
 function formatSavedAddress(address: SavedAddress): string {
   return `${address.street}, ${address.city} - ${address.state}, ${address.zip_code}`;
 }
@@ -109,10 +144,74 @@ function formatSavedAddress(address: SavedAddress): string {
 interface AddressFieldsProps {
   prefix: 'shipping' | 'billing';
   register: ReturnType<typeof useForm<CheckoutFormData>>['register'];
+  setValue: ReturnType<typeof useForm<CheckoutFormData>>['setValue'];
   errors: ReturnType<typeof useForm<CheckoutFormData>>['formState']['errors'];
+  zipCode: string;
 }
 
-function AddressFields({ prefix, register, errors }: AddressFieldsProps) {
+function AddressFields({ prefix, register, setValue, errors, zipCode }: AddressFieldsProps) {
+  const [zipLookupStatus, setZipLookupStatus] = useState<
+    'idle' | 'loading' | 'success' | 'not-found' | 'error'
+  >('idle');
+  const lastLookedUpZipCode = useRef<string | null>(null);
+
+  useEffect(() => {
+    const normalizedZipCode = normalizeZipCode(zipCode);
+
+    if (normalizedZipCode.length !== 8) {
+      lastLookedUpZipCode.current = null;
+      setZipLookupStatus('idle');
+
+      return;
+    }
+
+    if (lastLookedUpZipCode.current === normalizedZipCode) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    const timeoutId = window.setTimeout(async () => {
+      setZipLookupStatus('loading');
+
+      try {
+        const result = await lookupZipCode(normalizedZipCode, abortController.signal);
+
+        lastLookedUpZipCode.current = normalizedZipCode;
+
+        if (!result) {
+          setZipLookupStatus('not-found');
+
+          return;
+        }
+
+        if (result.street) {
+          setValue(`${prefix}_street`, result.street, { shouldDirty: true });
+        }
+
+        if (result.city) {
+          setValue(`${prefix}_city`, result.city, { shouldDirty: true });
+        }
+
+        if (result.state) {
+          setValue(`${prefix}_state`, result.state, { shouldDirty: true });
+        }
+
+        setZipLookupStatus('success');
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        setZipLookupStatus('error');
+      }
+    }, 350);
+
+    return () => {
+      abortController.abort();
+      window.clearTimeout(timeoutId);
+    };
+  }, [prefix, setValue, zipCode]);
+
   const field = (
     key: keyof CheckoutFormData,
     label: string,
@@ -139,11 +238,27 @@ function AddressFields({ prefix, register, errors }: AddressFieldsProps) {
 
   return (
     <div className="grid grid-cols-2 gap-4">
+      {field(`${prefix}_zip` as keyof CheckoutFormData, 'CEP', '01310-100', 'col-span-1')}
+      <div className="col-span-1 flex items-end">
+        {zipLookupStatus !== 'idle' && (
+          <p
+            className={`text-xs ${
+              zipLookupStatus === 'error' || zipLookupStatus === 'not-found'
+                ? 'text-warm-500'
+                : 'text-kintsugi-600'
+            }`}
+          >
+            {zipLookupStatus === 'loading' && 'Consultando CEP...'}
+            {zipLookupStatus === 'success' && 'Rua, cidade e estado preenchidos automaticamente.'}
+            {zipLookupStatus === 'not-found' && 'CEP não localizado. Continue manualmente.'}
+            {zipLookupStatus === 'error' && 'Falha na consulta do CEP. Continue manualmente.'}
+          </p>
+        )}
+      </div>
       {field(`${prefix}_name` as keyof CheckoutFormData, 'Nome do destinatário', 'João da Silva')}
       {field(`${prefix}_street` as keyof CheckoutFormData, 'Endereço', 'Rua Exemplo, 123')}
       {field(`${prefix}_city` as keyof CheckoutFormData, 'Cidade', 'São Paulo', 'col-span-1')}
       {field(`${prefix}_state` as keyof CheckoutFormData, 'Estado', 'SP', 'col-span-1')}
-      {field(`${prefix}_zip` as keyof CheckoutFormData, 'CEP', '01310-100', 'col-span-1')}
       {field(`${prefix}_country` as keyof CheckoutFormData, 'País', 'Brasil', 'col-span-1')}
     </div>
   );
@@ -281,9 +396,17 @@ interface OrderSummaryProps {
 }
 
 function OrderSummary({ cart }: OrderSummaryProps) {
+  const stockIssues = cart.stock_check?.issues ?? [];
+  const stockIssueMap = useMemo(() => getStockIssueMap(stockIssues), [stockIssues]);
+
   return (
     <div className="sticky top-24 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm">
       <h2 className="mb-5 text-base font-bold text-warm-700">Resumo do pedido</h2>
+      {cart.stock_check?.has_issues && (
+        <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {cart.stock_check.message}
+        </div>
+      )}
       <div className="mb-5 space-y-3">
         {cart.items.map((item) => (
           <div key={item.id} className="flex items-center gap-3">
@@ -300,6 +423,11 @@ function OrderSummary({ cart }: OrderSummaryProps) {
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-medium text-warm-700">{item.product.name}</p>
               <p className="text-xs text-warm-400">Qtd: {item.quantity}</p>
+              {stockIssueMap.has(item.id) && (
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {stockIssueMap.get(item.id)?.message}
+                </p>
+              )}
             </div>
             <p className="shrink-0 text-xs font-semibold text-warm-700">
               {formatPrice(item.product.price * item.quantity)}
@@ -377,6 +505,7 @@ function StepBar({ current }: { current: number }) {
 export default function Checkout({ cart, addresses }: CheckoutPageProps) {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmingPayment, setConfirmingPayment] = useState(false);
   const hasBootstrappedShippingTotals = useRef(false);
 
   const defaultShippingAddress = useMemo(
@@ -426,12 +555,16 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
   const billingAddressId = watch('billing_address_id');
   const sameBilling = watch('same_billing');
   const paymentSimulated = watch('payment_simulated');
+  const stockIssues = cart.stock_check?.issues ?? [];
+  const hasStockIssues = cart.stock_check?.has_issues ?? false;
+  const stockIssueMessage = cart.stock_check?.message;
   const shippingName = watch('shipping_name');
   const shippingStreet = watch('shipping_street');
   const shippingCity = watch('shipping_city');
   const shippingState = watch('shipping_state');
   const shippingZip = watch('shipping_zip');
   const shippingCountry = watch('shipping_country');
+  const billingZip = watch('billing_zip');
 
   useEffect(() => {
     if (!hasBootstrappedShippingTotals.current) {
@@ -518,6 +651,18 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
     shippingCountry,
   ]);
 
+  useEffect(() => {
+    if (!hasStockIssues || !paymentSimulated) {
+      return;
+    }
+
+    setValue('payment_simulated', false, {
+      shouldDirty: true,
+      shouldTouch: false,
+      shouldValidate: false,
+    });
+  }, [hasStockIssues, paymentSimulated, setValue]);
+
   const goNextFromShipping = async () => {
     const fields: Array<keyof CheckoutFormData> =
       shippingMode === 'saved'
@@ -566,11 +711,52 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
     }
   };
 
+  const confirmPayment = () => {
+    if (hasStockIssues) {
+      toast.error(stockIssueMessage ?? 'Existem itens indisponiveis no carrinho.');
+
+      return;
+    }
+
+    setConfirmingPayment(true);
+
+    router.reload({
+      only: ['cart'],
+      onSuccess: (page) => {
+        const refreshedCart = page.props.cart as Cart | undefined;
+        const refreshedStockCheck = refreshedCart?.stock_check;
+
+        if (refreshedStockCheck?.has_issues) {
+          setValue('payment_simulated', false, {
+            shouldDirty: true,
+            shouldValidate: false,
+          });
+          toast.error(refreshedStockCheck.message);
+
+          return;
+        }
+
+        setValue('payment_simulated', true, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        toast.success('Pagamento confirmado. Agora voce pode concluir o pedido.');
+      },
+      onFinish: () => setConfirmingPayment(false),
+    });
+  };
+
   const onSubmit = (data: CheckoutFormData) => {
+    if (hasStockIssues) {
+      toast.error(stockIssueMessage ?? 'Existem itens indisponiveis no carrinho.');
+
+      return;
+    }
+
     setSubmitting(true);
     router.post(appRoutes.customer.orders.store, data, {
-      onSuccess: () => toast.success('Pagamento simulado e pedido concluido com sucesso!'),
-      onError: () => toast.error('Erro ao finalizar pedido. Verifique os dados.'),
+      onSuccess: () => toast.success('Pagamento confirmado e pedido concluido com sucesso!'),
+      onError: (errors) => toast.error(resolveCheckoutErrorMessage(errors)),
       onFinish: () => setSubmitting(false),
     });
   };
@@ -606,7 +792,13 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                     }}
                     savedAddresses={addresses}
                   >
-                    <AddressFields prefix="shipping" register={register} errors={errors} />
+                    <AddressFields
+                      prefix="shipping"
+                      register={register}
+                      setValue={setValue}
+                      errors={errors}
+                      zipCode={shippingZip}
+                    />
                   </AddressChoice>
 
                   {shippingMode === 'saved' && addresses.length > 0 && (
@@ -666,7 +858,13 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                         onModeChange={(mode) => setValue('billing_mode', mode)}
                         savedAddresses={addresses}
                       >
-                        <AddressFields prefix="billing" register={register} errors={errors} />
+                        <AddressFields
+                          prefix="billing"
+                          register={register}
+                          setValue={setValue}
+                          errors={errors}
+                          zipCode={billingZip}
+                        />
                       </AddressChoice>
 
                       {billingMode === 'saved' && addresses.length > 0 && (
@@ -740,7 +938,7 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                       onClick={goNextFromReview}
                       className="rounded-xl bg-kintsugi-500 px-8 py-2.5 text-sm font-bold text-white transition-all hover:bg-kintsugi-600"
                     >
-                      Ir para pagamento mock →
+                      Ir para pagamento →
                     </button>
                   </div>
                 </div>
@@ -752,18 +950,18 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="text-xs font-bold uppercase tracking-[0.25em] text-kintsugi-600">
-                          Pagamento mock
+                          Pagamento
                         </p>
                         <h2 className="mt-2 text-xl font-bold text-warm-700">
-                          Simule o pagamento antes de concluir
+                          Confirme o pagamento antes de concluir
                         </h2>
                         <p className="mt-2 max-w-xl text-sm text-warm-600">
-                          Esta loja usa uma aprovacao ficticia para o desafio. Ao clicar no botao
-                          abaixo, registraremos o pedido como pago com o metodo de teste.
+                          Ao confirmar o pagamento, registraremos o pedido como pago para concluir a
+                          compra.
                         </p>
                       </div>
                       <div className="rounded-full border border-warm-200 bg-white px-3 py-1 text-xs font-semibold text-warm-500">
-                        Metodo: cartao mock
+                        Metodo: cartao
                       </div>
                     </div>
 
@@ -774,27 +972,41 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                       </p>
                     </div>
 
+                    {hasStockIssues && (
+                      <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                        <p className="font-semibold text-red-800">
+                          Nao foi possivel confirmar o pagamento com o carrinho atual.
+                        </p>
+                        <p className="mt-1">{stockIssueMessage}</p>
+                        <ul className="mt-3 space-y-2">
+                          {stockIssues.map((issue) => (
+                            <li key={issue.item_id}>{issue.message}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <button
                         type="button"
-                        onClick={() => {
-                          setValue('payment_simulated', true, {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          });
-                          toast.success(
-                            'Pagamento mock aprovado. Agora voce pode concluir o pedido.'
-                          );
-                        }}
-                        disabled={paymentSimulated}
+                        onClick={confirmPayment}
+                        disabled={paymentSimulated || confirmingPayment || hasStockIssues}
                         className="rounded-xl bg-kintsugi-500 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-kintsugi-600 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {paymentSimulated ? 'Pagamento mock aprovado' : 'Simular pagamento'}
+                        {paymentSimulated
+                          ? 'Pagamento confirmado'
+                          : confirmingPayment
+                            ? 'Validando estoque...'
+                            : hasStockIssues
+                              ? 'Pagamento bloqueado'
+                              : 'Confirmar pagamento'}
                       </button>
                       <p className="text-sm text-warm-500">
                         {paymentSimulated
                           ? 'Pagamento registrado. O pedido pode ser finalizado.'
-                          : 'A finalizacao so e liberada depois desta simulacao.'}
+                          : hasStockIssues
+                            ? 'Resolva os itens indisponiveis antes de tentar confirmar o pagamento.'
+                            : 'A finalizacao so e liberada depois da confirmacao do pagamento.'}
                       </p>
                     </div>
                   </div>
@@ -809,7 +1021,7 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                     </button>
                     <button
                       type="submit"
-                      disabled={submitting || !paymentSimulated}
+                      disabled={submitting || !paymentSimulated || hasStockIssues}
                       className="flex items-center gap-2 rounded-xl bg-kintsugi-500 px-8 py-2.5 text-sm font-bold text-white transition-all hover:bg-kintsugi-600 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {submitting && <Spinner />}

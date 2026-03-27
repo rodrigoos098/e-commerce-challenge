@@ -45,7 +45,7 @@ class CartTotalsServiceTest extends TestCase
         $this->assertSame(14.9, $totals['shipping_cost']);
         $this->assertSame(179.9, $totals['total']);
         $this->assertSame('01310100', $totals['shipping_zip_code']);
-        $this->assertSame('Faixa de CEP 0-2', $totals['shipping_rule_label']);
+        $this->assertSame('Frete para o seu endereco', $totals['shipping_rule_label']);
     }
 
     public function test_uses_default_shipping_estimate_when_zip_code_is_missing(): void

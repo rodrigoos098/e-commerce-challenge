@@ -50,7 +50,7 @@ class CartCheckoutTotalsTest extends TestCase
                 ->where('cart.subtotal', 150)
                 ->where('cart.tax', 15)
                 ->where('cart.shipping_cost', 14.9)
-                ->where('cart.shipping_rule_label', 'Faixa de CEP 0-2')
+                ->where('cart.shipping_rule_label', 'Frete para o seu endereco')
                 ->where('cart.total', 179.9));
 
         $this->actingAs($user)
@@ -67,7 +67,7 @@ class CartCheckoutTotalsTest extends TestCase
                 ->where('cart.subtotal', 150)
                 ->where('cart.tax', 15)
                 ->where('cart.shipping_cost', 14.9)
-                ->where('cart.shipping_rule_label', 'Faixa de CEP 0-2')
+                ->where('cart.shipping_rule_label', 'Frete para o seu endereco')
                 ->where('cart.total', 179.9));
     }
 
@@ -107,7 +107,45 @@ class CartCheckoutTotalsTest extends TestCase
                 ->component('Customer/Checkout')
                 ->where('cart.shipping_zip_code', '98765000')
                 ->where('cart.shipping_cost', 27.9)
-                ->where('cart.shipping_rule_label', 'Faixa de CEP 7-9')
+                ->where('cart.shipping_rule_label', 'Frete para o seu endereco')
                 ->where('cart.total', 115.9));
+    }
+
+    public function test_checkout_exposes_stock_issues_for_items_that_cannot_be_purchased(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+        $user->assignRole('customer');
+
+        Address::factory()->for($user)->defaultShipping()->create([
+            'zip_code' => '01310-100',
+        ]);
+
+        $product = Product::factory()->create([
+            'name' => 'Fone Studio',
+            'price' => 120.0,
+            'quantity' => 1,
+            'active' => true,
+        ]);
+
+        $cart = Cart::factory()->create(['user_id' => $user->id]);
+
+        CartItem::factory()->create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+        ]);
+
+        $this->actingAs($user)
+            ->get('/customer/checkout')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Customer/Checkout')
+                ->where('cart.stock_check.has_issues', true)
+                ->where('cart.stock_check.issues.0.product_name', 'Fone Studio')
+                ->where('cart.stock_check.issues.0.reason', 'insufficient_stock')
+                ->where('cart.stock_check.issues.0.available_quantity', 1));
     }
 }

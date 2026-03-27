@@ -62,8 +62,8 @@ class CartApiTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.shipping_zip_code', '01310100')
-            ->assertJsonPath('data.shipping_rule_label', 'Faixa de CEP 0-2')
-            ->assertJsonPath('data.shipping_rule_description', 'Frete mockado aplicado para o CEP 01310100: faixa 0-2 com custo de R$ 14,90.')
+            ->assertJsonPath('data.shipping_rule_label', 'Frete para o seu endereco')
+            ->assertJsonPath('data.shipping_rule_description', 'Frete calculado para o CEP 01310100: R$ 14,90.')
             ->assertJsonPath('data.shipping_is_free', false)
             ->assertJsonPath('data.shipping_cost', 14.9)
             ->assertJsonPath('data.total', 102.9);

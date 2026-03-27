@@ -48,8 +48,8 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
 };
 
 const PAYMENT_LABELS: Record<PaymentStatus, string> = {
-  pending: 'Aguardando simulacao',
-  paid: 'Pagamento simulado',
+  pending: 'Aguardando pagamento',
+  paid: 'Pago',
 };
 
 function formatDate(iso: string): string {
@@ -82,7 +82,7 @@ function formatAddress(address?: Address | null): string[] {
 
 function formatPaymentMethod(method?: string | null): string {
   if (method === 'mock_card') {
-    return 'Cartao mock';
+    return 'Cartao';
   }
 
   return method ?? '-';

@@ -42,9 +42,9 @@ class CartPricingServiceTest extends TestCase
         $service = new CartPricingService();
 
         $quotesByZipCode = [
-            '01310-100' => ['cost' => 14.9, 'label' => 'Faixa de CEP 0-2'],
-            '35700-000' => ['cost' => 21.9, 'label' => 'Faixa de CEP 3-6'],
-            '98765-000' => ['cost' => 27.9, 'label' => 'Faixa de CEP 7-9'],
+            '01310-100' => ['cost' => 14.9, 'label' => 'Frete para o seu endereco'],
+            '35700-000' => ['cost' => 21.9, 'label' => 'Frete para o seu endereco'],
+            '98765-000' => ['cost' => 27.9, 'label' => 'Frete para o seu endereco'],
         ];
 
         foreach ($quotesByZipCode as $zipCode => $expectedQuote) {
