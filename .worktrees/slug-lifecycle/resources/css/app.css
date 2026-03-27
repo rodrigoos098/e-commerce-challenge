@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap');
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+/* ——— Accessibility 3.0 Hardening ————————————————————————— */
+@layer base {
+    :focus-visible {
+        outline: 2px solid var(--color-kintsugi-500) !important;
+        outline-offset: 3px !important;
+    }
+}
+
+/* ——— Keyframes ——————————————————————————————————————————— */
+
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes slide-down {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes slide-in-left {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0);     }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0);   }
+    50%       { transform: translateY(-6px); }
+}
+
+@keyframes constellation-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(var(--float-y, -8px)); }
+}
+
+@keyframes badge-pop {
+    0%   { transform: scale(1);    }
+    40%  { transform: scale(1.35); }
+    100% { transform: scale(1);    }
+}
+
+@keyframes kintsugi-draw {
+    from { stroke-dashoffset: 600; opacity: 0.3; }
+    to   { stroke-dashoffset: 0;   opacity: 1;   }
+}
+
+@keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+}
+
+@keyframes reveal-up {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ——— Kintsugi section divider ——————————————————————————— */
+
+.kintsugi-divider, .kintsugi-divider-short, .kintsugi-accent {
+    display: block;
+    overflow: visible;
+}
+
+.kintsugi-divider {
+    width: 100%;
+    height: 48px;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.kintsugi-divider path, .kintsugi-divider-short path, .kintsugi-accent path {
+    stroke: var(--color-kintsugi-400);
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px var(--color-kintsugi-400));
+}
+
+.kintsugi-divider.is-visible path, .kintsugi-divider-short.is-visible path, .kintsugi-accent.is-visible path {
+    animation: kintsugi-draw 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.kintsugi-accent {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.kintsugi-accent.top-right { top: 0; right: 0; transform: rotate(90deg); }
+.kintsugi-accent.bottom-left { bottom: 0; left: 0; transform: rotate(-90deg); }
+.kintsugi-accent.top-left { top: 0; left: 0; }
+.kintsugi-accent.bottom-right { bottom: 0; right: 0; transform: rotate(180deg); }
+
+/* Scroll-triggered reveal */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Organic section fade */
+.organic-section-fade {
+    position: relative;
+}
+
+.organic-section-fade::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to bottom, transparent, var(--color-warm-50));
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Gold shimmer text accent — Quieted for elegance */
+.kintsugi-shimmer {
+    background: linear-gradient(
+        110deg,
+        var(--color-kintsugi-600) 0%,
+        var(--color-kintsugi-500) 35%,
+        var(--color-kintsugi-300) 50%,
+        var(--color-kintsugi-500) 65%,
+        var(--color-kintsugi-600) 100%
+    );
+    background-size: 250% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 12s ease-in-out infinite alternate;
+}
+
+/* ——— Reduced motion ————————————————————————————————————— */
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+@theme {
+    --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Playfair Display', Georgia, serif;
+
+    /* Kintsugi Gold - Refined Antique Gold Palette */
+    --color-kintsugi-50: #FCF7E3;
+    --color-kintsugi-100: #F8E8B0;
+    --color-kintsugi-200: #EDD581;
+    --color-kintsugi-300: #DBBA56;
+    --color-kintsugi-400: #C29A30;
+    --color-kintsugi-500: #A67C1F; /* Main Brand Gold - Richer and deeper */
+    --color-kintsugi-600: #8A6416;
+    --color-kintsugi-700: #6B4E10;
+    --color-kintsugi-800: #4D380B;
+    --color-kintsugi-900: #332506;
+
+    /* Warm Neutrals */
+    --color-warm-50: #FDFAF5;
+    --color-warm-100: #F7F0E6;
+    --color-warm-200: #EDE3D4;
+    --color-warm-300: #D9CCBA;
+    --color-warm-400: #B5A48E;
+    --color-warm-500: #8C7B66;
+    --color-warm-600: #6B5C4A;
+    --color-warm-700: #4A3F31;
+    --color-warm-800: #2D261D;
+    --color-warm-900: #1A1611;
+
+    /* Animations */
+    --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-fade-in: fade-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-slide-down: slide-down 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-slide-in-left: slide-in-left 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-float: float 3s ease-in-out infinite;
+    --animate-badge-pop: badge-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    /* Specialty */
+    --color-cream: #FFFDF7;
+    --color-parchment: #F5EFE0;
+}
