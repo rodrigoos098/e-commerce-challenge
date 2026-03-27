@@ -259,6 +259,29 @@ class StockServiceTest extends TestCase
         $this->makeService($movementRepo, $productRepo)->increaseStock(1, 20, 'Restocking');
     }
 
+    public function test_adjust_stock_creates_ajuste_movement_with_target_quantity(): void
+    {
+        Event::fake();
+
+        $product = Product::factory()->make(['id' => 1, 'quantity' => 12, 'min_quantity' => 3]);
+        $movement = StockMovement::factory()->make(['type' => 'ajuste', 'quantity' => 7]);
+
+        $movementRepo = Mockery::mock(StockMovementRepositoryInterface::class);
+        $movementRepo->shouldReceive('create')
+            ->once()
+            ->withArgs(fn ($data) => $data['type'] === 'ajuste'
+                && $data['quantity'] === 7
+                && $data['reference_type'] === 'manual_adjustment')
+            ->andReturn($movement);
+
+        $productRepo = Mockery::mock(ProductRepositoryInterface::class);
+        $productRepo->shouldReceive('findById')->with(1)->andReturn($product);
+        $productRepo->shouldReceive('update')->once()->with($product, ['quantity' => 7])->andReturn($product);
+        $productRepo->shouldReceive('findById')->andReturn($product);
+
+        $this->makeService($movementRepo, $productRepo)->adjustStock(1, 7, 'Inventory recount');
+    }
+
     public function test_record_movement_invalidates_products_cache(): void
     {
         Event::fake();

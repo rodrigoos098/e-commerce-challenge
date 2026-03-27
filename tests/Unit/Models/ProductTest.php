@@ -84,6 +84,21 @@ class ProductTest extends TestCase
         $this->assertEquals('produto-teste-incrivel', $product->slug);
     }
 
+    public function test_slug_is_auto_generated_uniquely_from_name_on_create_when_collision_exists(): void
+    {
+        Product::factory()->create([
+            'name' => 'Produto Teste Incrivel',
+            'slug' => 'produto-teste-incrivel',
+        ]);
+
+        $product = Product::factory()->create([
+            'name' => 'Produto Teste Incrível',
+            'slug' => '',
+        ]);
+
+        $this->assertEquals('produto-teste-incrivel-1', $product->slug);
+    }
+
     public function test_existing_slug_is_not_overwritten_on_create(): void
     {
         $product = Product::factory()->create([
@@ -101,6 +116,47 @@ class ProductTest extends TestCase
         $product->update(['name' => 'Produto Alterado']);
 
         $this->assertEquals('produto-alterado', $product->slug);
+    }
+
+    public function test_slug_is_updated_uniquely_when_name_changes_without_explicit_slug(): void
+    {
+        Product::factory()->create([
+            'name' => 'Produto Alterado!!!',
+            'slug' => 'produto-alterado',
+        ]);
+
+        $product = Product::factory()->create(['name' => 'Produto Original']);
+
+        $product->update(['name' => 'Produto Alterado']);
+
+        $this->assertEquals('produto-alterado-1', $product->fresh()->slug);
+    }
+
+    public function test_explicit_slug_is_preserved_when_name_changes(): void
+    {
+        $product = Product::factory()->create(['name' => 'Produto Original']);
+
+        $product->update([
+            'name' => 'Produto Alterado',
+            'slug' => 'meu-slug-customizado',
+        ]);
+
+        $this->assertEquals('meu-slug-customizado', $product->fresh()->slug);
+    }
+
+    public function test_existing_slug_is_preserved_when_name_changes_and_same_slug_is_explicitly_provided(): void
+    {
+        $product = Product::factory()->create([
+            'name' => 'Produto Original',
+            'slug' => 'slug-estavel',
+        ]);
+
+        $product->update([
+            'name' => 'Produto Alterado',
+            'slug' => 'slug-estavel',
+        ]);
+
+        $this->assertEquals('slug-estavel', $product->fresh()->slug);
     }
 
     public function test_slug_is_not_updated_when_name_does_not_change(): void
@@ -231,5 +287,22 @@ class ProductTest extends TestCase
         $found = Product::withTrashed()->find($product->id);
 
         $this->assertNotNull($found);
+    }
+
+    public function test_soft_deleted_product_slug_is_reserved_for_future_products(): void
+    {
+        $deletedProduct = Product::factory()->create([
+            'name' => 'Produto Arquivado',
+            'slug' => 'produto-arquivado',
+        ]);
+
+        $deletedProduct->delete();
+
+        $replacementProduct = Product::factory()->create([
+            'name' => 'Produto Arquivado!!!',
+            'slug' => '',
+        ]);
+
+        $this->assertEquals('produto-arquivado-1', $replacementProduct->slug);
     }
 }

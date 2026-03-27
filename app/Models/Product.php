@@ -17,6 +17,8 @@ class Product extends Model
     use HasFactory;
     use SoftDeletes;
 
+    private bool $slugWasExplicitlySet = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -57,16 +59,75 @@ class Product extends Model
     protected static function booted(): void
     {
         static::creating(function (Product $product): void {
-            if (empty($product->slug)) {
-                $product->slug = Str::slug($product->name);
-            }
+            $product->slug = filled($product->slug)
+                ? static::generateUniqueSlug($product->slug)
+                : static::generateUniqueSlug($product->name);
         });
 
         static::updating(function (Product $product): void {
-            if ($product->isDirty('name') && ! $product->isDirty('slug')) {
-                $product->slug = Str::slug($product->name);
+            if ($product->slugWasExplicitlySet) {
+                if (filled($product->slug)) {
+                    $product->slug = static::generateUniqueSlug($product->slug, $product->id);
+
+                    return;
+                }
+
+                if ($product->isDirty('name')) {
+                    $product->slug = static::generateUniqueSlug($product->name, $product->id);
+
+                    return;
+                }
+
+                $product->slug = $product->getOriginal('slug');
+
+                return;
+            }
+
+            if ($product->isDirty('name')) {
+                $product->slug = static::generateUniqueSlug($product->name, $product->id);
             }
         });
+
+        static::saved(function (Product $product): void {
+            $product->slugWasExplicitlySet = false;
+        });
+    }
+
+    public function setSlugAttribute(?string $value): void
+    {
+        $this->slugWasExplicitlySet = true;
+        $this->attributes['slug'] = $value;
+    }
+
+    /**
+     * Generate a unique slug for the product.
+     */
+    private static function generateUniqueSlug(string $value, ?int $exceptId = null): string
+    {
+        $slug = Str::slug($value);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (static::slugExists($slug, $exceptId)) {
+            $slug = "{$originalSlug}-{$count}";
+            $count++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Determine whether the slug already exists.
+     */
+    private static function slugExists(string $slug, ?int $exceptId = null): bool
+    {
+        $query = static::withTrashed()->where('slug', $slug);
+
+        if ($exceptId !== null) {
+            $query->whereKeyNot($exceptId);
+        }
+
+        return $query->exists();
     }
 
     /**

@@ -86,7 +86,7 @@ export default function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
                     <div className="min-w-0">
                         <h4 className="text-sm font-semibold text-warm-700 truncate">{item.product.name}</h4>
                         {item.product.category && (
-                            <p className="text-xs text-warm-400 mt-0.5 truncate">{item.product.category.name}</p>
+                            <p className="text-xs text-warm-500 mt-0.5 truncate">{item.product.category.name}</p>
                         )}
                     </div>
                     {/* Remove */}
@@ -94,9 +94,9 @@ export default function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
                         type="button"
                         onClick={handleRemove}
                         aria-label={`Remover ${item.product.name} do carrinho`}
-                        className="shrink-0 text-warm-300 hover:text-red-500 transition-colors p-1"
+                        className="shrink-0 flex items-center justify-center min-h-[44px] min-w-[44px] text-warm-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -111,7 +111,7 @@ export default function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
                     />
                     <div className="text-right">
                         <p className="text-sm font-bold text-warm-700">{formatPrice(lineTotal)}</p>
-                        <p className="text-xs text-warm-400">{formatPrice(item.product.price)} / unid.</p>
+                        <p className="text-xs text-warm-500">{formatPrice(item.product.price)} / unid.</p>
                     </div>
                 </div>
             </div>

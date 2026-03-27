@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'enabled' => env('TELESCOPE_ENABLED', true),
+    'enabled' => env('TELESCOPE_ENABLED', env('APP_ENV', 'production') === 'local'),
 
     /*
     |--------------------------------------------------------------------------
@@ -43,6 +43,8 @@ return [
     */
 
     'path' => env('TELESCOPE_PATH', 'telescope'),
+
+    'allowed_emails' => array_values(array_filter(array_map('trim', explode(',', env('TELESCOPE_ALLOWED_EMAILS', ''))))),
 
     /*
     |--------------------------------------------------------------------------

@@ -143,8 +143,9 @@ class OrderApiTest extends TestCase
         $response = $this->actingAs($customer, 'sanctum')
             ->getJson("/api/v1/orders/{$otherOrder->id}");
 
-        $response->assertStatus(404)
-            ->assertJsonPath('success', false);
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'This action is unauthorized.');
     }
 
     public function test_admin_can_view_any_order(): void
@@ -261,14 +262,104 @@ class OrderApiTest extends TestCase
 
         $response = $this->actingAs($admin, 'sanctum')
             ->putJson("/api/v1/orders/{$order->id}/status", [
-                'status' => 'shipped',
+                'status' => 'processing',
             ]);
 
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.status', 'shipped');
+            ->assertJsonPath('data.status', 'processing');
 
-        $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'shipped']);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'processing']);
+    }
+
+    public function test_cancelling_order_restores_stock_and_records_return_movement(): void
+    {
+        $admin = $this->createAdmin();
+        $customer = $this->createCustomer();
+        [, $product] = $this->setupCartWithProduct($customer, Product::factory()->create([
+            'quantity' => 10,
+            'active' => true,
+            'price' => 50.0,
+        ]));
+        $address = $this->validAddress();
+
+        $createResponse = $this->actingAs($customer, 'sanctum')
+            ->postJson('/api/v1/orders', [
+                'shipping_address' => $address,
+                'billing_address' => $address,
+            ]);
+
+        $orderId = $createResponse->json('data.id');
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$orderId}/status", [
+                'status' => 'cancelled',
+            ])
+            ->assertStatus(200)
+            ->assertJsonPath('data.status', 'cancelled');
+
+        $product->refresh();
+
+        $this->assertSame(10, $product->quantity);
+        $this->assertDatabaseHas('stock_movements', [
+            'product_id' => $product->id,
+            'type' => 'devolucao',
+            'quantity' => 2,
+            'reference_type' => 'order',
+            'reference_id' => $orderId,
+        ]);
+    }
+
+    public function test_admin_cannot_apply_invalid_status_transition(): void
+    {
+        $admin = $this->createAdmin();
+        $order = Order::factory()->create(['status' => 'shipped']);
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", [
+                'status' => 'cancelled',
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['errors' => ['status']]);
+    }
+
+    public function test_customer_can_cancel_own_eligible_order(): void
+    {
+        $customer = $this->createCustomer();
+        $product = Product::factory()->create(['quantity' => 10, 'active' => true, 'price' => 50.0]);
+        $address = $this->validAddress();
+
+        $this->setupCartWithProduct($customer, $product);
+
+        $createResponse = $this->actingAs($customer, 'sanctum')
+            ->postJson('/api/v1/orders', [
+                'shipping_address' => $address,
+                'billing_address' => $address,
+            ]);
+
+        $orderId = $createResponse->json('data.id');
+
+        $this->actingAs($customer, 'sanctum')
+            ->putJson("/api/v1/orders/{$orderId}/cancel")
+            ->assertStatus(200)
+            ->assertJsonPath('data.status', 'cancelled')
+            ->assertJsonPath('data.can_cancel', false);
+    }
+
+    public function test_customer_cannot_cancel_shipped_order(): void
+    {
+        $customer = $this->createCustomer();
+        $order = Order::factory()->create([
+            'user_id' => $customer->id,
+            'status' => 'shipped',
+        ]);
+
+        $this->actingAs($customer, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/cancel")
+            ->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'This action is unauthorized.');
     }
 
     public function test_customer_cannot_update_order_status(): void
@@ -281,7 +372,9 @@ class OrderApiTest extends TestCase
                 'status' => 'shipped',
             ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'This action is unauthorized.');
     }
 
     public function test_admin_cannot_set_invalid_order_status(): void

@@ -134,6 +134,39 @@ class StockService
     }
 
     /**
+     * Adjust product stock to a target quantity while preserving movement history.
+     */
+    public function adjustStock(int $productId, int $targetQuantity, string $reason): StockMovement
+    {
+        $dto = new StockMovementDTO(
+            productId: $productId,
+            type: 'ajuste',
+            quantity: $targetQuantity,
+            reason: $reason,
+            referenceType: 'manual_adjustment',
+        );
+
+        return $this->recordMovement($dto);
+    }
+
+    /**
+     * Restore product stock after an order cancellation.
+     */
+    public function restoreStockFromCancelledOrder(int $productId, int $quantity, int $orderId): StockMovement
+    {
+        $dto = new StockMovementDTO(
+            productId: $productId,
+            type: 'devolucao',
+            quantity: $quantity,
+            reason: 'Stock restored after order cancellation',
+            referenceType: 'order',
+            referenceId: $orderId,
+        );
+
+        return $this->recordMovement($dto);
+    }
+
+    /**
      * Apply a stock movement to a product's quantity.
      */
     private function applyMovementToProduct(Product $product, string $type, int $quantity): void

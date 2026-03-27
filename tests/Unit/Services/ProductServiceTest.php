@@ -104,6 +104,32 @@ class ProductServiceTest extends TestCase
         $this->makeService($repo)->create($dto);
     }
 
+    public function test_create_uses_explicit_slug_as_unique_base(): void
+    {
+        Event::fake();
+
+        $product = Product::factory()->make(['id' => 1, 'quantity' => 10, 'min_quantity' => 5]);
+
+        $repo = Mockery::mock(ProductRepositoryInterface::class);
+        $repo->shouldReceive('slugExists')->with('meu-slug-customizado', null)->once()->andReturn(false);
+        $repo->shouldReceive('create')
+            ->once()
+            ->withArgs(fn ($data) => $data['slug'] === 'meu-slug-customizado')
+            ->andReturn($product);
+        $repo->shouldReceive('syncTags')->andReturn(null);
+        $repo->shouldReceive('findById')->andReturn($product);
+
+        $dto = new ProductDTO(
+            name: 'Meu Produto',
+            slug: 'Meu Slug Customizado',
+            price: 10.0,
+            quantity: 10,
+            categoryId: 1,
+        );
+
+        $this->makeService($repo)->create($dto);
+    }
+
     public function test_create_syncs_tags_when_tag_ids_provided(): void
     {
         Event::fake();
@@ -139,6 +165,101 @@ class ProductServiceTest extends TestCase
         $this->makeService($repo)->update($original, $dto);
 
         Event::assertDispatched(StockLow::class);
+    }
+
+    public function test_update_auto_generates_unique_slug_when_name_changes_without_explicit_slug(): void
+    {
+        Event::fake();
+
+        $updatedProduct = Product::factory()->make(['id' => 1, 'quantity' => 10, 'min_quantity' => 5]);
+
+        $repo = Mockery::mock(ProductRepositoryInterface::class);
+        $repo->shouldReceive('slugExists')->with('novo-nome', 1)->once()->andReturn(true);
+        $repo->shouldReceive('slugExists')->with('novo-nome-1', 1)->once()->andReturn(false);
+        $repo->shouldReceive('update')
+            ->once()
+            ->withArgs(fn (Product $product, array $data) => $product->id === 1
+                && $data['name'] === 'Novo Nome'
+                && $data['slug'] === 'novo-nome-1')
+            ->andReturn($updatedProduct);
+
+        $original = Product::factory()->make(['id' => 1, 'name' => 'Nome Antigo']);
+        $dto = new ProductDTO(name: 'Novo Nome');
+
+        $this->makeService($repo)->update($original, $dto);
+    }
+
+    public function test_update_uses_explicit_slug_as_unique_base(): void
+    {
+        Event::fake();
+
+        $updatedProduct = Product::factory()->make(['id' => 1, 'quantity' => 10, 'min_quantity' => 5]);
+
+        $repo = Mockery::mock(ProductRepositoryInterface::class);
+        $repo->shouldReceive('slugExists')->with('slug-manual', 1)->once()->andReturn(false);
+        $repo->shouldReceive('update')
+            ->once()
+            ->withArgs(fn (Product $product, array $data) => $product->id === 1
+                && $data['name'] === 'Novo Nome'
+                && $data['slug'] === 'slug-manual')
+            ->andReturn($updatedProduct);
+
+        $original = Product::factory()->make(['id' => 1, 'name' => 'Nome Antigo']);
+        $dto = new ProductDTO(name: 'Novo Nome', slug: 'Slug Manual');
+
+        $this->makeService($repo)->update($original, $dto);
+    }
+
+    public function test_update_preserves_existing_slug_when_same_slug_is_explicitly_provided(): void
+    {
+        Event::fake();
+
+        $updatedProduct = Product::factory()->make([
+            'id' => 1,
+            'name' => 'Novo Nome',
+            'slug' => 'slug-estavel',
+            'quantity' => 10,
+            'min_quantity' => 5,
+        ]);
+
+        $repo = Mockery::mock(ProductRepositoryInterface::class);
+        $repo->shouldReceive('slugExists')->with('slug-estavel', 1)->once()->andReturn(false);
+        $repo->shouldReceive('update')
+            ->once()
+            ->withArgs(fn (Product $product, array $data) => $product->id === 1
+                && $data['name'] === 'Novo Nome'
+                && $data['slug'] === 'slug-estavel')
+            ->andReturn($updatedProduct);
+
+        $original = Product::factory()->make([
+            'id' => 1,
+            'name' => 'Nome Antigo',
+            'slug' => 'slug-estavel',
+        ]);
+        $dto = new ProductDTO(name: 'Novo Nome', slug: 'slug-estavel');
+
+        $this->makeService($repo)->update($original, $dto);
+    }
+
+    public function test_create_generates_new_slug_when_soft_deleted_product_already_uses_base_slug(): void
+    {
+        Event::fake();
+
+        $product = Product::factory()->make(['id' => 1, 'quantity' => 10, 'min_quantity' => 5]);
+
+        $repo = Mockery::mock(ProductRepositoryInterface::class);
+        $repo->shouldReceive('slugExists')->with('meu-produto', null)->once()->andReturn(true);
+        $repo->shouldReceive('slugExists')->with('meu-produto-1', null)->once()->andReturn(false);
+        $repo->shouldReceive('create')
+            ->once()
+            ->withArgs(fn ($data) => $data['slug'] === 'meu-produto-1')
+            ->andReturn($product);
+        $repo->shouldReceive('syncTags')->andReturn(null);
+        $repo->shouldReceive('findById')->andReturn($product);
+
+        $dto = new ProductDTO(name: 'Meu Produto', price: 10.0, quantity: 10, categoryId: 1);
+
+        $this->makeService($repo)->create($dto);
     }
 
     // ── Delete ────────────────────────────────────────────────────────────────

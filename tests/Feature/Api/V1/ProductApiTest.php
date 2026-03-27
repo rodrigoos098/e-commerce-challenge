@@ -4,6 +4,7 @@ namespace Tests\Feature\Api\V1;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\StockMovement;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -154,7 +155,10 @@ class ProductApiTest extends TestCase
                 'category_id' => $category->id,
             ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'This action is unauthorized.')
+            ->assertJsonStructure(['success', 'message']);
     }
 
     public function test_admin_can_create_product(): void
@@ -238,6 +242,142 @@ class ProductApiTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.name', 'Nome Atualizado');
+    }
+
+    public function test_admin_must_inform_reason_when_adjusting_stock_quantity(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['quantity' => 10]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", [
+                'quantity' => 4,
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['stock_adjustment_reason']);
+    }
+
+    public function test_admin_stock_adjustment_creates_movement_history(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['quantity' => 10]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", [
+                'quantity' => 4,
+                'stock_adjustment_reason' => 'Contagem fisica no inventario',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.quantity', 4);
+
+        $this->assertDatabaseHas('stock_movements', [
+            'product_id' => $product->id,
+            'type' => 'ajuste',
+            'quantity' => 4,
+            'reason' => 'Contagem fisica no inventario',
+            'reference_type' => 'manual_adjustment',
+        ]);
+
+        $this->assertSame(1, StockMovement::query()
+            ->where('product_id', $product->id)
+            ->where('type', 'ajuste')
+            ->count());
+    }
+
+    public function test_admin_stock_adjustment_creates_history_when_quantity_changes(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['quantity' => 12]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", [
+                'quantity' => 7,
+                'stock_adjustment_reason' => 'Ajuste apos contagem de inventario',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true);
+
+        $product->refresh();
+
+        $this->assertSame(7, $product->quantity);
+        $this->assertDatabaseHas('stock_movements', [
+            'product_id' => $product->id,
+            'type' => 'ajuste',
+            'quantity' => 7,
+            'reason' => 'Ajuste apos contagem de inventario',
+            'reference_type' => 'manual_adjustment',
+        ]);
+        $this->assertSame(1, StockMovement::query()
+            ->where('product_id', $product->id)
+            ->where('type', 'ajuste')
+            ->count());
+    }
+
+    public function test_admin_stock_adjustment_requires_reason_when_quantity_changes(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['quantity' => 12]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", [
+                'quantity' => 7,
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['success', 'errors' => ['stock_adjustment_reason']]);
+
+        $product->refresh();
+
+        $this->assertSame(12, $product->quantity);
+        $this->assertDatabaseMissing('stock_movements', [
+            'product_id' => $product->id,
+            'type' => 'ajuste',
+        ]);
+    }
+
+    public function test_admin_stock_adjustment_creates_manual_movement_history(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['quantity' => 12]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", [
+                'quantity' => 7,
+                'stock_adjustment_reason' => 'Inventario ciclico',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.quantity', 7);
+
+        $product->refresh();
+
+        $this->assertSame(7, $product->quantity);
+        $this->assertDatabaseHas('stock_movements', [
+            'product_id' => $product->id,
+            'type' => 'ajuste',
+            'quantity' => 7,
+            'reason' => 'Inventario ciclico',
+            'reference_type' => 'manual_adjustment',
+        ]);
+        $this->assertSame(1, StockMovement::query()->where('product_id', $product->id)->where('type', 'ajuste')->count());
+    }
+
+    public function test_stock_adjustment_requires_reason_when_quantity_changes(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['quantity' => 12]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", [
+                'quantity' => 7,
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['stock_adjustment_reason']);
     }
 
     // ── Destroy (admin) ───────────────────────────────────────────────────────

@@ -4,7 +4,13 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
-@source '../**/*.js';
+/* ——— Accessibility 3.0 Hardening ————————————————————————— */
+@layer base {
+    :focus-visible {
+        outline: 2px solid var(--color-kintsugi-500) !important;
+        outline-offset: 3px !important;
+    }
+}
 
 /* ——— Keyframes ——————————————————————————————————————————— */
 
@@ -31,6 +37,11 @@
 @keyframes float {
     0%, 100% { transform: translateY(0);   }
     50%       { transform: translateY(-6px); }
+}
+
+@keyframes constellation-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(var(--float-y, -8px)); }
 }
 
 @keyframes badge-pop {
@@ -125,21 +136,21 @@
     z-index: 1;
 }
 
-/* Gold shimmer text accent */
+/* Gold shimmer text accent — Quieted for elegance */
 .kintsugi-shimmer {
     background: linear-gradient(
-        90deg,
+        110deg,
         var(--color-kintsugi-600) 0%,
-        var(--color-kintsugi-400) 25%,
-        var(--color-kintsugi-700) 50%,
-        var(--color-kintsugi-400) 75%,
+        var(--color-kintsugi-500) 35%,
+        var(--color-kintsugi-300) 50%,
+        var(--color-kintsugi-500) 65%,
         var(--color-kintsugi-600) 100%
     );
-    background-size: 200% auto;
+    background-size: 250% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer 4s linear infinite;
+    animation: shimmer 12s ease-in-out infinite alternate;
 }
 
 /* ——— Reduced motion ————————————————————————————————————— */

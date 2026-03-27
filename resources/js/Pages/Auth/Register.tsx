@@ -65,7 +65,7 @@ export default function Register() {
                     <Link href="/" className="inline-flex items-center gap-2">
                         <Logo />
                     </Link>
-                    <h1 className="mt-6 text-2xl font-bold text-warm-700">Junte-se ao Shopsugiツ</h1>
+                    <h1 className="mt-6 text-2xl font-bold text-warm-700">Junte-se ao Shopsugi<span className="kintsugi-shimmer">ツ</span></h1>
                     <p className="mt-1 text-sm text-warm-500">Descubra arte artesanal unica de todo o Brasil.</p>
                 </div>
 

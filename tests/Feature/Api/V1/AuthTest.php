@@ -137,15 +137,56 @@ class AuthTest extends TestCase
 
     // ── Logout ────────────────────────────────────────────────────────────────
 
-    public function test_authenticated_user_can_logout(): void
+    public function test_bearer_token_logout_revokes_only_the_current_token(): void
     {
         $user = User::factory()->create();
+        $currentToken = $user->createToken('current-device');
+        $token = $currentToken->plainTextToken;
+        $otherToken = $user->createToken('other-device');
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->withToken($token)
             ->postJson('/api/v1/auth/logout');
 
         $response->assertStatus(200)
             ->assertJsonPath('success', true);
+
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'id' => $currentToken->accessToken->getKey(),
+        ]);
+
+        $this->assertDatabaseHas('personal_access_tokens', [
+            'id' => $otherToken->accessToken->getKey(),
+        ]);
+
+        $this->withToken($token)
+            ->getJson('/api/v1/auth/me')
+            ->assertStatus(401);
+
+        $this->withToken($otherToken->plainTextToken)
+            ->getJson('/api/v1/auth/me')
+            ->assertStatus(200)
+            ->assertJsonPath('data.email', $user->email);
+    }
+
+    public function test_stateful_logout_clears_session_auth_without_revoking_api_tokens(): void
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('browser-session');
+
+        $response = $this->withSession(['auth_test' => 'present'])
+            ->actingAs($user, 'web')
+            ->postJson('/api/v1/auth/logout');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true);
+
+        $this->assertGuest('web');
+        $this->assertDatabaseHas('personal_access_tokens', [
+            'id' => $token->accessToken->getKey(),
+        ]);
+
+        $this->getJson('/api/v1/auth/me')
+            ->assertStatus(401);
     }
 
     public function test_guest_cannot_logout(): void

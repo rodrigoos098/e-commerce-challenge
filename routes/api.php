@@ -5,6 +5,9 @@ use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\ProductController;
+use App\Http\Controllers\Api\V1\TagController;
+use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -20,6 +23,7 @@ Route::prefix('v1')->group(function (): void {
     Route::get('categories', [CategoryController::class, 'index']);
     Route::get('categories/{category}', [CategoryController::class, 'show']);
     Route::get('categories/{category}/products', [CategoryController::class, 'products']);
+    Route::get('tags', [TagController::class, 'index']);
 
     // ── Authenticated Routes ─────────────────────────────────────────────────
     Route::middleware('auth:sanctum')->group(function (): void {
@@ -35,25 +39,29 @@ Route::prefix('v1')->group(function (): void {
         Route::delete('cart', [CartController::class, 'clear']);
 
         // Orders
-        Route::get('orders', [OrderController::class, 'index']);
-        Route::get('orders/{id}', [OrderController::class, 'show']);
-        Route::post('orders', [OrderController::class, 'store']);
+        Route::get('orders', [OrderController::class, 'index'])->middleware('can:viewAny,'.Order::class);
+        Route::get('orders/{order}', [OrderController::class, 'show'])->middleware('can:view,order');
+        Route::post('orders', [OrderController::class, 'store'])->middleware('can:create,'.Order::class);
+        Route::put('orders/{order}/cancel', [OrderController::class, 'cancel'])->middleware('can:cancel,order');
+        Route::put('orders/{order}/status', [OrderController::class, 'updateStatus'])->middleware('can:update,order');
+
+        // Products (policy-backed admin mutations)
+        Route::post('products', [ProductController::class, 'store'])->middleware('can:create,'.Product::class);
+        Route::put('products/{product}', [ProductController::class, 'update'])->middleware('can:update,product');
+        Route::delete('products/{product}', [ProductController::class, 'destroy'])->middleware('can:delete,product');
+
+        Route::get('products/low-stock', [ProductController::class, 'lowStock'])
+            ->middleware('can:viewLowStock,'.Product::class);
 
         // ── Admin Routes ─────────────────────────────────────────────────────
         Route::middleware('role:admin')->group(function (): void {
-            // Products (admin CRUD)
-            Route::post('products', [ProductController::class, 'store']);
-            Route::put('products/{product}', [ProductController::class, 'update']);
-            Route::delete('products/{product}', [ProductController::class, 'destroy']);
-            Route::get('products/low-stock', [ProductController::class, 'lowStock']);
-
             // Categories (admin CRUD)
             Route::post('categories', [CategoryController::class, 'store']);
             Route::put('categories/{category}', [CategoryController::class, 'update']);
             Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
-
-            // Orders (admin status update)
-            Route::put('orders/{order}/status', [OrderController::class, 'updateStatus']);
+            Route::post('tags', [TagController::class, 'store']);
+            Route::put('tags/{tag}', [TagController::class, 'update']);
+            Route::delete('tags/{tag}', [TagController::class, 'destroy']);
         });
     });
 });

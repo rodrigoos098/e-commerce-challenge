@@ -18,6 +18,16 @@ interface CartRepositoryInterface
     public function findByUserId(int $userId): ?Cart;
 
     /**
+     * Get or create a cart for the given session.
+     */
+    public function findOrCreateForSession(string $sessionId): Cart;
+
+    /**
+     * Find a cart by session ID with items and products eager-loaded.
+     */
+    public function findBySessionId(string $sessionId): ?Cart;
+
+    /**
      * Add an item to the cart (or update quantity if already exists).
      */
     public function addItem(Cart $cart, int $productId, int $quantity): CartItem;
@@ -46,4 +56,9 @@ interface CartRepositoryInterface
      * Find a cart item by cart and product.
      */
     public function findItemByCartAndProduct(Cart $cart, int $productId): ?CartItem;
+
+    /**
+     * Delete a cart record.
+     */
+    public function deleteCart(Cart $cart): bool;
 }

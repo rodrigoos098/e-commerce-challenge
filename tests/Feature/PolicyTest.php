@@ -5,9 +5,8 @@ namespace Tests\Feature;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use App\Policies\OrderPolicy;
-use App\Policies\ProductPolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -15,13 +14,14 @@ class PolicyTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * These tests cover direct Gate / policy decisions only.
+     * HTTP integration and middleware behavior belong in AuthorizationTest.
+     */
+
     private User $admin;
 
     private User $customer;
-
-    private ProductPolicy $productPolicy;
-
-    private OrderPolicy $orderPolicy;
 
     protected function setUp(): void
     {
@@ -35,143 +35,140 @@ class PolicyTest extends TestCase
 
         $this->customer = User::factory()->create();
         $this->customer->assignRole('customer');
-
-        $this->productPolicy = new ProductPolicy();
-        $this->orderPolicy = new OrderPolicy();
     }
 
-    // ── ProductPolicy ──────────────────────────────────────────────────────────────
-
-    public function test_product_policy_view_any_returns_true_for_guest(): void
+    public function test_product_policy_create_allows_admin_via_gate(): void
     {
-        $this->assertTrue($this->productPolicy->viewAny(null));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('create', Product::class));
     }
 
-    public function test_product_policy_view_any_returns_true_for_authenticated(): void
+    public function test_product_policy_create_denies_customer_via_gate(): void
     {
-        $this->assertTrue($this->productPolicy->viewAny($this->customer));
+        $this->assertTrue(Gate::forUser($this->customer)->denies('create', Product::class));
     }
 
-    public function test_product_policy_view_returns_true_for_guest(): void
+    public function test_product_policy_update_allows_admin_via_gate(): void
     {
         $product = Product::factory()->create();
 
-        $this->assertTrue($this->productPolicy->view(null, $product));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('update', $product));
     }
 
-    public function test_product_policy_create_allows_admin(): void
-    {
-        $this->assertTrue($this->productPolicy->create($this->admin));
-    }
-
-    public function test_product_policy_create_denies_customer(): void
-    {
-        $this->assertFalse($this->productPolicy->create($this->customer));
-    }
-
-    public function test_product_policy_update_allows_admin(): void
+    public function test_product_policy_update_denies_customer_via_gate(): void
     {
         $product = Product::factory()->create();
 
-        $this->assertTrue($this->productPolicy->update($this->admin, $product));
+        $this->assertTrue(Gate::forUser($this->customer)->denies('update', $product));
     }
 
-    public function test_product_policy_update_denies_customer(): void
+    public function test_product_policy_delete_allows_admin_via_gate(): void
     {
         $product = Product::factory()->create();
 
-        $this->assertFalse($this->productPolicy->update($this->customer, $product));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('delete', $product));
     }
 
-    public function test_product_policy_delete_allows_admin(): void
+    public function test_product_policy_delete_denies_customer_via_gate(): void
     {
         $product = Product::factory()->create();
 
-        $this->assertTrue($this->productPolicy->delete($this->admin, $product));
+        $this->assertTrue(Gate::forUser($this->customer)->denies('delete', $product));
     }
 
-    public function test_product_policy_delete_denies_customer(): void
+    public function test_product_policy_restore_allows_admin_via_gate(): void
     {
         $product = Product::factory()->create();
 
-        $this->assertFalse($this->productPolicy->delete($this->customer, $product));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('restore', $product));
     }
 
-    public function test_product_policy_restore_allows_admin(): void
+    public function test_product_policy_force_delete_allows_admin_via_gate(): void
     {
         $product = Product::factory()->create();
 
-        $this->assertTrue($this->productPolicy->restore($this->admin, $product));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('forceDelete', $product));
     }
 
-    public function test_product_policy_force_delete_allows_admin(): void
+    public function test_order_policy_view_any_allows_authenticated_users_via_gate(): void
     {
-        $product = Product::factory()->create();
-
-        $this->assertTrue($this->productPolicy->forceDelete($this->admin, $product));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('viewAny', Order::class));
+        $this->assertTrue(Gate::forUser($this->customer)->allows('viewAny', Order::class));
     }
 
-    // ── OrderPolicy ────────────────────────────────────────────────────────────────
-
-    public function test_order_policy_view_any_returns_true_for_any_user(): void
-    {
-        $this->assertTrue($this->orderPolicy->viewAny($this->admin));
-        $this->assertTrue($this->orderPolicy->viewAny($this->customer));
-    }
-
-    public function test_order_policy_view_allows_admin_to_see_any_order(): void
+    public function test_order_policy_view_allows_admin_to_see_any_order_via_gate(): void
     {
         $order = Order::factory()->create(['user_id' => $this->customer->id]);
 
-        $this->assertTrue($this->orderPolicy->view($this->admin, $order));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('view', $order));
     }
 
-    public function test_order_policy_view_allows_customer_to_see_own_order(): void
+    public function test_order_policy_view_allows_customer_to_see_own_order_via_gate(): void
     {
         $order = Order::factory()->create(['user_id' => $this->customer->id]);
 
-        $this->assertTrue($this->orderPolicy->view($this->customer, $order));
+        $this->assertTrue(Gate::forUser($this->customer)->allows('view', $order));
     }
 
-    public function test_order_policy_view_denies_customer_seeing_other_order(): void
+    public function test_order_policy_view_denies_customer_seeing_other_order_via_gate(): void
     {
         $otherUser = User::factory()->create();
         $order = Order::factory()->create(['user_id' => $otherUser->id]);
 
-        $this->assertFalse($this->orderPolicy->view($this->customer, $order));
+        $this->assertTrue(Gate::forUser($this->customer)->denies('view', $order));
     }
 
-    public function test_order_policy_create_allows_any_authenticated_user(): void
+    public function test_order_policy_create_allows_any_authenticated_user_via_gate(): void
     {
-        $this->assertTrue($this->orderPolicy->create($this->admin));
-        $this->assertTrue($this->orderPolicy->create($this->customer));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('create', Order::class));
+        $this->assertTrue(Gate::forUser($this->customer)->allows('create', Order::class));
     }
 
-    public function test_order_policy_update_allows_admin(): void
-    {
-        $order = Order::factory()->create();
-
-        $this->assertTrue($this->orderPolicy->update($this->admin, $order));
-    }
-
-    public function test_order_policy_update_denies_customer(): void
-    {
-        $order = Order::factory()->create(['user_id' => $this->customer->id]);
-
-        $this->assertFalse($this->orderPolicy->update($this->customer, $order));
-    }
-
-    public function test_order_policy_delete_allows_admin(): void
+    public function test_order_policy_update_allows_admin_via_gate(): void
     {
         $order = Order::factory()->create();
 
-        $this->assertTrue($this->orderPolicy->delete($this->admin, $order));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('update', $order));
     }
 
-    public function test_order_policy_delete_denies_customer(): void
+    public function test_order_policy_update_denies_customer_via_gate(): void
     {
         $order = Order::factory()->create(['user_id' => $this->customer->id]);
 
-        $this->assertFalse($this->orderPolicy->delete($this->customer, $order));
+        $this->assertTrue(Gate::forUser($this->customer)->denies('update', $order));
+    }
+
+    public function test_order_policy_delete_allows_admin_via_gate(): void
+    {
+        $order = Order::factory()->create();
+
+        $this->assertTrue(Gate::forUser($this->admin)->allows('delete', $order));
+    }
+
+    public function test_order_policy_delete_denies_customer_via_gate(): void
+    {
+        $order = Order::factory()->create(['user_id' => $this->customer->id]);
+
+        $this->assertTrue(Gate::forUser($this->customer)->denies('delete', $order));
+    }
+
+    public function test_order_policy_cancel_allows_customer_for_own_pending_order(): void
+    {
+        $order = Order::factory()->create(['user_id' => $this->customer->id, 'status' => 'pending']);
+
+        $this->assertTrue(Gate::forUser($this->customer)->allows('cancel', $order));
+    }
+
+    public function test_order_policy_cancel_denies_customer_for_non_cancellable_status(): void
+    {
+        $order = Order::factory()->create(['user_id' => $this->customer->id, 'status' => 'shipped']);
+
+        $this->assertTrue(Gate::forUser($this->customer)->denies('cancel', $order));
+    }
+
+    public function test_order_policy_cancel_denies_admin_via_gate(): void
+    {
+        $order = Order::factory()->create(['user_id' => $this->customer->id, 'status' => 'pending']);
+
+        $this->assertTrue(Gate::forUser($this->admin)->denies('cancel', $order));
     }
 }

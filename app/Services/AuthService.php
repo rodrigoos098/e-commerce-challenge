@@ -4,8 +4,11 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Traits\LogsActivity;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthService
 {
@@ -26,6 +29,7 @@ class AuthService
         ]);
 
         $user->assignRole('customer');
+        event(new Registered($user));
 
         $token = $user->createToken('api-token')->plainTextToken;
 
@@ -76,7 +80,26 @@ class AuthService
      */
     public function logout(User $user): void
     {
-        $user->currentAccessToken()?->delete();
+        $request = request();
+        $bearerToken = $request->bearerToken();
+
+        if ($bearerToken) {
+            $token = PersonalAccessToken::findToken($bearerToken);
+
+            if ($token instanceof PersonalAccessToken) {
+                $token->delete();
+            }
+        } elseif ($request->hasSession()) {
+            foreach ((array) config('sanctum.guard', ['web']) as $guard) {
+                Auth::guard($guard)->logout();
+            }
+
+            $request->session()->flush();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        Auth::forgetGuards();
 
         $this->logActivity('auth', 'User logged out', [
             'logout_user_id' => $user->id,
@@ -98,6 +121,7 @@ class AuthService
         ]);
 
         $user->assignRole('customer');
+        event(new Registered($user));
 
         $this->logActivity('auth', 'User registered', [
             'registered_user_id' => $user->id,

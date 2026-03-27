@@ -13,6 +13,8 @@ class Category extends Model
     /** @use HasFactory<\Database\Factories\CategoryFactory> */
     use HasFactory;
 
+    private bool $slugWasExplicitlySet = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -44,16 +46,75 @@ class Category extends Model
     protected static function booted(): void
     {
         static::creating(function (Category $category): void {
-            if (empty($category->slug)) {
-                $category->slug = Str::slug($category->name);
-            }
+            $category->slug = filled($category->slug)
+                ? static::generateUniqueSlug($category->slug)
+                : static::generateUniqueSlug($category->name);
         });
 
         static::updating(function (Category $category): void {
-            if ($category->isDirty('name') && ! $category->isDirty('slug')) {
-                $category->slug = Str::slug($category->name);
+            if ($category->slugWasExplicitlySet) {
+                if (filled($category->slug)) {
+                    $category->slug = static::generateUniqueSlug($category->slug, $category->id);
+
+                    return;
+                }
+
+                if ($category->isDirty('name')) {
+                    $category->slug = static::generateUniqueSlug($category->name, $category->id);
+
+                    return;
+                }
+
+                $category->slug = $category->getOriginal('slug');
+
+                return;
+            }
+
+            if ($category->isDirty('name')) {
+                $category->slug = static::generateUniqueSlug($category->name, $category->id);
             }
         });
+
+        static::saved(function (Category $category): void {
+            $category->slugWasExplicitlySet = false;
+        });
+    }
+
+    public function setSlugAttribute(?string $value): void
+    {
+        $this->slugWasExplicitlySet = true;
+        $this->attributes['slug'] = $value;
+    }
+
+    /**
+     * Generate a unique slug for the category.
+     */
+    private static function generateUniqueSlug(string $value, ?int $exceptId = null): string
+    {
+        $slug = Str::slug($value);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (static::slugExists($slug, $exceptId)) {
+            $slug = "{$originalSlug}-{$count}";
+            $count++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Determine whether the slug already exists.
+     */
+    private static function slugExists(string $slug, ?int $exceptId = null): bool
+    {
+        $query = static::query()->where('slug', $slug);
+
+        if ($exceptId !== null) {
+            $query->whereKeyNot($exceptId);
+        }
+
+        return $query->exists();
     }
 
     /**

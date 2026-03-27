@@ -46,6 +46,21 @@ class CategoryTest extends TestCase
         $this->assertEquals('eletronicos-de-casa', $category->slug);
     }
 
+    public function test_slug_is_auto_generated_uniquely_from_name_on_create_when_collision_exists(): void
+    {
+        Category::factory()->create([
+            'name' => 'Eletronicos de Casa',
+            'slug' => 'eletronicos-de-casa',
+        ]);
+
+        $category = Category::factory()->create([
+            'name' => 'Eletronicos de Casa',
+            'slug' => '',
+        ]);
+
+        $this->assertEquals('eletronicos-de-casa-1', $category->slug);
+    }
+
     public function test_existing_slug_is_not_overwritten_on_create(): void
     {
         $category = Category::factory()->create([
@@ -63,6 +78,47 @@ class CategoryTest extends TestCase
         $category->update(['name' => 'Calçados Esportivos']);
 
         $this->assertEquals('calcados-esportivos', $category->slug);
+    }
+
+    public function test_slug_is_updated_uniquely_when_name_changes_without_explicit_slug(): void
+    {
+        Category::factory()->create([
+            'name' => 'Calcados Esportivos',
+            'slug' => 'calcados-esportivos',
+        ]);
+
+        $category = Category::factory()->create(['name' => 'Calcados']);
+
+        $category->update(['name' => 'Calcados Esportivos']);
+
+        $this->assertEquals('calcados-esportivos-1', $category->fresh()->slug);
+    }
+
+    public function test_explicit_slug_is_preserved_when_name_changes(): void
+    {
+        $category = Category::factory()->create(['name' => 'Calcados']);
+
+        $category->update([
+            'name' => 'Calcados Esportivos',
+            'slug' => 'calcados-personalizados',
+        ]);
+
+        $this->assertEquals('calcados-personalizados', $category->fresh()->slug);
+    }
+
+    public function test_existing_slug_is_preserved_when_name_changes_and_same_slug_is_explicitly_provided(): void
+    {
+        $category = Category::factory()->create([
+            'name' => 'Calcados',
+            'slug' => 'calcados-estaveis',
+        ]);
+
+        $category->update([
+            'name' => 'Calcados Esportivos',
+            'slug' => 'calcados-estaveis',
+        ]);
+
+        $this->assertEquals('calcados-estaveis', $category->fresh()->slug);
     }
 
     // ── Relacionamentos ───────────────────────────────────────────────────────

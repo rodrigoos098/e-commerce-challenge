@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
 import PublicLayout from '@/Layouts/PublicLayout';
 import CartItemComponent from '@/Components/Public/CartItem';
@@ -10,6 +10,9 @@ function formatPrice(value: number) {
 }
 
 export default function Cart({ cart }: CartPageProps) {
+    const { auth } = usePage<{ auth?: { user?: { id: number } | null } }>().props;
+    const isAuthenticated = Boolean(auth?.user);
+
     const handleClearCart = () => {
         router.delete('/cart', {
             onSuccess: () => toast.success('Sacola esvaziada.'),
@@ -101,6 +104,7 @@ export default function Cart({ cart }: CartPageProps) {
                                         {cart.shipping_cost === 0 ? 'Grátis' : formatPrice(cart.shipping_cost)}
                                     </span>
                                 </div>
+                                <p className="text-xs text-warm-400">Frete grátis a partir de R$ 200,00. Abaixo disso, taxa fixa de R$ 19,90.</p>
                                 <div className="border-t border-warm-200 pt-3 flex justify-between font-bold text-base text-warm-700">
                                     <span>Total</span>
                                     <span>{formatPrice(cart.total)}</span>
@@ -108,10 +112,10 @@ export default function Cart({ cart }: CartPageProps) {
                             </div>
 
                             <Link
-                                href="/customer/checkout"
+                                href={isAuthenticated ? '/customer/checkout' : '/login'}
                                 className="mt-6 block w-full rounded-full bg-kintsugi-500 py-3.5 text-center text-sm font-bold text-white hover:bg-kintsugi-600 active:scale-95 transition-all shadow-sm"
                             >
-                                Finalizar compra
+                                {isAuthenticated ? 'Finalizar compra' : 'Entrar para finalizar'}
                             </Link>
 
                             <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-warm-400">

@@ -23,6 +23,7 @@ class OrderContractsTest extends TestCase
 
     public function test_customer_order_show_exposes_structured_addresses(): void
     {
+        /** @var User $customer */
         $customer = User::factory()->create();
         $customer->assignRole('customer');
         $order = Order::factory()->for($customer)->create([
@@ -54,5 +55,23 @@ class OrderContractsTest extends TestCase
                 ->where('order.shipping_address.zip_code', '01000-000')
                 ->where('order.billing_address.street', 'Rua Beta, 20')
                 ->where('order.billing_address.zip_code', '02000-000'));
+    }
+
+    public function test_customer_order_show_exposes_cancel_capability(): void
+    {
+        /** @var User $customer */
+        $customer = User::factory()->create();
+        $customer->assignRole('customer');
+        $order = Order::factory()->for($customer)->create([
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($customer)
+            ->get("/customer/orders/{$order->id}")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Customer/Orders/Show')
+                ->where('order.id', $order->id)
+                ->where('order.can_cancel', true));
     }
 }

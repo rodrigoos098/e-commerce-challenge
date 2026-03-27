@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -35,13 +36,13 @@ class ProductQueryBuilder
         }
 
         if (isset($filters['category_id'])) {
-            $categoryId = $filters['category_id'];
-            $query->whereIn('category_id', function ($query) use ($categoryId) {
-                $query->select('id')
-                      ->from('categories')
-                      ->where('id', $categoryId)
-                      ->orWhere('parent_id', $categoryId);
-            });
+            $query->whereIn(
+                'category_id',
+                $this->categoryIdsForFilter(
+                    (int) $filters['category_id'],
+                    filter_var($filters['category_active'] ?? false, FILTER_VALIDATE_BOOL),
+                ),
+            );
         }
 
         if (array_key_exists('active', $filters) && $filters['active'] !== null && $filters['active'] !== '') {
@@ -73,5 +74,34 @@ class ProductQueryBuilder
         }
 
         return $query;
+    }
+
+    /**
+     * @return array<int>
+     */
+    private function categoryIdsForFilter(int $categoryId, bool $onlyActiveCategories): array
+    {
+        $categoryIds = [$categoryId];
+        $parentIds = [$categoryId];
+
+        while ($parentIds !== []) {
+            $childrenQuery = Category::query()->whereIn('parent_id', $parentIds);
+
+            if ($onlyActiveCategories) {
+                $childrenQuery->where('active', true);
+            }
+
+            $childIds = $childrenQuery->pluck('id')->all();
+            $childIds = array_values(array_diff($childIds, $categoryIds));
+
+            if ($childIds === []) {
+                break;
+            }
+
+            $categoryIds = [...$categoryIds, ...$childIds];
+            $parentIds = $childIds;
+        }
+
+        return $categoryIds;
     }
 }

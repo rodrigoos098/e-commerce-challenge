@@ -54,6 +54,21 @@ class CategoryRepositoryTest extends TestCase
         $this->assertTrue($tree->first()->active);
     }
 
+    public function test_tree_loads_active_descendants_recursively_without_inactive_branches(): void
+    {
+        $root = Category::factory()->create(['parent_id' => null]);
+        $child = Category::factory()->create(['parent_id' => $root->id, 'active' => true]);
+        $grandchild = Category::factory()->create(['parent_id' => $child->id, 'active' => true]);
+        Category::factory()->inactive()->create(['parent_id' => $child->id]);
+
+        $tree = $this->repository->tree();
+
+        $this->assertCount(1, $tree);
+        $this->assertCount(1, $tree->first()->children);
+        $this->assertCount(1, $tree->first()->children->first()->children);
+        $this->assertSame($grandchild->id, $tree->first()->children->first()->children->first()->id);
+    }
+
     // ── All ───────────────────────────────────────────────────────────────────
 
     public function test_all_returns_all_categories_flat(): void
@@ -92,6 +107,34 @@ class CategoryRepositoryTest extends TestCase
         $found = $this->repository->findById(9999);
 
         $this->assertNull($found);
+    }
+
+    public function test_find_by_id_excludes_inactive_children_from_loaded_descendants(): void
+    {
+        $category = Category::factory()->create();
+        $activeChild = Category::factory()->create(['parent_id' => $category->id, 'active' => true]);
+        Category::factory()->inactive()->create(['parent_id' => $category->id]);
+
+        $found = $this->repository->findById($category->id);
+
+        $this->assertNotNull($found);
+        $this->assertCount(1, $found->children);
+        $this->assertSame($activeChild->id, $found->children->first()->id);
+    }
+
+    public function test_find_by_id_excludes_entire_inactive_child_branch_from_loaded_descendants(): void
+    {
+        $category = Category::factory()->create(['active' => true]);
+        $activeChild = Category::factory()->create(['parent_id' => $category->id, 'active' => true]);
+        $inactiveChild = Category::factory()->inactive()->create(['parent_id' => $category->id]);
+        Category::factory()->create(['parent_id' => $inactiveChild->id, 'active' => true]);
+
+        $found = $this->repository->findById($category->id);
+
+        $this->assertNotNull($found);
+        $this->assertCount(1, $found->children);
+        $this->assertSame($activeChild->id, $found->children->first()->id);
+        $this->assertNotContains($inactiveChild->id, $found->children->pluck('id')->all());
     }
 
     // ── FindBySlug ────────────────────────────────────────────────────────────
@@ -147,11 +190,13 @@ class CategoryRepositoryTest extends TestCase
     public function test_delete_category(): void
     {
         $category = Category::factory()->create();
+        $child = Category::factory()->create(['parent_id' => $category->id]);
 
         $result = $this->repository->delete($category);
 
         $this->assertTrue($result);
-        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+        $this->assertDatabaseHas('categories', ['id' => $category->id, 'active' => false]);
+        $this->assertDatabaseHas('categories', ['id' => $child->id, 'active' => false]);
     }
 
     // ── SlugExists ────────────────────────────────────────────────────────────

@@ -41,6 +41,14 @@ class OrderPolicy
     }
 
     /**
+     * Determine whether the customer can cancel their own order.
+     */
+    public function cancel(User $user, Order $order): bool
+    {
+        return $user->id === $order->user_id && $order->canBeCancelledByCustomer();
+    }
+
+    /**
      * Determine whether the user can delete an order.
      */
     public function delete(User $user, Order $order): bool

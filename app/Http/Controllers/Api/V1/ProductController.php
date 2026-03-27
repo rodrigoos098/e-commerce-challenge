@@ -9,9 +9,11 @@ use App\Http\Requests\Api\V1\UpdateProductRequest;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
 use App\Services\ProductService;
+use App\Services\StockService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
@@ -19,6 +21,7 @@ class ProductController extends Controller
 
     public function __construct(
         private readonly ProductService $productService,
+        private readonly StockService $stockService,
     ) {
     }
 
@@ -130,7 +133,39 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product): JsonResponse
     {
-        $updated = $this->productService->update($product, ProductDTO::fromRequest($request));
+        $validated = $request->validated();
+        $adjustedQuantity = array_key_exists('quantity', $validated) ? (int) $validated['quantity'] : null;
+
+        if ($adjustedQuantity !== null && $adjustedQuantity !== (int) $product->quantity && empty($validated['stock_adjustment_reason'])) {
+            throw ValidationException::withMessages([
+                'stock_adjustment_reason' => ['A stock adjustment reason is required when quantity changes.'],
+            ]);
+        }
+
+        $dto = new ProductDTO(
+            name: $request->has('name') ? $request->string('name')->toString() : null,
+            description: $request->has('description') ? $request->string('description')->toString() : null,
+            price: $request->has('price') ? (float) $request->input('price') : null,
+            costPrice: $request->has('cost_price') ? (float) $request->input('cost_price') : null,
+            quantity: null,
+            minQuantity: $request->has('min_quantity') ? (int) $request->input('min_quantity') : null,
+            active: $request->has('active') ? (bool) $request->input('active') : null,
+            categoryId: $request->has('category_id') ? (int) $request->input('category_id') : null,
+            tagIds: $request->has('tag_ids') ? $request->input('tag_ids', []) : null,
+            slug: $request->has('slug') ? $request->input('slug') : null,
+        );
+
+        $updated = $this->productService->update($product, $dto);
+
+        if ($adjustedQuantity !== null && $adjustedQuantity !== (int) $product->fresh()->quantity) {
+            $this->stockService->adjustStock(
+                productId: $product->id,
+                targetQuantity: $adjustedQuantity,
+                reason: $validated['stock_adjustment_reason'],
+            );
+
+            $updated = $updated->fresh(['category', 'tags']) ?? $updated;
+        }
 
         return $this->successResponse(new ProductResource($updated));
     }

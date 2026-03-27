@@ -11,10 +11,26 @@ use Laravel\Telescope\TelescopeApplicationServiceProvider;
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
     /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        if (! $this->isEnabled()) {
+            return;
+        }
+
+        parent::boot();
+    }
+
+    /**
      * Register any application services.
      */
     public function register(): void
     {
+        if (! $this->isEnabled()) {
+            return;
+        }
+
         // Telescope::night();
 
         $this->hideSensitiveRequestDetails();
@@ -32,10 +48,22 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     }
 
     /**
+     * Determine whether Telescope should be enabled.
+     */
+    protected function isEnabled(): bool
+    {
+        return (bool) config('telescope.enabled', false);
+    }
+
+    /**
      * Prevent sensitive request details from being logged by Telescope.
      */
     protected function hideSensitiveRequestDetails(): void
     {
+        Telescope::hideRequestHeaders([
+            'authorization',
+        ]);
+
         if ($this->app->environment('local')) {
             return;
         }
@@ -57,9 +85,8 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewTelescope', function (User $user) {
-            return in_array($user->email, [
-                //
-            ]);
+            return $user->hasRole('admin')
+                && in_array($user->email, config('telescope.allowed_emails', []), true);
         });
     }
 }

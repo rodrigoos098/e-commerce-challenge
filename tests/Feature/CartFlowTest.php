@@ -143,4 +143,17 @@ class CartFlowTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('data.items', []);
     }
+
+    public function test_single_user_reuses_the_same_cart_across_requests(): void
+    {
+        $product = Product::factory()->create(['quantity' => 20, 'active' => true]);
+
+        $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/cart')->assertStatus(200);
+        $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/cart')->assertStatus(200);
+        $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 2])
+            ->assertStatus(201);
+
+        $this->assertSame(1, Cart::query()->where('user_id', $this->user->id)->count());
+    }
 }

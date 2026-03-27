@@ -143,6 +143,35 @@ class CartServiceTest extends TestCase
         $this->makeService($cartRepo, $productRepo)->updateItem($cartItem, 10); // wants 10, only 3 available
     }
 
+    public function test_update_item_throws_when_product_not_found(): void
+    {
+        $cartItem = CartItem::factory()->make(['product_id' => 5, 'quantity' => 1]);
+
+        $productRepo = Mockery::mock(ProductRepositoryInterface::class);
+        $productRepo->shouldReceive('findById')->with(5)->andReturn(null);
+
+        $cartRepo = Mockery::mock(CartRepositoryInterface::class);
+
+        $this->expectException(ValidationException::class);
+
+        $this->makeService($cartRepo, $productRepo)->updateItem($cartItem, 2);
+    }
+
+    public function test_update_item_throws_when_product_is_inactive(): void
+    {
+        $product = Product::factory()->make(['id' => 5, 'active' => false, 'quantity' => 10]);
+        $cartItem = CartItem::factory()->make(['product_id' => 5, 'quantity' => 1]);
+
+        $productRepo = Mockery::mock(ProductRepositoryInterface::class);
+        $productRepo->shouldReceive('findById')->with(5)->andReturn($product);
+
+        $cartRepo = Mockery::mock(CartRepositoryInterface::class);
+
+        $this->expectException(ValidationException::class);
+
+        $this->makeService($cartRepo, $productRepo)->updateItem($cartItem, 2);
+    }
+
     public function test_update_item_succeeds_when_stock_sufficient(): void
     {
         $product = Product::factory()->make(['id' => 5, 'active' => true, 'quantity' => 10]);

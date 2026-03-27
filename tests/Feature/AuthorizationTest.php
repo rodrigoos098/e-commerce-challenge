@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -53,16 +55,74 @@ class AuthorizationTest extends TestCase
         ];
     }
 
+    private function validOrderAddress(): array
+    {
+        return [
+            'street' => '123 Main Street',
+            'city' => 'Sao Paulo',
+            'state' => 'SP',
+            'zip_code' => '01234-567',
+            'country' => 'BR',
+        ];
+    }
+
+    private function seedCartForOrder(User $user): void
+    {
+        $product = Product::factory()->create(['quantity' => 10, 'active' => true, 'price' => 50.0]);
+        $cart = Cart::factory()->create(['user_id' => $user->id]);
+
+        CartItem::factory()->create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+        ]);
+    }
+
     // ── Guest access restrictions ─────────────────────────────────────────────
 
     public function test_guest_cannot_access_protected_routes(): void
     {
-        $this->getJson('/api/v1/auth/me')->assertStatus(401);
-        $this->postJson('/api/v1/auth/logout')->assertStatus(401);
-        $this->getJson('/api/v1/cart')->assertStatus(401);
-        $this->postJson('/api/v1/cart/items')->assertStatus(401);
-        $this->getJson('/api/v1/orders')->assertStatus(401);
-        $this->postJson('/api/v1/orders')->assertStatus(401);
+        $this->getJson('/api/v1/auth/me')
+            ->assertStatus(401)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ]);
+
+        $this->postJson('/api/v1/auth/logout')
+            ->assertStatus(401)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ]);
+
+        $this->getJson('/api/v1/cart')
+            ->assertStatus(401)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ]);
+
+        $this->postJson('/api/v1/cart/items')
+            ->assertStatus(401)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ]);
+
+        $this->getJson('/api/v1/orders')
+            ->assertStatus(401)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ]);
+
+        $this->postJson('/api/v1/orders')
+            ->assertStatus(401)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ]);
     }
 
     public function test_guest_can_access_public_routes(): void
@@ -86,7 +146,11 @@ class AuthorizationTest extends TestCase
 
         $this->actingAs($customer, 'sanctum')
             ->postJson('/api/v1/products', $payload)
-            ->assertStatus(403);
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
     }
 
     public function test_customer_cannot_update_product(): void
@@ -96,7 +160,11 @@ class AuthorizationTest extends TestCase
 
         $this->actingAs($customer, 'sanctum')
             ->putJson("/api/v1/products/{$product->id}", ['name' => 'Novo Nome'])
-            ->assertStatus(403);
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
     }
 
     public function test_customer_cannot_delete_product(): void
@@ -106,7 +174,77 @@ class AuthorizationTest extends TestCase
 
         $this->actingAs($customer, 'sanctum')
             ->deleteJson("/api/v1/products/{$product->id}")
-            ->assertStatus(403);
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_api_product_create_route_enforces_product_policy_create(): void
+    {
+        $admin = $this->createAdmin();
+        $payload = $this->validProductPayload();
+
+        Gate::before(function (User $user, string $ability, array $arguments = []): ?bool {
+            if ($ability === 'create' && $arguments === [Product::class]) {
+                return false;
+            }
+
+            return null;
+        });
+
+        $this->actingAs($admin, 'sanctum')
+            ->postJson('/api/v1/products', $payload)
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_api_product_update_route_enforces_product_policy_update(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create();
+
+        Gate::before(function (User $user, string $ability, array $arguments = []): ?bool {
+            if ($ability === 'update' && count($arguments) === 1 && $arguments[0] instanceof Product) {
+                return false;
+            }
+
+            return null;
+        });
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", ['name' => 'Produto Bloqueado'])
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_api_product_delete_route_enforces_product_policy_delete(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create();
+
+        Gate::before(function (User $user, string $ability, array $arguments = []): ?bool {
+            if ($ability === 'delete' && count($arguments) === 1 && $arguments[0] instanceof Product) {
+                return false;
+            }
+
+            return null;
+        });
+
+        $this->actingAs($admin, 'sanctum')
+            ->deleteJson("/api/v1/products/{$product->id}")
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
     }
 
     public function test_customer_cannot_view_low_stock(): void
@@ -115,7 +253,32 @@ class AuthorizationTest extends TestCase
 
         $this->actingAs($customer, 'sanctum')
             ->getJson('/api/v1/products/low-stock')
-            ->assertStatus(403);
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_api_product_low_stock_route_enforces_product_policy_view_low_stock(): void
+    {
+        $admin = $this->createAdmin();
+
+        Gate::before(function (User $user, string $ability, array $arguments = []): ?bool {
+            if ($ability === 'viewLowStock' && $arguments === [Product::class]) {
+                return false;
+            }
+
+            return null;
+        });
+
+        $this->actingAs($admin, 'sanctum')
+            ->getJson('/api/v1/products/low-stock')
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
     }
 
     public function test_customer_cannot_update_order_status(): void
@@ -125,7 +288,232 @@ class AuthorizationTest extends TestCase
 
         $this->actingAs($customer, 'sanctum')
             ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'shipped'])
-            ->assertStatus(403);
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_customer_can_cancel_own_pending_order(): void
+    {
+        $customer = $this->createCustomer();
+        $order = Order::factory()->create([
+            'user_id' => $customer->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($customer, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/cancel")
+            ->assertStatus(200)
+            ->assertJsonPath('data.status', 'cancelled');
+    }
+
+    public function test_customer_cannot_cancel_another_users_order(): void
+    {
+        $customer = $this->createCustomer();
+        $otherCustomer = $this->createCustomer();
+        $order = Order::factory()->create([
+            'user_id' => $otherCustomer->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($customer, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/cancel")
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_api_order_status_route_enforces_order_policy_update(): void
+    {
+        $admin = $this->createAdmin();
+        $order = Order::factory()->pending()->create();
+
+        Gate::before(function (User $user, string $ability, array $arguments = []): ?bool {
+            if ($ability === 'update' && count($arguments) === 1 && $arguments[0] instanceof Order) {
+                return false;
+            }
+
+            return null;
+        });
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'shipped'])
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_web_order_status_route_enforces_order_policy_update(): void
+    {
+        $admin = $this->createAdmin();
+        $order = Order::factory()->pending()->create();
+
+        Gate::before(function (User $user, string $ability, array $arguments = []): ?bool {
+            if ($ability === 'update' && count($arguments) === 1 && $arguments[0] instanceof Order) {
+                return false;
+            }
+
+            return null;
+        });
+
+        $this->actingAs($admin)
+            ->put("/admin/orders/{$order->id}/status", ['status' => 'shipped'])
+            ->assertForbidden();
+    }
+
+    public function test_api_order_create_route_enforces_order_policy_create(): void
+    {
+        $customer = $this->createCustomer();
+        $this->seedCartForOrder($customer);
+        $address = $this->validOrderAddress();
+
+        Gate::before(function (User $user, string $ability, array $arguments = []): ?bool {
+            if ($ability === 'create' && $arguments === [Order::class]) {
+                return false;
+            }
+
+            return null;
+        });
+
+        $this->actingAs($customer, 'sanctum')
+            ->postJson('/api/v1/orders', [
+                'shipping_address' => $address,
+                'billing_address' => $address,
+            ])
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_web_order_create_route_enforces_order_policy_create(): void
+    {
+        $customer = $this->createCustomer();
+        $this->seedCartForOrder($customer);
+
+        Gate::before(function (User $user, string $ability, array $arguments = []): ?bool {
+            if ($ability === 'create' && $arguments === [Order::class]) {
+                return false;
+            }
+
+            return null;
+        });
+
+        $this->actingAs($customer)
+            ->post('/customer/orders', [
+                'shipping_name' => 'Cliente Teste',
+                'shipping_street' => 'Rua Alfa, 10',
+                'shipping_city' => 'Sao Paulo',
+                'shipping_state' => 'SP',
+                'shipping_zip' => '01000-000',
+                'shipping_country' => 'BR',
+                'same_billing' => true,
+            ])
+            ->assertForbidden();
+    }
+
+    public function test_customer_can_cancel_own_pending_order_via_web(): void
+    {
+        $customer = $this->createCustomer();
+        $order = Order::factory()->create([
+            'user_id' => $customer->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($customer)
+            ->put("/customer/orders/{$order->id}/cancel")
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'cancelled',
+        ]);
+    }
+
+    public function test_customer_cannot_cancel_non_cancellable_order_via_web(): void
+    {
+        $customer = $this->createCustomer();
+        $order = Order::factory()->create([
+            'user_id' => $customer->id,
+            'status' => 'shipped',
+        ]);
+
+        $this->actingAs($customer)
+            ->put("/customer/orders/{$order->id}/cancel")
+            ->assertForbidden();
+    }
+
+    public function test_customer_cannot_access_web_admin_mutation_routes(): void
+    {
+        $customer = $this->createCustomer();
+        $product = Product::factory()->create();
+        $order = Order::factory()->create();
+
+        $this->actingAs($customer)
+            ->post('/admin/products', $this->validProductPayload())
+            ->assertForbidden();
+
+        $this->actingAs($customer)
+            ->put("/admin/products/{$product->id}", ['name' => 'Novo Nome'])
+            ->assertForbidden();
+
+        $this->actingAs($customer)
+            ->delete("/admin/products/{$product->id}")
+            ->assertForbidden();
+
+        $this->actingAs($customer)
+            ->put("/admin/orders/{$order->id}/status", ['status' => 'shipped'])
+            ->assertForbidden();
+    }
+
+    public function test_customer_cannot_view_another_users_order_via_policy(): void
+    {
+        $customer1 = $this->createCustomer();
+        $customer2 = $this->createCustomer();
+        $order = Order::factory()->create(['user_id' => $customer2->id]);
+
+        $this->actingAs($customer1, 'sanctum')
+            ->getJson("/api/v1/orders/{$order->id}")
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_customer_cannot_view_another_users_web_order_via_policy(): void
+    {
+        $customer1 = $this->createCustomer();
+        $customer2 = $this->createCustomer();
+        $order = Order::factory()->create(['user_id' => $customer2->id]);
+
+        $this->actingAs($customer1)
+            ->get("/customer/orders/{$order->id}")
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_view_any_order_through_api_read_routes(): void
+    {
+        $admin = $this->createAdmin();
+        $customer = $this->createCustomer();
+        $order = Order::factory()->create(['user_id' => $customer->id]);
+
+        $this->actingAs($admin, 'sanctum')
+            ->getJson('/api/v1/orders')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1);
+
+        $this->actingAs($admin, 'sanctum')
+            ->getJson("/api/v1/orders/{$order->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $order->id);
     }
 
     // ── Admin can access all endpoints ───────────────────────────────────────
@@ -185,17 +573,6 @@ class AuthorizationTest extends TestCase
 
     // ── Resource isolation ────────────────────────────────────────────────────
 
-    public function test_customer_cannot_view_another_users_order(): void
-    {
-        $customer1 = $this->createCustomer();
-        $customer2 = $this->createCustomer();
-        $order = Order::factory()->create(['user_id' => $customer2->id]);
-
-        $this->actingAs($customer1, 'sanctum')
-            ->getJson("/api/v1/orders/{$order->id}")
-            ->assertStatus(404);
-    }
-
     public function test_customer_order_list_is_isolated(): void
     {
         $customer1 = $this->createCustomer();
@@ -230,14 +607,14 @@ class AuthorizationTest extends TestCase
         // Read the production closure registered in bootstrap/app.php without overriding it.
         $closure = RateLimiter::limiter('api');
 
-        $guestRequest = HttpRequest::create('/api/v1/products');
+        $guestRequest = \Illuminate\Http\Request::create('/api/v1/products');
         $guestLimit = $closure($guestRequest);
         $this->assertEquals(100, $guestLimit->maxAttempts);
         $this->assertEquals(60, $guestLimit->decaySeconds);        // 1 minute
         $this->assertEquals($guestRequest->ip(), $guestLimit->key); // keyed by IP for guests
 
         $user = $this->createCustomer();
-        $authRequest = HttpRequest::create('/api/v1/orders');
+        $authRequest = \Illuminate\Http\Request::create('/api/v1/orders');
         $authRequest->setUserResolver(fn () => $user);
         $authLimit = $closure($authRequest);
         $this->assertEquals(100, $authLimit->maxAttempts);

@@ -98,6 +98,7 @@ class StockFlowTest extends TestCase
         Event::assertDispatched(StockLow::class, function (StockLow $event) use ($product) {
             return $event->product->id === $product->id;
         });
+        Event::assertDispatched(StockLow::class, 1);
     }
 
     public function test_stock_low_event_not_fired_when_stock_remains_above_minimum(): void
@@ -168,6 +169,7 @@ class StockFlowTest extends TestCase
 
     public function test_failed_follow_up_order_does_not_create_extra_stock_movements(): void
     {
+        /** @var User $secondCustomer */
         $secondCustomer = User::factory()->create();
         $secondCustomer->assignRole('customer');
         $product = Product::factory()->create(['price' => 50.0, 'quantity' => 2, 'active' => true]);
@@ -190,5 +192,74 @@ class StockFlowTest extends TestCase
 
         $this->assertSame(0, $product->quantity);
         $this->assertSame(1, StockMovement::query()->where('product_id', $product->id)->where('type', 'venda')->count());
+    }
+
+    public function test_stock_is_restored_after_order_is_cancelled(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $product = Product::factory()->create(['price' => 50.0, 'quantity' => 10, 'active' => true]);
+        $address = $this->validAddress();
+
+        $this->actingAs($this->customer, 'sanctum')
+            ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 3]);
+
+        $this->actingAs($this->customer, 'sanctum')
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+
+        $order = Order::where('user_id', $this->customer->id)->firstOrFail();
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'cancelled'])
+            ->assertOk();
+
+        $product->refresh();
+
+        $this->assertSame(10, $product->quantity);
+        $this->assertDatabaseHas('stock_movements', [
+            'product_id' => $product->id,
+            'type' => 'devolucao',
+            'quantity' => 3,
+            'reference_type' => 'order',
+            'reference_id' => $order->id,
+        ]);
+    }
+
+    public function test_repeated_cancellation_does_not_create_duplicate_stock_returns(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $product = Product::factory()->create(['price' => 50.0, 'quantity' => 10, 'active' => true]);
+        $address = $this->validAddress();
+
+        $this->actingAs($this->customer, 'sanctum')
+            ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 3]);
+
+        $this->actingAs($this->customer, 'sanctum')
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+
+        $order = Order::where('user_id', $this->customer->id)->firstOrFail();
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'cancelled'])
+            ->assertOk();
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'cancelled'])
+            ->assertOk();
+
+        $product->refresh();
+
+        $this->assertSame(10, $product->quantity);
+        $this->assertSame(1, StockMovement::query()
+            ->where('product_id', $product->id)
+            ->where('type', 'devolucao')
+            ->where('reference_type', 'order')
+            ->where('reference_id', $order->id)
+            ->count());
     }
 }

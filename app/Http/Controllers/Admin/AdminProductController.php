@@ -155,7 +155,16 @@ class AdminProductController extends Controller
             'tags' => ['nullable', 'array'],
             'tags.*' => ['integer', 'exists:tags,id'],
             'active' => ['boolean'],
+            'stock_adjustment_reason' => ['nullable', 'string', 'max:255'],
         ]);
+
+        $adjustedQuantity = isset($validated['quantity']) ? (int) $validated['quantity'] : null;
+
+        if ($adjustedQuantity !== null && $adjustedQuantity !== (int) $product->quantity && empty($validated['stock_adjustment_reason'])) {
+            return back()
+                ->withErrors(['stock_adjustment_reason' => 'Informe o motivo do ajuste de estoque.'])
+                ->withInput();
+        }
 
         $dto = new ProductDTO(
             name: $validated['name'] ?? null,
@@ -163,7 +172,7 @@ class AdminProductController extends Controller
             description: $validated['description'] ?? null,
             price: isset($validated['price']) ? (float) $validated['price'] : null,
             costPrice: array_key_exists('cost_price', $validated) ? (isset($validated['cost_price']) ? (float) $validated['cost_price'] : null) : null,
-            quantity: isset($validated['quantity']) ? (int) $validated['quantity'] : null,
+            quantity: null,
             minQuantity: isset($validated['min_quantity']) ? (int) $validated['min_quantity'] : null,
             active: $validated['active'] ?? null,
             categoryId: isset($validated['category_id']) ? (int) $validated['category_id'] : null,
@@ -171,6 +180,14 @@ class AdminProductController extends Controller
         );
 
         $this->productService->update($product, $dto);
+
+        if ($adjustedQuantity !== null && $adjustedQuantity !== (int) $product->fresh()->quantity) {
+            $this->stockService->adjustStock(
+                productId: $product->id,
+                targetQuantity: $adjustedQuantity,
+                reason: $validated['stock_adjustment_reason'],
+            );
+        }
 
         return redirect('/admin/products')->with('success', 'Produto atualizado com sucesso!');
     }

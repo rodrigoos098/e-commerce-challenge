@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Cart;
 use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -27,6 +28,8 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
+                    'email_verified_at' => $request->user()->email_verified_at?->toISOString(),
+                    'email_verified' => $request->user()->hasVerifiedEmail(),
                     'roles' => $request->user()->getRoleNames()->toArray(),
                 ] : null,
             ],
@@ -36,7 +39,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'cart_count' => fn () => $request->user()
                 ? CartItem::whereHas('cart', fn ($q) => $q->where('user_id', $request->user()->id))->count()
-                : 0,
+                : Cart::query()->where('session_id', $request->session()->getId())->first()?->items()->count() ?? 0,
         ];
     }
 }
