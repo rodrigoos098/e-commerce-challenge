@@ -20,6 +20,8 @@ readonly class ProductDTO
         public ?int $categoryId = null,
         public ?array $tagIds = null,
         public ?string $slug = null,
+        /** @var list<string> */
+        public array $presentFields = [],
     ) {
     }
 
@@ -29,17 +31,30 @@ readonly class ProductDTO
      */
     public static function fromRequest(FormRequest $request): self
     {
+        $input = $request->all();
+
         return new self(
-            name: $request->has('name') ? $request->string('name')->toString() : null,
-            description: $request->has('description') ? $request->string('description')->toString() : null,
-            price: $request->has('price') ? (float) $request->input('price') : null,
-            costPrice: $request->has('cost_price') ? (float) $request->input('cost_price') : null,
-            quantity: $request->has('quantity') ? (int) $request->input('quantity') : null,
-            minQuantity: $request->has('min_quantity') ? (int) $request->input('min_quantity') : null,
-            active: $request->has('active') ? (bool) $request->input('active') : null,
-            categoryId: $request->has('category_id') ? (int) $request->input('category_id') : null,
-            tagIds: $request->has('tag_ids') ? $request->input('tag_ids', []) : null,
-            slug: $request->has('slug') ? $request->input('slug') : null,
+            name: array_key_exists('name', $input) ? (string) $request->input('name') : null,
+            description: array_key_exists('description', $input) ? (string) $request->input('description') : null,
+            price: array_key_exists('price', $input) && $request->input('price') !== null ? (float) $request->input('price') : null,
+            costPrice: array_key_exists('cost_price', $input) && $request->input('cost_price') !== null ? (float) $request->input('cost_price') : null,
+            quantity: array_key_exists('quantity', $input) && $request->input('quantity') !== null ? (int) $request->input('quantity') : null,
+            minQuantity: array_key_exists('min_quantity', $input) && $request->input('min_quantity') !== null ? (int) $request->input('min_quantity') : null,
+            active: array_key_exists('active', $input) && $request->input('active') !== null ? (bool) $request->input('active') : null,
+            categoryId: array_key_exists('category_id', $input) && $request->input('category_id') !== null ? (int) $request->input('category_id') : null,
+            tagIds: array_key_exists('tag_ids', $input) ? $request->input('tag_ids', []) : null,
+            slug: array_key_exists('slug', $input) ? $request->input('slug') : null,
+            presentFields: array_values(array_intersect(array_keys($input), [
+                'name',
+                'slug',
+                'description',
+                'price',
+                'cost_price',
+                'quantity',
+                'min_quantity',
+                'active',
+                'category_id',
+            ])),
         );
     }
 
@@ -60,6 +75,6 @@ readonly class ProductDTO
             'min_quantity' => $this->minQuantity,
             'active' => $this->active,
             'category_id' => $this->categoryId,
-        ], fn ($value) => $value !== null);
+        ], fn ($value, string $key) => $value !== null || in_array($key, $this->presentFields, true), ARRAY_FILTER_USE_BOTH);
     }
 }

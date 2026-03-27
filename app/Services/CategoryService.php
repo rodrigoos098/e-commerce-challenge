@@ -169,5 +169,6 @@ class CategoryService
     private function invalidateCache(): void
     {
         Cache::tags(['categories'])->flush();
+        Cache::tags(['products'])->flush();
     }
 }

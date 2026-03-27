@@ -99,6 +99,55 @@ class ProductApiTest extends TestCase
         $this->assertSame('Produto Ativo', $response->json('data.0.name'));
     }
 
+    public function test_public_product_listing_hides_products_from_inactive_root_categories_after_category_update(): void
+    {
+        $admin = $this->createAdmin();
+        $category = Category::factory()->create(['active' => true]);
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+            'active' => true,
+            'name' => 'Produto da Raiz',
+        ]);
+
+        $this->getJson('/api/v1/products')
+            ->assertStatus(200)
+            ->assertJsonFragment(['id' => $product->id, 'name' => 'Produto da Raiz']);
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/categories/{$category->id}", ['active' => false])
+            ->assertStatus(200);
+
+        $this->getJson('/api/v1/products')
+            ->assertStatus(200)
+            ->assertJsonMissing(['id' => $product->id, 'name' => 'Produto da Raiz']);
+
+        $this->getJson("/api/v1/products/{$product->id}")
+            ->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_public_product_endpoints_hide_products_from_active_subcategories_inside_inactive_branches(): void
+    {
+        $inactiveRoot = Category::factory()->inactive()->create();
+        $activeChild = Category::factory()->create([
+            'parent_id' => $inactiveRoot->id,
+            'active' => true,
+        ]);
+        $product = Product::factory()->create([
+            'category_id' => $activeChild->id,
+            'active' => true,
+            'name' => 'Produto do Ramo Inativo',
+        ]);
+
+        $this->getJson('/api/v1/products')
+            ->assertStatus(200)
+            ->assertJsonMissing(['id' => $product->id, 'name' => 'Produto do Ramo Inativo']);
+
+        $this->getJson("/api/v1/products/{$product->id}")
+            ->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
+
     // ── Show (public) ─────────────────────────────────────────────────────────
 
     public function test_guest_can_view_single_product(): void
@@ -231,7 +280,7 @@ class ProductApiTest extends TestCase
     public function test_admin_can_update_product(): void
     {
         $admin = $this->createAdmin();
-        $product = Product::factory()->create();
+        $product = Product::factory()->create(['cost_price' => 120.50]);
 
         $response = $this->actingAs($admin, 'sanctum')
             ->putJson("/api/v1/products/{$product->id}", [
@@ -241,7 +290,54 @@ class ProductApiTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.name', 'Nome Atualizado');
+            ->assertJsonPath('data.name', 'Nome Atualizado')
+            ->assertJsonPath('data.cost_price', 120.5);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'name' => 'Nome Atualizado',
+            'cost_price' => 120.50,
+        ]);
+    }
+
+    public function test_admin_can_update_product_cost_price_with_a_new_value(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['cost_price' => null]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", [
+                'cost_price' => 89.90,
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.cost_price', 89.9);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'cost_price' => 89.90,
+        ]);
+    }
+
+    public function test_admin_can_clear_product_cost_price_explicitly(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['cost_price' => 89.90]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/products/{$product->id}", [
+                'cost_price' => null,
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.cost_price', null);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'cost_price' => null,
+        ]);
     }
 
     public function test_admin_must_inform_reason_when_adjusting_stock_quantity(): void

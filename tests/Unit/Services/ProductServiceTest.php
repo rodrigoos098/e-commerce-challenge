@@ -241,6 +241,57 @@ class ProductServiceTest extends TestCase
         $this->makeService($repo)->update($original, $dto);
     }
 
+    public function test_update_allows_clearing_explicit_nullable_cost_price(): void
+    {
+        Event::fake();
+
+        $updatedProduct = Product::factory()->make([
+            'id' => 1,
+            'cost_price' => null,
+            'quantity' => 10,
+            'min_quantity' => 5,
+        ]);
+
+        $repo = Mockery::mock(ProductRepositoryInterface::class);
+        $repo->shouldReceive('update')
+            ->once()
+            ->withArgs(fn (Product $product, array $data) => $product->id === 1
+                && array_key_exists('cost_price', $data)
+                && $data['cost_price'] === null)
+            ->andReturn($updatedProduct);
+
+        $original = Product::factory()->make(['id' => 1, 'cost_price' => 99.90]);
+        $dto = new ProductDTO(costPrice: null, presentFields: ['cost_price']);
+
+        $this->makeService($repo)->update($original, $dto);
+    }
+
+    public function test_update_does_not_change_cost_price_when_field_is_absent(): void
+    {
+        Event::fake();
+
+        $updatedProduct = Product::factory()->make([
+            'id' => 1,
+            'cost_price' => 99.90,
+            'active' => false,
+            'quantity' => 10,
+            'min_quantity' => 5,
+        ]);
+
+        $repo = Mockery::mock(ProductRepositoryInterface::class);
+        $repo->shouldReceive('update')
+            ->once()
+            ->withArgs(fn (Product $product, array $data) => $product->id === 1
+                && ! array_key_exists('cost_price', $data)
+                && $data['active'] === false)
+            ->andReturn($updatedProduct);
+
+        $original = Product::factory()->make(['id' => 1, 'cost_price' => 99.90]);
+        $dto = new ProductDTO(active: false);
+
+        $this->makeService($repo)->update($original, $dto);
+    }
+
     public function test_create_generates_new_slug_when_soft_deleted_product_already_uses_base_slug(): void
     {
         Event::fake();

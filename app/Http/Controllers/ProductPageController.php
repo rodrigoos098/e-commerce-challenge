@@ -21,27 +21,31 @@ class ProductPageController extends Controller
 
     public function index(Request $request): Response
     {
-        $filters = $request->only(['search', 'category_id', 'price_min', 'price_max', 'min_price', 'max_price', 'active', 'in_stock']);
+        $filters = $request->only(['search', 'category_id', 'active', 'in_stock']);
+
+        if ($request->filled('price_min') || $request->filled('min_price')) {
+            $filters['min_price'] = $request->input('price_min', $request->input('min_price'));
+        }
+
+        if ($request->filled('price_max') || $request->filled('max_price')) {
+            $filters['max_price'] = $request->input('price_max', $request->input('max_price'));
+        }
+
         $perPage = (int) $request->input('per_page', 15);
-        $filters['active'] = true;
 
-        // Map frontend filter names to backend filter names
-        if (isset($filters['price_min'])) {
-            $filters['min_price'] = $filters['price_min'];
-            unset($filters['price_min']);
-        }
-        if (isset($filters['price_max'])) {
-            $filters['max_price'] = $filters['price_max'];
-            unset($filters['price_max']);
-        }
-
-        $products = $this->productService->paginate($filters, $perPage);
+        $products = $this->productService->paginatePublic($filters, $perPage);
         $categories = $this->categoryService->tree();
 
         return Inertia::render('Products/Index', [
             'products' => (new ProductCollection($products))->response()->getData(true),
             'categories' => CategoryResource::collection($categories)->toArray($request),
-            'filters' => $request->only(['search', 'category_id', 'price_min', 'price_max']),
+            'filters' => [
+                'search' => $request->input('search'),
+                'category_id' => $request->input('category_id'),
+                'price_min' => $request->input('price_min', $request->input('min_price')),
+                'price_max' => $request->input('price_max', $request->input('max_price')),
+                'page' => $request->input('page'),
+            ],
         ]);
     }
 
@@ -53,9 +57,12 @@ class ProductPageController extends Controller
             abort(404);
         }
 
-        $relatedProducts = $this->productService->paginate([
+        if (! $this->categoryService->findPublicById($product->category_id)) {
+            abort(404);
+        }
+
+        $relatedProducts = $this->productService->paginatePublic([
             'category_id' => $product->category_id,
-            'active' => true,
         ], 4);
 
         $related = collect($relatedProducts->items())->filter(fn ($p) => $p->id !== $product->id)->take(4)->values();

@@ -159,10 +159,10 @@ class CategoryController extends Controller
         $perPage = (int) $request->input('per_page', 15);
         $filters = array_merge(
             $request->only(['search', 'in_stock', 'min_price', 'max_price', 'sort_by', 'sort_dir']),
-            ['category_id' => $category->id, 'category_active' => true, 'active' => true],
+            ['category_id' => $category->id],
         );
 
-        $products = $this->productService->paginate($filters, $perPage);
+        $products = $this->productService->paginatePublic($filters, $perPage);
 
         return $this->paginatedResponse(ProductResource::collection($products));
     }

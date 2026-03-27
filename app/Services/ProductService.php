@@ -32,6 +32,19 @@ class ProductService
     }
 
     /**
+     * Get paginated products visible in public storefront surfaces.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    public function paginatePublic(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->paginate(array_merge($filters, [
+            'active' => true,
+            'category_active' => true,
+        ]), $perPage);
+    }
+
+    /**
      * Find a product by ID.
      */
     public function findById(int $id): ?Product

@@ -20,7 +20,7 @@ class HomeController extends Controller
 
     public function index(Request $request): Response
     {
-        $featuredProducts = $this->productService->paginate(['active' => true, 'in_stock' => true], 8);
+        $featuredProducts = $this->productService->paginatePublic(['in_stock' => true], 8);
         $categories = $this->categoryService->tree();
 
         // Add product counts for homepage category cards, including subcategories

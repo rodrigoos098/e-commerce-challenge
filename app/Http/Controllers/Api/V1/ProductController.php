@@ -8,6 +8,7 @@ use App\Http\Requests\Api\V1\StoreProductRequest;
 use App\Http\Requests\Api\V1\UpdateProductRequest;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
+use App\Services\CategoryService;
 use App\Services\ProductService;
 use App\Services\StockService;
 use App\Traits\ApiResponseTrait;
@@ -20,6 +21,7 @@ class ProductController extends Controller
     use ApiResponseTrait;
 
     public function __construct(
+        private readonly CategoryService $categoryService,
         private readonly ProductService $productService,
         private readonly StockService $stockService,
     ) {
@@ -50,10 +52,9 @@ class ProductController extends Controller
             'search', 'category_id', 'active', 'in_stock', 'low_stock',
             'min_price', 'max_price', 'sort_by', 'sort_dir',
         ]);
-        $filters['active'] = true;
 
         $perPage = (int) $request->input('per_page', 15);
-        $products = $this->productService->paginate($filters, $perPage);
+        $products = $this->productService->paginatePublic($filters, $perPage);
 
         return $this->paginatedResponse(ProductResource::collection($products));
     }
@@ -75,6 +76,10 @@ class ProductController extends Controller
         $product = $this->productService->findById($id);
 
         if (! $product || ! $product->active) {
+            return $this->notFoundResponse('Product not found.');
+        }
+
+        if (! $this->categoryService->findPublicById($product->category_id)) {
             return $this->notFoundResponse('Product not found.');
         }
 
@@ -143,16 +148,20 @@ class ProductController extends Controller
         }
 
         $dto = new ProductDTO(
-            name: $request->has('name') ? $request->string('name')->toString() : null,
-            description: $request->has('description') ? $request->string('description')->toString() : null,
-            price: $request->has('price') ? (float) $request->input('price') : null,
-            costPrice: $request->has('cost_price') ? (float) $request->input('cost_price') : null,
+            name: array_key_exists('name', $validated) ? (string) $validated['name'] : null,
+            description: array_key_exists('description', $validated) ? (string) $validated['description'] : null,
+            price: array_key_exists('price', $validated) ? (float) $validated['price'] : null,
+            costPrice: array_key_exists('cost_price', $validated) ? (isset($validated['cost_price']) ? (float) $validated['cost_price'] : null) : null,
             quantity: null,
-            minQuantity: $request->has('min_quantity') ? (int) $request->input('min_quantity') : null,
-            active: $request->has('active') ? (bool) $request->input('active') : null,
-            categoryId: $request->has('category_id') ? (int) $request->input('category_id') : null,
-            tagIds: $request->has('tag_ids') ? $request->input('tag_ids', []) : null,
-            slug: $request->has('slug') ? $request->input('slug') : null,
+            minQuantity: array_key_exists('min_quantity', $validated) && $validated['min_quantity'] !== null ? (int) $validated['min_quantity'] : null,
+            active: array_key_exists('active', $validated) && $validated['active'] !== null ? (bool) $validated['active'] : null,
+            categoryId: array_key_exists('category_id', $validated) ? (int) $validated['category_id'] : null,
+            tagIds: array_key_exists('tag_ids', $validated) ? $validated['tag_ids'] : null,
+            slug: array_key_exists('slug', $validated) ? $validated['slug'] : null,
+            presentFields: array_values(array_filter([
+                array_key_exists('slug', $validated) ? 'slug' : null,
+                array_key_exists('cost_price', $validated) ? 'cost_price' : null,
+            ])),
         );
 
         $updated = $this->productService->update($product, $dto);

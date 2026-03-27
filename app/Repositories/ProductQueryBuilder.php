@@ -25,6 +25,8 @@ class ProductQueryBuilder
      */
     public function apply(Builder $query, array $filters = []): Builder
     {
+        $filterOnlyPublicCategories = filter_var($filters['category_active'] ?? false, FILTER_VALIDATE_BOOL);
+
         if (isset($filters['search']) && trim((string) $filters['search']) !== '') {
             $search = trim((string) $filters['search']);
 
@@ -40,9 +42,13 @@ class ProductQueryBuilder
                 'category_id',
                 $this->categoryIdsForFilter(
                     (int) $filters['category_id'],
-                    filter_var($filters['category_active'] ?? false, FILTER_VALIDATE_BOOL),
+                    $filterOnlyPublicCategories,
                 ),
             );
+        }
+
+        if ($filterOnlyPublicCategories) {
+            $query->whereIn('category_id', $this->publicCategoryIds());
         }
 
         if (array_key_exists('active', $filters) && $filters['active'] !== null && $filters['active'] !== '') {
@@ -81,6 +87,10 @@ class ProductQueryBuilder
      */
     private function categoryIdsForFilter(int $categoryId, bool $onlyActiveCategories): array
     {
+        if ($onlyActiveCategories && ! in_array($categoryId, $this->publicCategoryIds(), true)) {
+            return [];
+        }
+
         $categoryIds = [$categoryId];
         $parentIds = [$categoryId];
 
@@ -88,7 +98,7 @@ class ProductQueryBuilder
             $childrenQuery = Category::query()->whereIn('parent_id', $parentIds);
 
             if ($onlyActiveCategories) {
-                $childrenQuery->where('active', true);
+                $childrenQuery->whereIn('id', $this->publicCategoryIds());
             }
 
             $childIds = $childrenQuery->pluck('id')->all();
@@ -103,5 +113,30 @@ class ProductQueryBuilder
         }
 
         return $categoryIds;
+    }
+
+    /**
+     * @return array<int>
+     */
+    private function publicCategoryIds(): array
+    {
+        $publicCategoryIds = [];
+        $parentIds = Category::query()
+            ->whereNull('parent_id')
+            ->where('active', true)
+            ->pluck('id')
+            ->all();
+
+        while ($parentIds !== []) {
+            $publicCategoryIds = [...$publicCategoryIds, ...$parentIds];
+
+            $parentIds = Category::query()
+                ->whereIn('parent_id', $parentIds)
+                ->where('active', true)
+                ->pluck('id')
+                ->all();
+        }
+
+        return $publicCategoryIds;
     }
 }

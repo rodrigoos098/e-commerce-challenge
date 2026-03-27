@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\DTOs\ProductDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\Admin\StoreProductRequest;
+use App\Http\Requests\Web\Admin\UpdateProductRequest;
 use App\Http\Resources\Api\V1\ProductCollection;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
@@ -68,20 +70,9 @@ class AdminProductController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreProductRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:products,name'],
-            'description' => ['required', 'string'],
-            'price' => ['required', 'numeric', 'gt:0'],
-            'cost_price' => ['nullable', 'numeric', 'gte:0', 'lt:'.$request->input('price', 0)],
-            'quantity' => ['required', 'integer', 'min:0'],
-            'min_quantity' => ['nullable', 'integer', 'min:0'],
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'tags' => ['nullable', 'array'],
-            'tags.*' => ['integer', 'exists:tags,id'],
-            'active' => ['boolean'],
-        ]);
+        $validated = $request->validated();
 
         $dto = new ProductDTO(
             name: $validated['name'],
@@ -142,29 +133,11 @@ class AdminProductController extends Controller
         ]);
     }
 
-    public function update(Request $request, Product $product): RedirectResponse
+    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['sometimes', 'string', 'max:255', 'unique:products,name,'.$product->id],
-            'description' => ['sometimes', 'string'],
-            'price' => ['sometimes', 'numeric', 'gt:0'],
-            'cost_price' => ['nullable', 'numeric', 'gte:0'],
-            'quantity' => ['sometimes', 'integer', 'min:0'],
-            'min_quantity' => ['nullable', 'integer', 'min:0'],
-            'category_id' => ['sometimes', 'integer', 'exists:categories,id'],
-            'tags' => ['nullable', 'array'],
-            'tags.*' => ['integer', 'exists:tags,id'],
-            'active' => ['boolean'],
-            'stock_adjustment_reason' => ['nullable', 'string', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
-        $adjustedQuantity = isset($validated['quantity']) ? (int) $validated['quantity'] : null;
-
-        if ($adjustedQuantity !== null && $adjustedQuantity !== (int) $product->quantity && empty($validated['stock_adjustment_reason'])) {
-            return back()
-                ->withErrors(['stock_adjustment_reason' => 'Informe o motivo do ajuste de estoque.'])
-                ->withInput();
-        }
+        $adjustedQuantity = array_key_exists('quantity', $validated) ? (int) $validated['quantity'] : null;
 
         $dto = new ProductDTO(
             name: $validated['name'] ?? null,
@@ -177,6 +150,7 @@ class AdminProductController extends Controller
             active: $validated['active'] ?? null,
             categoryId: isset($validated['category_id']) ? (int) $validated['category_id'] : null,
             tagIds: $validated['tags'] ?? null,
+            presentFields: array_key_exists('cost_price', $validated) ? ['cost_price'] : [],
         );
 
         $this->productService->update($product, $dto);
@@ -185,7 +159,7 @@ class AdminProductController extends Controller
             $this->stockService->adjustStock(
                 productId: $product->id,
                 targetQuantity: $adjustedQuantity,
-                reason: $validated['stock_adjustment_reason'],
+                reason: (string) $validated['stock_adjustment_reason'],
             );
         }
 
