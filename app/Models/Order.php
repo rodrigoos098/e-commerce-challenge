@@ -20,6 +20,9 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'status',
+        'payment_status',
+        'payment_method',
+        'paid_at',
         'total',
         'subtotal',
         'tax',
@@ -43,6 +46,7 @@ class Order extends Model
             'shipping_cost' => 'decimal:2',
             'shipping_address' => 'array',
             'billing_address' => 'array',
+            'paid_at' => 'datetime',
         ];
     }
 
@@ -81,6 +85,22 @@ class Order extends Model
         'pending',
         'processing',
     ];
+
+    public const INITIAL_STATUS = 'pending';
+
+    /**
+     * Valid payment statuses.
+     *
+     * @var list<string>
+     */
+    public const PAYMENT_STATUSES = [
+        'pending',
+        'paid',
+    ];
+
+    public const INITIAL_PAYMENT_STATUS = 'pending';
+
+    public const MOCK_PAYMENT_METHOD = 'mock_card';
 
     /**
      * Get the user that owns the order.

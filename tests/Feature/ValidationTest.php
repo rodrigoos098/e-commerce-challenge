@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -22,8 +24,56 @@ class ValidationTest extends TestCase
         Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
 
+        /** @var User $admin */
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');
+    }
+
+    private function createCustomer(): User
+    {
+        /** @var User $customer */
+        $customer = User::factory()->create();
+        $customer->assignRole('customer');
+
+        return $customer;
+    }
+
+    private function seedCartForWebCheckout(User $customer): void
+    {
+        $product = Product::factory()->create([
+            'price' => 75.0,
+            'quantity' => 10,
+            'active' => true,
+        ]);
+
+        $cart = Cart::factory()->create([
+            'user_id' => $customer->id,
+        ]);
+
+        CartItem::factory()->create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function validWebCheckoutPayload(array $overrides = []): array
+    {
+        return array_merge([
+            'shipping_mode' => 'new',
+            'shipping_name' => 'Cliente Teste',
+            'shipping_street' => 'Rua Alfa, 10',
+            'shipping_city' => 'Sao Paulo',
+            'shipping_state' => 'SP',
+            'shipping_zip' => '01000-000',
+            'shipping_country' => 'BR',
+            'same_billing' => true,
+            'notes' => 'Sem observacoes adicionais.',
+            'payment_simulated' => true,
+        ], $overrides);
     }
 
     private function validProductData(?Category $category = null): array
@@ -225,6 +275,7 @@ class ValidationTest extends TestCase
 
     public function test_sufficient_stock_rule_rejects_quantity_exceeding_stock(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
         $product = Product::factory()->create(['quantity' => 3, 'active' => true]);
 
@@ -236,6 +287,7 @@ class ValidationTest extends TestCase
 
     public function test_sufficient_stock_rule_accepts_quantity_within_stock(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
         $product = Product::factory()->create(['quantity' => 10, 'active' => true]);
 
@@ -246,6 +298,7 @@ class ValidationTest extends TestCase
 
     public function test_cart_item_quantity_must_be_at_least_one(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
         $product = Product::factory()->create(['quantity' => 10, 'active' => true]);
 
@@ -257,6 +310,7 @@ class ValidationTest extends TestCase
 
     public function test_cart_item_requires_existing_product(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
@@ -269,6 +323,7 @@ class ValidationTest extends TestCase
 
     public function test_order_requires_shipping_address(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
 
         $this->actingAs($user, 'sanctum')
@@ -281,6 +336,7 @@ class ValidationTest extends TestCase
 
     public function test_order_requires_shipping_address_street(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
         $address = ['city' => 'SP', 'state' => 'SP', 'zip_code' => '00000', 'country' => 'BR'];
 
@@ -301,6 +357,61 @@ class ValidationTest extends TestCase
             ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'not-a-valid-status'])
             ->assertStatus(422)
             ->assertJsonStructure(['errors' => ['status']]);
+    }
+
+    public function test_web_checkout_requires_saved_shipping_address_selection(): void
+    {
+        $customer = $this->createCustomer();
+        $this->seedCartForWebCheckout($customer);
+
+        $this->actingAs($customer)
+            ->post('/customer/orders', $this->validWebCheckoutPayload([
+                'shipping_mode' => 'saved',
+                'shipping_name' => null,
+                'shipping_street' => null,
+                'shipping_city' => null,
+                'shipping_state' => null,
+                'shipping_zip' => null,
+                'shipping_country' => null,
+            ]))
+            ->assertSessionHasErrors(['shipping_address_id']);
+    }
+
+    public function test_web_checkout_requires_manual_billing_fields_when_same_billing_is_false(): void
+    {
+        $customer = $this->createCustomer();
+        $this->seedCartForWebCheckout($customer);
+
+        $this->actingAs($customer)
+            ->post('/customer/orders', $this->validWebCheckoutPayload([
+                'same_billing' => false,
+                'billing_mode' => 'new',
+            ]))
+            ->assertSessionHasErrors([
+                'billing_name',
+                'billing_street',
+                'billing_city',
+                'billing_state',
+                'billing_zip',
+                'billing_country',
+            ]);
+    }
+
+    public function test_web_checkout_requires_same_billing_and_string_notes(): void
+    {
+        $customer = $this->createCustomer();
+        $this->seedCartForWebCheckout($customer);
+
+        $payload = $this->validWebCheckoutPayload();
+        unset($payload['same_billing']);
+        $payload['notes'] = ['invalido'];
+
+        $this->actingAs($customer)
+            ->post('/customer/orders', $payload)
+            ->assertSessionHasErrors([
+                'same_billing',
+                'notes',
+            ]);
     }
 
     // ── ValidParentCategory rule ───────────────────────────────────────────────────

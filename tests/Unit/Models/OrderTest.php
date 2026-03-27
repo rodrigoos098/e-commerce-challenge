@@ -19,7 +19,7 @@ class OrderTest extends TestCase
     public function test_fillable_attributes_are_correct(): void
     {
         $expected = [
-            'user_id', 'status', 'total', 'subtotal', 'tax',
+            'user_id', 'status', 'payment_status', 'payment_method', 'paid_at', 'total', 'subtotal', 'tax',
             'shipping_cost', 'shipping_address', 'billing_address', 'notes',
         ];
 
@@ -80,6 +80,14 @@ class OrderTest extends TestCase
         $this->assertEquals('Rua B', $order->billing_address['street']);
     }
 
+    public function test_paid_at_is_cast_to_datetime(): void
+    {
+        $order = Order::factory()->create(['paid_at' => '2026-03-27 10:15:00']);
+
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $order->paid_at);
+        $this->assertSame('2026-03-27 10:15:00', $order->paid_at?->format('Y-m-d H:i:s'));
+    }
+
     // ── Status constants ──────────────────────────────────────────────────────
 
     public function test_statuses_constant_contains_expected_values(): void
@@ -101,6 +109,45 @@ class OrderTest extends TestCase
         $order = Order::factory()->delivered()->create();
 
         $this->assertEquals('delivered', $order->status);
+    }
+
+    public function test_initial_status_constant_is_pending(): void
+    {
+        $this->assertSame('pending', Order::INITIAL_STATUS);
+    }
+
+    public function test_payment_status_constants_match_expected_flow(): void
+    {
+        $this->assertSame(['pending', 'paid'], Order::PAYMENT_STATUSES);
+        $this->assertSame('pending', Order::INITIAL_PAYMENT_STATUS);
+        $this->assertSame('mock_card', Order::MOCK_PAYMENT_METHOD);
+    }
+
+    public function test_allowed_transitions_constant_matches_expected_flow(): void
+    {
+        $this->assertSame([
+            'pending' => ['processing', 'cancelled'],
+            'processing' => ['shipped', 'cancelled'],
+            'shipped' => ['delivered'],
+            'delivered' => [],
+            'cancelled' => [],
+        ], Order::ALLOWED_TRANSITIONS);
+    }
+
+    public function test_can_transition_to_only_accepts_valid_status_changes(): void
+    {
+        $order = Order::factory()->make(['status' => 'pending']);
+
+        $this->assertTrue($order->canTransitionTo('processing'));
+        $this->assertTrue($order->canTransitionTo('cancelled'));
+        $this->assertFalse($order->canTransitionTo('shipped'));
+    }
+
+    public function test_customer_can_cancel_only_pending_or_processing_orders(): void
+    {
+        $this->assertTrue(Order::factory()->make(['status' => 'pending'])->canBeCancelledByCustomer());
+        $this->assertTrue(Order::factory()->make(['status' => 'processing'])->canBeCancelledByCustomer());
+        $this->assertFalse(Order::factory()->make(['status' => 'shipped'])->canBeCancelledByCustomer());
     }
 
     // ── Relacionamentos ───────────────────────────────────────────────────────
@@ -128,10 +175,12 @@ class OrderTest extends TestCase
 
     public function test_items_relationship_returns_order_items(): void
     {
+        /** @var Order $order */
         $order = Order::factory()->create();
         OrderItem::factory()->count(3)->create(['order_id' => $order->id]);
+        $firstItem = $order->items->first();
 
         $this->assertCount(3, $order->items);
-        $this->assertInstanceOf(OrderItem::class, $order->items->first());
+        $this->assertInstanceOf(OrderItem::class, $firstItem);
     }
 }

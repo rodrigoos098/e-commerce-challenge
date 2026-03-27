@@ -18,6 +18,11 @@ interface CartRepositoryInterface
     public function findByUserId(int $userId): ?Cart;
 
     /**
+     * Find a cart by user ID with a row lock for checkout finalization.
+     */
+    public function findByUserIdForUpdate(int $userId): ?Cart;
+
+    /**
      * Get or create a cart for the given session.
      */
     public function findOrCreateForSession(string $sessionId): Cart;

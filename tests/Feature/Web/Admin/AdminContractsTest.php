@@ -91,6 +91,45 @@ class AdminContractsTest extends TestCase
                 ->has('tags'));
     }
 
+    public function test_admin_can_clear_product_cost_price_explicitly(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['cost_price' => 149.90]);
+
+        $this->actingAs($admin)
+            ->put("/admin/products/{$product->id}", [
+                'cost_price' => null,
+            ])
+            ->assertRedirect('/admin/products')
+            ->assertSessionHas('success', 'Produto atualizado com sucesso!');
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'cost_price' => null,
+        ]);
+    }
+
+    public function test_admin_product_update_requires_stock_adjustment_reason_when_quantity_changes(): void
+    {
+        $admin = $this->createAdmin();
+        $product = Product::factory()->create(['quantity' => 10]);
+
+        $this->actingAs($admin)
+            ->from("/admin/products/{$product->id}/edit")
+            ->put("/admin/products/{$product->id}", [
+                'quantity' => 15,
+            ])
+            ->assertRedirect("/admin/products/{$product->id}/edit")
+            ->assertSessionHasErrors([
+                'stock_adjustment_reason' => 'Informe o motivo do ajuste de estoque.',
+            ]);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'quantity' => 10,
+        ]);
+    }
+
     public function test_admin_tags_index_exposes_tags_with_product_counts(): void
     {
         $admin = $this->createAdmin();
@@ -144,5 +183,29 @@ class AdminContractsTest extends TestCase
                 ->where('order.shipping_address.zip_code', '01310-100')
                 ->where('order.billing_address.street', 'Avenida Central, 456')
                 ->where('order.billing_address.zip_code', '13010-000'));
+    }
+
+    public function test_admin_order_show_exposes_mock_payment_fields_without_overwriting_logistics_status(): void
+    {
+        $admin = $this->createAdmin();
+        $customer = User::factory()->create();
+        $customer->assignRole('customer');
+        $order = Order::factory()->for($customer)->create([
+            'status' => 'processing',
+            'payment_status' => 'paid',
+            'payment_method' => Order::MOCK_PAYMENT_METHOD,
+            'paid_at' => now(),
+        ]);
+
+        $this->actingAs($admin)
+            ->get("/admin/orders/{$order->id}")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Admin/Orders/Show')
+                ->where('order.id', $order->id)
+                ->where('order.status', 'processing')
+                ->where('order.payment_status', 'paid')
+                ->where('order.payment_method', Order::MOCK_PAYMENT_METHOD)
+                ->where('order.paid_at', $order->paid_at?->toIso8601String()));
     }
 }

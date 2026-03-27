@@ -618,7 +618,8 @@
                             "schema": {
                                 "required": [
                                     "shipping_address",
-                                    "billing_address"
+                                    "billing_address",
+                                    "payment_simulated"
                                 ],
                                 "properties": {
                                     "shipping_address": {
@@ -670,6 +671,10 @@
                                     "notes": {
                                         "type": "string",
                                         "nullable": true
+                                    },
+                                    "payment_simulated": {
+                                        "type": "boolean",
+                                        "example": true
                                     }
                                 },
                                 "type": "object"

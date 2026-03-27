@@ -49,7 +49,7 @@ class StockFlowTest extends TestCase
             ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 3]);
 
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true]);
 
         $product->refresh();
         $this->assertEquals(7, $product->quantity);
@@ -64,7 +64,7 @@ class StockFlowTest extends TestCase
             ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 3]);
 
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true]);
 
         $order = Order::where('user_id', $this->customer->id)->first();
 
@@ -75,6 +75,16 @@ class StockFlowTest extends TestCase
             'reference_type' => 'order',
             'reference_id' => $order->id,
         ]);
+
+        $movement = StockMovement::query()
+            ->where('product_id', $product->id)
+            ->where('type', 'venda')
+            ->where('reference_type', 'order')
+            ->where('reference_id', $order->id)
+            ->firstOrFail();
+
+        $this->assertInstanceOf(Order::class, $movement->reference);
+        $this->assertSame($order->id, $movement->reference->id);
     }
 
     public function test_stock_low_event_is_fired_when_stock_drops_below_minimum(): void
@@ -93,7 +103,7 @@ class StockFlowTest extends TestCase
             ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 2]);
 
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true]);
 
         Event::assertDispatched(StockLow::class, function (StockLow $event) use ($product) {
             return $event->product->id === $product->id;
@@ -117,7 +127,7 @@ class StockFlowTest extends TestCase
             ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 2]);
 
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true]);
 
         Event::assertNotDispatched(StockLow::class);
     }
@@ -134,7 +144,7 @@ class StockFlowTest extends TestCase
             ->postJson('/api/v1/cart/items', ['product_id' => $product2->id, 'quantity' => 2]);
 
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true]);
 
         $product1->refresh();
         $product2->refresh();
@@ -155,7 +165,7 @@ class StockFlowTest extends TestCase
             ->postJson('/api/v1/cart/items', ['product_id' => $product2->id, 'quantity' => 2]);
 
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true]);
 
         $order = Order::where('user_id', $this->customer->id)->first();
         $movements = StockMovement::where('reference_type', 'order')
@@ -181,11 +191,11 @@ class StockFlowTest extends TestCase
             ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 2]);
 
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address])
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true])
             ->assertStatus(201);
 
         $this->actingAs($secondCustomer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address])
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true])
             ->assertStatus(422);
 
         $product->refresh();
@@ -207,7 +217,7 @@ class StockFlowTest extends TestCase
             ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 3]);
 
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true]);
 
         $order = Order::where('user_id', $this->customer->id)->firstOrFail();
 
@@ -225,6 +235,16 @@ class StockFlowTest extends TestCase
             'reference_type' => 'order',
             'reference_id' => $order->id,
         ]);
+
+        $movement = StockMovement::query()
+            ->where('product_id', $product->id)
+            ->where('type', 'devolucao')
+            ->where('reference_type', 'order')
+            ->where('reference_id', $order->id)
+            ->firstOrFail();
+
+        $this->assertInstanceOf(Order::class, $movement->reference);
+        $this->assertSame($order->id, $movement->reference->id);
     }
 
     public function test_repeated_cancellation_does_not_create_duplicate_stock_returns(): void
@@ -240,7 +260,7 @@ class StockFlowTest extends TestCase
             ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 3]);
 
         $this->actingAs($this->customer, 'sanctum')
-            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address]);
+            ->postJson('/api/v1/orders', ['shipping_address' => $address, 'billing_address' => $address, 'payment_simulated' => true]);
 
         $order = Order::where('user_id', $this->customer->id)->firstOrFail();
 

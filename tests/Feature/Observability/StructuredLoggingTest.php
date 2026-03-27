@@ -61,6 +61,7 @@ class StructuredLoggingTest extends TestCase
         Event::fake();
         Queue::fake();
 
+        /** @var User $customer */
         $customer = User::factory()->create();
         $customer->assignRole('customer');
 
@@ -119,16 +120,18 @@ class StructuredLoggingTest extends TestCase
             ->postJson('/api/v1/orders', [
                 'shipping_address' => $address,
                 'billing_address' => $address,
+                'payment_simulated' => true,
             ])
             ->assertStatus(201);
     }
 
     public function test_order_status_updates_are_logged_to_the_orders_channel(): void
     {
+        /** @var User $admin */
         $admin = User::factory()->create();
         $admin->assignRole('admin');
 
-        $order = Order::factory()->pending()->create();
+        $order = Order::factory()->create(['status' => 'processing']);
 
         Log::shouldReceive('channel')
             ->once()
@@ -154,6 +157,7 @@ class StructuredLoggingTest extends TestCase
 
     public function test_stock_movements_are_logged_to_the_stock_channel(): void
     {
+        /** @var User $admin */
         $admin = User::factory()->create();
         $admin->assignRole('admin');
 

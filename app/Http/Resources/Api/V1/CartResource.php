@@ -14,7 +14,19 @@ class CartResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $totals = $this->whenLoaded('items', fn () => app(\App\Services\CartTotalsService::class)->calculate($this->items));
+        $cartTotalsService = app(\App\Services\CartTotalsService::class);
+        $addresses = collect();
+
+        if ($request->user()) {
+            $addresses = $request->user()->addresses()
+                ->orderByDesc('is_default_shipping')
+                ->latest()
+                ->get(['zip_code', 'is_default_shipping']);
+        }
+
+        $shippingZipCode = $cartTotalsService->resolveShippingZipCode(addresses: $addresses);
+
+        $totals = $this->whenLoaded('items', fn () => $cartTotalsService->calculate($this->items, $shippingZipCode));
 
         return [
             'id' => $this->id,
@@ -25,6 +37,10 @@ class CartResource extends JsonResource
             'tax' => $this->whenLoaded('items', fn () => $totals['tax']),
             'shipping_cost' => $this->whenLoaded('items', fn () => $totals['shipping_cost']),
             'total' => $this->whenLoaded('items', fn () => $totals['total']),
+            'shipping_zip_code' => $this->whenLoaded('items', fn () => $totals['shipping_zip_code']),
+            'shipping_rule_label' => $this->whenLoaded('items', fn () => $totals['shipping_rule_label']),
+            'shipping_rule_description' => $this->whenLoaded('items', fn () => $totals['shipping_rule_description']),
+            'shipping_is_free' => $this->whenLoaded('items', fn () => $totals['shipping_is_free']),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

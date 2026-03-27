@@ -4,17 +4,27 @@ namespace App\Jobs;
 
 use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Mail;
 
-class SendOrderConfirmationEmail implements ShouldQueue
+class SendOrderConfirmationEmail implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
+    public int $uniqueFor = 86400;
+
     public function __construct(
-        public readonly Order $order,
+        public readonly int $orderId,
+        public readonly string $notificationType,
     ) {
+        $this->afterCommit();
+    }
+
+    public function uniqueId(): string
+    {
+        return sprintf('order-notification:%s:%d', $this->notificationType, $this->orderId);
     }
 
     /**
@@ -22,9 +32,15 @@ class SendOrderConfirmationEmail implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->order->loadMissing('user');
+        $order = Order::query()
+            ->with(['user', 'items.product'])
+            ->find($this->orderId);
 
-        Mail::to($this->order->user->email)
-            ->send(new OrderConfirmationMail($this->order));
+        if (! $order instanceof Order || ! $order->user?->email) {
+            return;
+        }
+
+        Mail::to($order->user->email)
+            ->send(new OrderConfirmationMail($order, $this->notificationType));
     }
 }

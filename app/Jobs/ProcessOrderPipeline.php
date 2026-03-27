@@ -44,10 +44,6 @@ class ProcessOrderPipeline implements ShouldQueue
             'items_count' => $processedOrder->items->count(),
         ]);
 
-        if ($processedOrder->status === 'pending') {
-            SendOrderConfirmationEmail::dispatch($processedOrder);
-        }
-
         Log::info('Order processing pipeline completed.', [
             'order_id' => $processedOrder->id,
             'status' => $processedOrder->status,

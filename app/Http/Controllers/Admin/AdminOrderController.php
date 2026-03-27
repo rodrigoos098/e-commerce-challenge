@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\Admin\UpdateOrderStatusRequest;
 use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Http\RedirectResponse;
@@ -56,6 +57,9 @@ class AdminOrderController extends Controller
             'order' => [
                 'id' => $order->id,
                 'status' => $order->status,
+                'payment_status' => $order->payment_status,
+                'payment_method' => $order->payment_method,
+                'paid_at' => $order->paid_at?->toIso8601String(),
                 'total' => (float) $order->total,
                 'subtotal' => (float) $order->subtotal,
                 'shipping_cost' => (float) $order->shipping_cost,
@@ -80,11 +84,9 @@ class AdminOrderController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, Order $order): RedirectResponse
+    public function updateStatus(UpdateOrderStatusRequest $request, Order $order): RedirectResponse
     {
-        $validated = $request->validate([
-            'status' => ['required', 'string', 'in:pending,processing,shipped,delivered,cancelled'],
-        ]);
+        $validated = $request->validated();
 
         $this->orderService->updateStatus($order, $validated['status']);
 

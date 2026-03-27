@@ -385,6 +385,7 @@ class AuthorizationTest extends TestCase
             ->postJson('/api/v1/orders', [
                 'shipping_address' => $address,
                 'billing_address' => $address,
+                'payment_simulated' => true,
             ])
             ->assertStatus(403)
             ->assertJson([
@@ -415,6 +416,7 @@ class AuthorizationTest extends TestCase
                 'shipping_zip' => '01000-000',
                 'shipping_country' => 'BR',
                 'same_billing' => true,
+                'payment_simulated' => true,
             ])
             ->assertForbidden();
     }

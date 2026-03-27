@@ -15,6 +15,7 @@ readonly class OrderDTO
         public array $shippingAddress,
         public array $billingAddress,
         public ?string $notes = null,
+        public bool $paymentSimulated = false,
     ) {
     }
 
@@ -28,6 +29,7 @@ readonly class OrderDTO
             shippingAddress: self::normalizeAddress($request->input('shipping_address', [])),
             billingAddress: self::normalizeAddress($request->input('billing_address', [])),
             notes: $request->input('notes'),
+            paymentSimulated: $request->boolean('payment_simulated'),
         );
     }
 

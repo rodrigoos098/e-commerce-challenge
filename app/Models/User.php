@@ -62,6 +62,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the addresses for the user.
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    /**
      * Get the cart for the user.
      */
     public function cart(): HasOne

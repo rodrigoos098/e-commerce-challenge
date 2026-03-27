@@ -87,6 +87,18 @@ class CartRepository implements CartRepositoryInterface
     }
 
     /**
+     * Find a cart by user ID with items and products eager-loaded and locked.
+     */
+    public function findByUserIdForUpdate(int $userId): ?Cart
+    {
+        return Cart::query()
+            ->with(['items.product.category'])
+            ->where('user_id', $userId)
+            ->lockForUpdate()
+            ->first();
+    }
+
+    /**
      * Find a cart by session ID with items and products eager-loaded.
      */
     public function findBySessionId(string $sessionId): ?Cart

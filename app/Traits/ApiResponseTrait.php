@@ -55,8 +55,24 @@ trait ApiResponseTrait
     /**
      * Return a created resource JSON response.
      */
-    protected function createdResponse(mixed $data): JsonResponse
+    protected function createdResponse(mixed $data, ?string $message = null): JsonResponse
     {
-        return $this->successResponse($data, 201);
+        if ($data instanceof JsonResource || $data instanceof ResourceCollection) {
+            $additional = ['success' => true];
+
+            if ($message !== null) {
+                $additional['message'] = $message;
+            }
+
+            return $data->additional($additional)->response()->setStatusCode(201);
+        }
+
+        $payload = ['success' => true, 'data' => $data];
+
+        if ($message !== null) {
+            $payload['message'] = $message;
+        }
+
+        return response()->json($payload, 201);
     }
 }

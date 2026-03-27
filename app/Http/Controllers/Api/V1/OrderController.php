@@ -12,6 +12,8 @@ use App\Services\OrderService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class OrderController extends Controller
 {
@@ -85,7 +87,7 @@ class OrderController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"shipping_address","billing_address"},
+     *             required={"shipping_address","billing_address","payment_simulated"},
      *             @OA\Property(property="shipping_address", type="object",
      *                 @OA\Property(property="name", type="string"),
      *                 @OA\Property(property="street", type="string"),
@@ -102,7 +104,8 @@ class OrderController extends Controller
      *                 @OA\Property(property="zip_code", type="string"),
      *                 @OA\Property(property="country", type="string")
      *             ),
-     *             @OA\Property(property="notes", type="string", nullable=true)
+     *             @OA\Property(property="notes", type="string", nullable=true),
+     *             @OA\Property(property="payment_simulated", type="boolean", example=true)
      *         )
      *     ),
      *     @OA\Response(response=201, description="Pedido criado com sucesso"),
@@ -113,11 +116,23 @@ class OrderController extends Controller
     {
         $this->authorize('create', Order::class);
 
-        $order = $this->orderService->createFromCart(OrderDTO::fromRequest($request));
+        try {
+            $order = $this->orderService->createFromCart(OrderDTO::fromRequest($request));
+        } catch (ValidationException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return $this->errorResponse(
+                'Nao foi possivel finalizar o pedido agora. Nenhuma alteracao definitiva foi aplicada; tente novamente em instantes.',
+                422,
+                ['order' => ['Falha operacional ao finalizar o pedido.']]
+            );
+        }
 
         return $this->createdResponse(
             new OrderResource($order),
-            'Pedido criado e enviado para processamento.'
+            'Pagamento simulado com sucesso e pedido criado.'
         );
     }
 

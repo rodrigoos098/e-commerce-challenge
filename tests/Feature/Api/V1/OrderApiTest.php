@@ -2,12 +2,17 @@
 
 namespace Tests\Feature\Api\V1;
 
+use App\Jobs\SendOrderConfirmationEmail;
+use App\Mail\OrderConfirmationMail;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\StockMovement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -164,21 +169,52 @@ class OrderApiTest extends TestCase
 
     public function test_authenticated_user_can_create_order_from_cart(): void
     {
+        Queue::fake();
+
         $customer = $this->createCustomer();
-        $this->setupCartWithProduct($customer);
+        [, $product] = $this->setupCartWithProduct($customer);
         $address = $this->validAddress();
 
         $response = $this->actingAs($customer, 'sanctum')
             ->postJson('/api/v1/orders', [
                 'shipping_address' => $address,
                 'billing_address' => $address,
+                'payment_simulated' => true,
             ]);
 
         $response->assertStatus(201)
             ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'Pagamento simulado com sucesso e pedido criado.')
+            ->assertJsonPath('data.status', 'pending')
+            ->assertJsonPath('data.payment_status', 'paid')
+            ->assertJsonPath('data.payment_method', Order::MOCK_PAYMENT_METHOD)
             ->assertJsonStructure(['success', 'data' => ['id', 'status', 'total', 'items']]);
 
-        $this->assertDatabaseHas('orders', ['user_id' => $customer->id, 'status' => 'pending']);
+        $this->assertDatabaseHas('orders', [
+            'user_id' => $customer->id,
+            'status' => 'pending',
+            'payment_status' => 'paid',
+            'payment_method' => Order::MOCK_PAYMENT_METHOD,
+        ]);
+        $orderId = $response->json('data.id');
+        $this->assertSame(8, $product->fresh()->quantity);
+        $this->assertDatabaseHas('stock_movements', [
+            'product_id' => $product->id,
+            'reference_type' => 'order',
+            'reference_id' => $orderId,
+            'type' => 'venda',
+            'quantity' => 2,
+        ]);
+
+        Queue::assertPushed(SendOrderConfirmationEmail::class, function (SendOrderConfirmationEmail $job) use ($orderId): bool {
+            return $job->orderId === $orderId
+                && $job->notificationType === OrderConfirmationMail::TYPE_CREATED;
+        });
+
+        Queue::assertPushed(SendOrderConfirmationEmail::class, function (SendOrderConfirmationEmail $job) use ($orderId): bool {
+            return $job->orderId === $orderId
+                && $job->notificationType === OrderConfirmationMail::TYPE_PAYMENT_CONFIRMED;
+        });
     }
 
     public function test_create_order_fails_with_empty_cart(): void
@@ -192,6 +228,7 @@ class OrderApiTest extends TestCase
             ->postJson('/api/v1/orders', [
                 'shipping_address' => $address,
                 'billing_address' => $address,
+                'payment_simulated' => true,
             ]);
 
         $response->assertStatus(422)
@@ -209,9 +246,40 @@ class OrderApiTest extends TestCase
             ->postJson('/api/v1/orders', [
                 'shipping_address' => $address,
                 'billing_address' => $address,
+                'payment_simulated' => true,
             ]);
 
         $this->assertDatabaseMissing('cart_items', ['cart_id' => $cart->id]);
+    }
+
+    public function test_retrying_order_submission_does_not_create_a_duplicate_order(): void
+    {
+        $customer = $this->createCustomer();
+        [, $product] = $this->setupCartWithProduct($customer);
+        $address = $this->validAddress();
+
+        $firstResponse = $this->actingAs($customer, 'sanctum')
+            ->postJson('/api/v1/orders', [
+                'shipping_address' => $address,
+                'billing_address' => $address,
+                'payment_simulated' => true,
+            ]);
+
+        $firstResponse->assertCreated();
+
+        $this->actingAs($customer, 'sanctum')
+            ->postJson('/api/v1/orders', [
+                'shipping_address' => $address,
+                'billing_address' => $address,
+                'payment_simulated' => true,
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['errors' => ['cart']]);
+
+        $this->assertSame(1, Order::query()->where('user_id', $customer->id)->count());
+        $this->assertSame(8, $product->fresh()->quantity);
+        $this->assertSame(1, StockMovement::query()->where('product_id', $product->id)->where('type', 'venda')->count());
     }
 
     public function test_second_order_is_rejected_after_stock_is_consumed(): void
@@ -228,6 +296,7 @@ class OrderApiTest extends TestCase
             ->postJson('/api/v1/orders', [
                 'shipping_address' => $address,
                 'billing_address' => $address,
+                'payment_simulated' => true,
             ])
             ->assertStatus(201);
 
@@ -235,6 +304,7 @@ class OrderApiTest extends TestCase
             ->postJson('/api/v1/orders', [
                 'shipping_address' => $address,
                 'billing_address' => $address,
+                'payment_simulated' => true,
             ])
             ->assertStatus(422)
             ->assertJsonPath('success', false);
@@ -251,6 +321,23 @@ class OrderApiTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonPath('success', false)
             ->assertJsonStructure(['success', 'errors']);
+    }
+
+    public function test_create_order_requires_payment_simulation(): void
+    {
+        $customer = $this->createCustomer();
+        $this->setupCartWithProduct($customer);
+        $address = $this->validAddress();
+
+        $response = $this->actingAs($customer, 'sanctum')
+            ->postJson('/api/v1/orders', [
+                'shipping_address' => $address,
+                'billing_address' => $address,
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonValidationErrors(['payment_simulated']);
     }
 
     // ── UpdateStatus (admin) ──────────────────────────────────────────────────
@@ -272,8 +359,67 @@ class OrderApiTest extends TestCase
         $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'processing']);
     }
 
+    public function test_admin_can_apply_full_valid_status_chain(): void
+    {
+        Queue::fake();
+
+        $admin = $this->createAdmin();
+        $order = Order::factory()->pending()->create();
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'processing'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'processing');
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'shipped'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'shipped');
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'delivered'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'delivered');
+
+        Queue::assertPushed(SendOrderConfirmationEmail::class, function (SendOrderConfirmationEmail $job) use ($order): bool {
+            return $job->orderId === $order->id
+                && $job->notificationType === OrderConfirmationMail::TYPE_SHIPPED;
+        });
+
+        Queue::assertPushed(SendOrderConfirmationEmail::class, function (SendOrderConfirmationEmail $job) use ($order): bool {
+            return $job->orderId === $order->id
+                && $job->notificationType === OrderConfirmationMail::TYPE_DELIVERED;
+        });
+    }
+
+    public function test_admin_cannot_skip_steps_in_status_chain(): void
+    {
+        $admin = $this->createAdmin();
+        $order = Order::factory()->pending()->create();
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'shipped'])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['errors' => ['status']]);
+    }
+
+    public function test_admin_cannot_cancel_delivered_order(): void
+    {
+        $admin = $this->createAdmin();
+        $order = Order::factory()->delivered()->create();
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'cancelled'])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['errors' => ['status']]);
+    }
+
     public function test_cancelling_order_restores_stock_and_records_return_movement(): void
     {
+        Queue::fake();
+
         $admin = $this->createAdmin();
         $customer = $this->createCustomer();
         [, $product] = $this->setupCartWithProduct($customer, Product::factory()->create([
@@ -287,6 +433,7 @@ class OrderApiTest extends TestCase
             ->postJson('/api/v1/orders', [
                 'shipping_address' => $address,
                 'billing_address' => $address,
+                'payment_simulated' => true,
             ]);
 
         $orderId = $createResponse->json('data.id');
@@ -308,6 +455,95 @@ class OrderApiTest extends TestCase
             'reference_type' => 'order',
             'reference_id' => $orderId,
         ]);
+
+        $movement = StockMovement::query()
+            ->where('product_id', $product->id)
+            ->where('type', 'devolucao')
+            ->where('reference_type', 'order')
+            ->where('reference_id', $orderId)
+            ->firstOrFail();
+
+        $this->assertInstanceOf(Order::class, $movement->reference);
+        $this->assertSame($orderId, $movement->reference->id);
+
+        Queue::assertPushed(SendOrderConfirmationEmail::class, function (SendOrderConfirmationEmail $job) use ($orderId): bool {
+            return $job->orderId === $orderId
+                && $job->notificationType === OrderConfirmationMail::TYPE_CANCELLED;
+        });
+    }
+
+    public function test_repeating_same_admin_status_does_not_queue_duplicate_notification(): void
+    {
+        Queue::fake();
+
+        $admin = $this->createAdmin();
+        $order = Order::factory()->create(['status' => 'shipped']);
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", ['status' => 'shipped'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'shipped');
+
+        Queue::assertNotPushed(SendOrderConfirmationEmail::class);
+    }
+
+    public function test_cancelling_order_with_legacy_sale_reference_restores_stock_and_records_return_movement(): void
+    {
+        $admin = $this->createAdmin();
+        $customer = $this->createCustomer();
+        $product = Product::factory()->create([
+            'quantity' => 7,
+            'active' => true,
+            'price' => 50.0,
+        ]);
+        $order = Order::factory()->create([
+            'user_id' => $customer->id,
+            'status' => 'processing',
+        ]);
+
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 3,
+            'unit_price' => 50.0,
+            'total_price' => 150.0,
+        ]);
+
+        StockMovement::factory()->create([
+            'product_id' => $product->id,
+            'type' => 'venda',
+            'quantity' => 3,
+            'reference_type' => Order::class,
+            'reference_id' => $order->id,
+        ]);
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/status", [
+                'status' => 'cancelled',
+            ])
+            ->assertStatus(200)
+            ->assertJsonPath('data.status', 'cancelled');
+
+        $product->refresh();
+
+        $this->assertSame(10, $product->quantity);
+        $this->assertDatabaseHas('stock_movements', [
+            'product_id' => $product->id,
+            'type' => 'devolucao',
+            'quantity' => 3,
+            'reference_type' => 'order',
+            'reference_id' => $order->id,
+        ]);
+
+        $movement = StockMovement::query()
+            ->where('product_id', $product->id)
+            ->where('type', 'devolucao')
+            ->where('reference_type', 'order')
+            ->where('reference_id', $order->id)
+            ->firstOrFail();
+
+        $this->assertInstanceOf(Order::class, $movement->reference);
+        $this->assertSame($order->id, $movement->reference->id);
     }
 
     public function test_admin_cannot_apply_invalid_status_transition(): void
@@ -336,6 +572,7 @@ class OrderApiTest extends TestCase
             ->postJson('/api/v1/orders', [
                 'shipping_address' => $address,
                 'billing_address' => $address,
+                'payment_simulated' => true,
             ]);
 
         $orderId = $createResponse->json('data.id');

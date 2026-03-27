@@ -39,20 +39,32 @@ class OrderProcessingPipelineTest extends TestCase
         });
     }
 
-    public function test_processing_pipeline_dispatches_confirmation_email_job(): void
+    public function test_processing_pipeline_does_not_dispatch_notification_jobs(): void
     {
         Queue::fake();
 
         $user = User::factory()->create();
         $user->assignRole('customer');
-        $order = Order::factory()->for($user)->create(['status' => 'processing']);
+        $order = Order::factory()->for($user)->create(['status' => 'pending']);
 
         app()->call([new ProcessOrderPipeline($order->id), 'handle']);
 
         $this->assertSame('pending', $order->fresh()->status);
 
-        Queue::assertPushed(SendOrderConfirmationEmail::class, function (SendOrderConfirmationEmail $job) use ($order): bool {
-            return $job->order->is($order);
-        });
+        Queue::assertNotPushed(SendOrderConfirmationEmail::class);
+    }
+
+    public function test_processing_pipeline_is_retry_safe_for_pending_orders(): void
+    {
+        Queue::fake();
+
+        $user = User::factory()->create();
+        $user->assignRole('customer');
+        $order = Order::factory()->for($user)->create(['status' => 'pending']);
+
+        app()->call([new ProcessOrderPipeline($order->id), 'handle']);
+        app()->call([new ProcessOrderPipeline($order->id), 'handle']);
+
+        $this->assertSame('pending', $order->fresh()->status);
     }
 }

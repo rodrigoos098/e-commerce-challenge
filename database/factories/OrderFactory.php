@@ -34,6 +34,9 @@ class OrderFactory extends Factory
         return [
             'user_id' => User::factory(),
             'status' => fake()->randomElement(Order::STATUSES),
+            'payment_status' => Order::INITIAL_PAYMENT_STATUS,
+            'payment_method' => null,
+            'paid_at' => null,
             'subtotal' => $subtotal,
             'tax' => $tax,
             'shipping_cost' => $shippingCost,

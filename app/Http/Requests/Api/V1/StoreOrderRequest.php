@@ -36,6 +36,7 @@ class StoreOrderRequest extends FormRequest
             'billing_address.zip_code' => ['required', 'string', 'max:20'],
             'billing_address.country' => ['required', 'string', 'max:100'],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'payment_simulated' => ['accepted'],
         ];
     }
 }

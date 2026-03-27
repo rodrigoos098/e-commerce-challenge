@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api\V1;
 
+use App\Models\Address;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -34,6 +35,38 @@ class CartApiTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
             ->assertJsonStructure(['success', 'data' => ['id', 'items']]);
+    }
+
+    public function test_cart_api_returns_shipping_metadata_from_backend_rule(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        Address::factory()->for($user)->defaultShipping()->create([
+            'zip_code' => '01310-100',
+        ]);
+        $product = Product::factory()->create([
+            'price' => 80.0,
+            'quantity' => 10,
+            'active' => true,
+        ]);
+        $cart = Cart::factory()->create(['user_id' => $user->id]);
+        CartItem::factory()->create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+        ]);
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->getJson('/api/v1/cart');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.shipping_zip_code', '01310100')
+            ->assertJsonPath('data.shipping_rule_label', 'Faixa de CEP 0-2')
+            ->assertJsonPath('data.shipping_rule_description', 'Frete mockado aplicado para o CEP 01310100: faixa 0-2 com custo de R$ 14,90.')
+            ->assertJsonPath('data.shipping_is_free', false)
+            ->assertJsonPath('data.shipping_cost', 14.9)
+            ->assertJsonPath('data.total', 102.9);
     }
 
     public function test_viewing_cart_creates_it_if_not_exists(): void

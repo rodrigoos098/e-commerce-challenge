@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminOrderController;
@@ -58,15 +59,6 @@ Route::middleware('auth')->group(function (): void {
         ->name('verification.verify');
 });
 
-// ── Authenticated Routes ──────────────────────────────────────────────────
-
-// Cart
-Route::get('/cart', [CartPageController::class, 'index'])->name('cart');
-Route::post('/cart/items', [CartPageController::class, 'addItem'])->name('cart.items.add');
-Route::put('/cart/items/{item}', [CartPageController::class, 'updateItem'])->name('cart.items.update');
-Route::delete('/cart/items/{item}', [CartPageController::class, 'removeItem'])->name('cart.items.remove');
-Route::delete('/cart', [CartPageController::class, 'clear'])->name('cart.clear');
-
 Route::middleware('auth')->group(function (): void {
     // Customer area
     Route::prefix('customer')->group(function (): void {
@@ -75,6 +67,12 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/orders/{order}', [OrderPageController::class, 'show'])->middleware('can:view,order')->name('orders.show');
         Route::post('/orders', [OrderPageController::class, 'store'])->middleware(['verified', 'can:create,'.Order::class])->name('orders.store');
         Route::put('/orders/{order}/cancel', [OrderPageController::class, 'cancel'])->middleware('can:cancel,order')->name('orders.cancel');
+        Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
+        Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
+        Route::put('/addresses/{address}', [AddressController::class, 'update'])->middleware('can:update,address')->name('addresses.update');
+        Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->middleware('can:delete,address')->name('addresses.destroy');
+        Route::put('/addresses/{address}/default/shipping', [AddressController::class, 'setDefaultShipping'])->middleware('can:update,address')->name('addresses.default.shipping');
+        Route::put('/addresses/{address}/default/billing', [AddressController::class, 'setDefaultBilling'])->middleware('can:update,address')->name('addresses.default.billing');
         Route::get('/profile', [ProfilePageController::class, 'index'])->name('profile');
         Route::put('/profile', [ProfilePageController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [ProfilePageController::class, 'updatePassword'])->name('profile.password');

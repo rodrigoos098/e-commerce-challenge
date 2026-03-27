@@ -3,16 +3,24 @@
 namespace App\Services;
 
 use App\DTOs\OrderDTO;
+use App\Events\OrderCancelled;
 use App\Events\OrderCreated;
+use App\Events\OrderDelivered;
+use App\Events\OrderPaymentConfirmed;
+use App\Events\OrderShipped;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use App\Models\StockMovement;
 use App\Repositories\Contracts\CartRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Traits\LogsActivity;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class OrderService
 {
@@ -68,67 +76,107 @@ class OrderService
      */
     public function createFromCart(OrderDTO $dto): Order
     {
-        $cart = $this->cartRepository->findByUserId($dto->userId);
-
-        if (! $cart || $cart->items->isEmpty()) {
+        if (! $dto->paymentSimulated) {
             throw ValidationException::withMessages([
-                'cart' => ['Cart is empty or not found.'],
+                'payment_simulated' => ['Simule o pagamento antes de concluir o pedido.'],
             ]);
         }
 
-        $order = DB::transaction(function () use ($dto, $cart): Order {
-            $orderItems = [];
-            $subtotal = 0;
-            $requiredQuantities = $cart->items
-                ->groupBy('product_id')
-                ->map(fn ($items): int => (int) $items->sum('quantity'));
+        try {
+            $order = DB::transaction(function () use ($dto): Order {
+                $cart = $this->cartRepository->findByUserIdForUpdate($dto->userId);
 
-            foreach ($cart->items as $cartItem) {
-                $product = $cartItem->product;
-
-                if (! $product || ! $product->active) {
+                if (! $cart || $cart->items->isEmpty()) {
                     throw ValidationException::withMessages([
-                        'cart' => ["Product '{$cartItem->product?->name}' is no longer available."],
+                        'cart' => ['Nao ha itens disponiveis no carrinho para finalizar o pedido. Se voce acabou de enviar a compra, aguarde a confirmacao do pedido.'],
                     ]);
                 }
 
-                if ($product->quantity < $requiredQuantities->get($product->id, 0)) {
-                    throw ValidationException::withMessages([
-                        'cart' => ["Insufficient stock for product '{$product->name}'. Available: {$product->quantity}."],
-                    ]);
+                $requiredQuantities = $cart->items
+                    ->groupBy('product_id')
+                    ->map(fn (Collection $items): int => (int) $items->sum('quantity'));
+
+                $lockedProducts = $this->productRepository
+                    ->findByIdsForUpdate($requiredQuantities->keys()->map(fn ($id): int => (int) $id)->all())
+                    ->keyBy('id');
+
+                $orderItems = [];
+
+                foreach ($cart->items as $cartItem) {
+                    /** @var Product|null $product */
+                    $product = $lockedProducts->get($cartItem->product_id);
+
+                    if (! $product || ! $product->active) {
+                        throw ValidationException::withMessages([
+                            'cart' => ["Product '{$cartItem->product?->name}' is no longer available."],
+                        ]);
+                    }
+
+                    $requiredQuantity = $requiredQuantities->get($product->id, 0);
+
+                    if ($product->quantity < $requiredQuantity) {
+                        throw ValidationException::withMessages([
+                            'cart' => ["Insufficient stock for product '{$product->name}'. Available: {$product->quantity}."],
+                        ]);
+                    }
+
+                    $lineTotal = $product->price * $cartItem->quantity;
+
+                    $orderItems[] = [
+                        'product_id' => $product->id,
+                        'quantity' => $cartItem->quantity,
+                        'unit_price' => $product->price,
+                        'total_price' => $lineTotal,
+                    ];
                 }
 
-                $lineTotal = $product->price * $cartItem->quantity;
-                $subtotal += $lineTotal;
+                $totals = $this->cartTotalsService->calculate(
+                    $cart->items,
+                    (string) data_get($dto->shippingAddress, 'zip_code', ''),
+                );
 
-                $orderItems[] = [
-                    'product_id' => $product->id,
-                    'quantity' => $cartItem->quantity,
-                    'unit_price' => $product->price,
-                    'total_price' => $lineTotal,
-                ];
-            }
+                $orderData = array_merge($dto->toArray(), [
+                    'status' => Order::INITIAL_STATUS,
+                    'payment_status' => $dto->paymentSimulated ? 'paid' : Order::INITIAL_PAYMENT_STATUS,
+                    'payment_method' => $dto->paymentSimulated ? Order::MOCK_PAYMENT_METHOD : null,
+                    'paid_at' => $dto->paymentSimulated ? Carbon::now() : null,
+                    'subtotal' => $totals['subtotal'],
+                    'tax' => $totals['tax'],
+                    'shipping_cost' => $totals['shipping_cost'],
+                    'total' => $totals['total'],
+                ]);
 
-            $totals = $this->cartTotalsService->calculate($cart->items);
+                $order = $this->orderRepository->create($orderData, $orderItems);
 
-            $orderData = array_merge($dto->toArray(), [
-                'status' => 'processing',
-                'subtotal' => $totals['subtotal'],
-                'tax' => $totals['tax'],
-                'shipping_cost' => $totals['shipping_cost'],
-                'total' => $totals['total'],
+                foreach ($order->items as $item) {
+                    /** @var Product $product */
+                    $product = $lockedProducts->get($item->product_id);
+
+                    $this->stockService->decreaseStockForLockedProduct(
+                        product: $product,
+                        quantity: $item->quantity,
+                        orderId: $order->id,
+                    );
+                }
+
+                $this->cartRepository->clear($cart);
+
+                return $order->fresh(['items.product', 'user']) ?? $order;
+            });
+        } catch (ValidationException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            report($exception);
+
+            throw ValidationException::withMessages([
+                'order' => ['Nao foi possivel finalizar o pedido agora. Nenhuma alteracao definitiva foi aplicada; tente novamente em instantes.'],
             ]);
+        }
 
-            $order = $this->orderRepository->create($orderData, $orderItems);
-
-            $this->cartRepository->clear($cart);
-
-            return $order;
-        });
+        $order = $order->fresh(['items.product', 'user']) ?? $order;
 
         event(new OrderCreated($order));
-
-        $order = $order->fresh(['items.product']) ?? $order;
+        event(new OrderPaymentConfirmed($order));
 
         $this->logActivity('orders', 'Order created', [
             'order_id' => $order->id,
@@ -140,46 +188,11 @@ class OrderService
     }
 
     /**
-     * Process a pending order asynchronously after it has been created.
+     * Load the latest persisted order state for asynchronous follow-up work.
      */
     public function processPendingOrder(Order $order): Order
     {
-        return DB::transaction(function () use ($order): Order {
-            $freshOrder = $this->orderRepository->findById($order->id);
-
-            if (! $freshOrder || $freshOrder->status !== 'processing') {
-                return $freshOrder ?? $order->loadMissing(['items.product', 'user']);
-            }
-
-            $requiredQuantities = $freshOrder->items
-                ->groupBy('product_id')
-                ->map(fn ($items): int => (int) $items->sum('quantity'));
-            $lockedProducts = $this->productRepository
-                ->findByIdsForUpdate($requiredQuantities->keys()->map(fn ($id): int => (int) $id)->all())
-                ->keyBy('id');
-
-            foreach ($freshOrder->items as $item) {
-                /** @var \App\Models\Product|null $product */
-                $product = $lockedProducts->get($item->product_id);
-
-                if (! $product || ! $product->active || $product->quantity < $requiredQuantities->get($item->product_id, 0)) {
-                    return $this->orderRepository->updateStatus($freshOrder, 'cancelled');
-                }
-            }
-
-            foreach ($freshOrder->items as $item) {
-                /** @var \App\Models\Product $product */
-                $product = $lockedProducts->get($item->product_id);
-
-                $this->stockService->decreaseStockForLockedProduct(
-                    product: $product,
-                    quantity: $item->quantity,
-                    orderId: $freshOrder->id,
-                );
-            }
-
-            return $this->orderRepository->updateStatus($freshOrder, 'pending');
-        });
+        return $this->orderRepository->findById($order->id) ?? $order->loadMissing(['items.product', 'user']);
     }
 
     /**
@@ -190,7 +203,7 @@ class OrderService
         $previousStatus = $order->status;
 
         if ($previousStatus === $status) {
-            return $order->loadMissing(['items.product']);
+            return $order->loadMissing(['items.product', 'user']);
         }
 
         if (! $order->canTransitionTo($status)) {
@@ -203,7 +216,7 @@ class OrderService
             $order->loadMissing(['items.product']);
 
             $orderAlreadyReducedStock = StockMovement::query()
-                ->where('reference_type', 'order')
+                ->whereIn('reference_type', ['order', Order::class])
                 ->where('reference_id', $order->id)
                 ->where('type', 'venda')
                 ->exists();
@@ -221,13 +234,30 @@ class OrderService
             return $this->orderRepository->updateStatus($order, $status);
         });
 
+        $updatedOrder = $updatedOrder->fresh(['items.product', 'user']) ?? $updatedOrder->loadMissing(['items.product', 'user']);
+
         $this->logActivity('orders', 'Order status updated', [
             'order_id' => $updatedOrder->id,
             'previous_status' => $previousStatus,
             'status' => $updatedOrder->status,
         ]);
 
+        $this->dispatchStatusChangedEvent($updatedOrder);
+
         return $updatedOrder;
+    }
+
+    /**
+     * Dispatch transactional notification events for status changes.
+     */
+    private function dispatchStatusChangedEvent(Order $order): void
+    {
+        match ($order->status) {
+            'cancelled' => event(new OrderCancelled($order)),
+            'shipped' => event(new OrderShipped($order)),
+            'delivered' => event(new OrderDelivered($order)),
+            default => null,
+        };
     }
 
     /**

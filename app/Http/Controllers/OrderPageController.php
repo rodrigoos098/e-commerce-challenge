@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\OrderDTO;
+use App\Http\Requests\Web\StoreOrderRequest;
 use App\Http\Resources\Api\V1\OrderResource;
 use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class OrderPageController extends Controller
 {
@@ -34,56 +37,38 @@ class OrderPageController extends Controller
     {
         $this->authorize('view', $order);
 
+        $order->loadMissing('items.product');
+
         return Inertia::render('Customer/Orders/Show', [
             'order' => (new OrderResource($order))->resolve($request),
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreOrderRequest $request): RedirectResponse
     {
         $this->authorize('create', Order::class);
 
-        $request->validate([
-            'shipping_name' => ['required', 'string', 'max:255'],
-            'shipping_street' => ['required', 'string', 'max:255'],
-            'shipping_city' => ['required', 'string', 'max:255'],
-            'shipping_state' => ['required', 'string', 'max:255'],
-            'shipping_zip' => ['required', 'string', 'max:20'],
-            'shipping_country' => ['required', 'string', 'max:255'],
-        ]);
-
-        $shippingAddress = [
-            'name' => $request->input('shipping_name'),
-            'street' => $request->input('shipping_street'),
-            'city' => $request->input('shipping_city'),
-            'state' => $request->input('shipping_state'),
-            'zip_code' => $request->input('shipping_zip'),
-            'country' => $request->input('shipping_country'),
-        ];
-
-        if ($request->boolean('same_billing')) {
-            $billingAddress = $shippingAddress;
-        } else {
-            $billingAddress = [
-                'name' => $request->input('billing_name', $shippingAddress['name']),
-                'street' => $request->input('billing_street', $shippingAddress['street']),
-                'city' => $request->input('billing_city', $shippingAddress['city']),
-                'state' => $request->input('billing_state', $shippingAddress['state']),
-                'zip_code' => $request->input('billing_zip', $shippingAddress['zip_code']),
-                'country' => $request->input('billing_country', $shippingAddress['country']),
-            ];
-        }
-
         $dto = new OrderDTO(
             userId: $request->user()->id,
-            shippingAddress: $shippingAddress,
-            billingAddress: $billingAddress,
-            notes: $request->input('notes'),
+            shippingAddress: $request->shippingAddressSnapshot(),
+            billingAddress: $request->billingAddressSnapshot(),
+            notes: $request->validated('notes'),
+            paymentSimulated: $request->boolean('payment_simulated'),
         );
 
-        $order = $this->orderService->createFromCart($dto);
+        try {
+            $order = $this->orderService->createFromCart($dto);
+        } catch (ValidationException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            report($exception);
 
-        return redirect("/customer/orders/{$order->id}")->with('success', 'Pedido criado e enviado para processamento.');
+            return back()->withInput()->withErrors([
+                'order' => 'Nao foi possivel finalizar o pedido agora. Tente novamente em instantes.',
+            ]);
+        }
+
+        return redirect("/customer/orders/{$order->id}")->with('success', 'Pagamento simulado com sucesso e pedido criado.');
     }
 
     public function cancel(Order $order): RedirectResponse

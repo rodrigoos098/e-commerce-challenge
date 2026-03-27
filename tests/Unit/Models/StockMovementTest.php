@@ -2,9 +2,11 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\StockMovement;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -78,6 +80,37 @@ class StockMovementTest extends TestCase
         $this->assertEquals($product->id, $stockMovement->product->id);
     }
 
+    public function test_reference_relationship_returns_morph_to(): void
+    {
+        $stockMovement = new StockMovement();
+
+        $this->assertInstanceOf(MorphTo::class, $stockMovement->reference());
+    }
+
+    public function test_reference_relationship_resolves_order_alias(): void
+    {
+        $order = Order::factory()->create();
+        $stockMovement = StockMovement::factory()->create([
+            'reference_type' => 'order',
+            'reference_id' => $order->id,
+        ]);
+
+        $this->assertInstanceOf(Order::class, $stockMovement->reference);
+        $this->assertSame($order->id, $stockMovement->reference->id);
+    }
+
+    public function test_reference_relationship_resolves_fully_qualified_order_class(): void
+    {
+        $order = Order::factory()->create();
+        $stockMovement = StockMovement::factory()->create([
+            'reference_type' => Order::class,
+            'reference_id' => $order->id,
+        ]);
+
+        $this->assertInstanceOf(Order::class, $stockMovement->reference);
+        $this->assertSame($order->id, $stockMovement->reference->id);
+    }
+
     // ── Comportamento ─────────────────────────────────────────────────────────
 
     public function test_multiple_stock_movements_can_belong_to_same_product(): void
@@ -105,5 +138,6 @@ class StockMovementTest extends TestCase
 
         $this->assertNull($stockMovement->reference_type);
         $this->assertNull($stockMovement->reference_id);
+        $this->assertNull($stockMovement->reference);
     }
 }

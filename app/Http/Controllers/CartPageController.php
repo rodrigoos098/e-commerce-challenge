@@ -35,7 +35,18 @@ class CartPageController extends Controller
 
     private function formatCart(Cart $cart, Request $request): array
     {
-        $totals = $this->cartTotalsService->calculate($cart->items);
+        $addresses = collect();
+
+        if ($request->user()) {
+            $addresses = $request->user()->addresses()
+                ->orderByDesc('is_default_shipping')
+                ->latest()
+                ->get(['zip_code', 'is_default_shipping']);
+        }
+
+        $shippingZipCode = $this->cartTotalsService->resolveShippingZipCode(addresses: $addresses);
+
+        $totals = $this->cartTotalsService->calculate($cart->items, $shippingZipCode);
 
         return [
             'id' => $cart->id,
@@ -48,6 +59,10 @@ class CartPageController extends Controller
             'tax' => $totals['tax'],
             'shipping_cost' => $totals['shipping_cost'],
             'total' => $totals['total'],
+            'shipping_zip_code' => $totals['shipping_zip_code'],
+            'shipping_rule_label' => $totals['shipping_rule_label'],
+            'shipping_rule_description' => $totals['shipping_rule_description'],
+            'shipping_is_free' => $totals['shipping_is_free'],
             'item_count' => $cart->items->count(),
         ];
     }
