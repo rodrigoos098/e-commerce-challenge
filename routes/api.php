@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\ProductController;
+use App\Http\Controllers\Api\V1\TagController;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ Route::prefix('v1')->group(function (): void {
     Route::get('categories', [CategoryController::class, 'index']);
     Route::get('categories/{category}', [CategoryController::class, 'show']);
     Route::get('categories/{category}/products', [CategoryController::class, 'products']);
+    Route::get('tags', [TagController::class, 'index']);
 
     // ── Authenticated Routes ─────────────────────────────────────────────────
     Route::middleware('auth:sanctum')->group(function (): void {
@@ -40,6 +42,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('orders', [OrderController::class, 'index'])->middleware('can:viewAny,'.Order::class);
         Route::get('orders/{order}', [OrderController::class, 'show'])->middleware('can:view,order');
         Route::post('orders', [OrderController::class, 'store'])->middleware('can:create,'.Order::class);
+        Route::put('orders/{order}/cancel', [OrderController::class, 'cancel'])->middleware('can:cancel,order');
         Route::put('orders/{order}/status', [OrderController::class, 'updateStatus'])->middleware('can:update,order');
 
         // Products (policy-backed admin mutations)
@@ -56,6 +59,9 @@ Route::prefix('v1')->group(function (): void {
             Route::post('categories', [CategoryController::class, 'store']);
             Route::put('categories/{category}', [CategoryController::class, 'update']);
             Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
+            Route::post('tags', [TagController::class, 'store']);
+            Route::put('tags/{tag}', [TagController::class, 'update']);
+            Route::delete('tags/{tag}', [TagController::class, 'destroy']);
         });
     });
 });

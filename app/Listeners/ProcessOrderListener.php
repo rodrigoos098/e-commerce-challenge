@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\OrderCreated;
-use App\Jobs\SendOrderConfirmationEmail;
+use App\Jobs\ProcessOrderPipeline;
 use Illuminate\Support\Facades\Log;
 
 class ProcessOrderListener
@@ -20,6 +20,6 @@ class ProcessOrderListener
             'status' => $event->order->status,
         ]);
 
-        SendOrderConfirmationEmail::dispatch($event->order);
+        ProcessOrderPipeline::dispatch($event->order->id);
     }
 }

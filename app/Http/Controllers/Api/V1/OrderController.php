@@ -115,7 +115,10 @@ class OrderController extends Controller
 
         $order = $this->orderService->createFromCart(OrderDTO::fromRequest($request));
 
-        return $this->createdResponse(new OrderResource($order));
+        return $this->createdResponse(
+            new OrderResource($order),
+            'Pedido criado e enviado para processamento.'
+        );
     }
 
     /**
@@ -144,6 +147,18 @@ class OrderController extends Controller
         $this->authorize('update', $order);
 
         $updated = $this->orderService->updateStatus($order, $request->string('status')->toString());
+
+        return $this->successResponse(new OrderResource($updated));
+    }
+
+    /**
+     * Cancel an order for the authenticated customer.
+     */
+    public function cancel(Order $order): JsonResponse
+    {
+        $this->authorize('cancel', $order);
+
+        $updated = $this->orderService->cancel($order);
 
         return $this->successResponse(new OrderResource($updated));
     }

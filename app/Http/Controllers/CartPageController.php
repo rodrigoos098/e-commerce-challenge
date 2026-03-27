@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Cart;
 use App\Services\CartService;
+use App\Services\CartTotalsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,13 +15,18 @@ class CartPageController extends Controller
 {
     public function __construct(
         private readonly CartService $cartService,
+        private readonly CartTotalsService $cartTotalsService,
     ) {
     }
 
     public function index(Request $request): Response
     {
-        $cart = $this->cartService->getOrCreateForUser($request->user()->id);
+        $cart = $this->cartService->getOrCreateForContext($request->user()?->id, $request->session()->getId());
         $cart->load('items.product.category', 'items.product.tags');
+
+        if (! $request->user()) {
+            $request->session()->put('guest_cart_id', $cart->id);
+        }
 
         return Inertia::render('Customer/Cart', [
             'cart' => $this->formatCart($cart, $request),
@@ -29,9 +35,7 @@ class CartPageController extends Controller
 
     private function formatCart(Cart $cart, Request $request): array
     {
-        $subtotal = (float) $cart->items->sum(fn ($item) => ($item->product?->price ?? 0) * $item->quantity);
-        $tax = round($subtotal * 0.1, 2);
-        $shippingCost = 0;
+        $totals = $this->cartTotalsService->calculate($cart->items);
 
         return [
             'id' => $cart->id,
@@ -40,10 +44,10 @@ class CartPageController extends Controller
                 'product' => (new ProductResource($item->product))->toArray($request),
                 'quantity' => (int) $item->quantity,
             ])->toArray(),
-            'subtotal' => $subtotal,
-            'tax' => $tax,
-            'shipping_cost' => $shippingCost,
-            'total' => $subtotal + $tax + $shippingCost,
+            'subtotal' => $totals['subtotal'],
+            'tax' => $totals['tax'],
+            'shipping_cost' => $totals['shipping_cost'],
+            'total' => $totals['total'],
             'item_count' => $cart->items->count(),
         ];
     }
@@ -55,11 +59,16 @@ class CartPageController extends Controller
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $this->cartService->addItem(
-            $request->user()->id,
+        $cartItem = $this->cartService->addItemForContext(
+            $request->user()?->id,
+            $request->session()->getId(),
             $validated['product_id'],
             $validated['quantity'],
         );
+
+        if (! $request->user()) {
+            $request->session()->put('guest_cart_id', $cartItem->cart_id);
+        }
 
         return back()->with('success', 'Produto adicionado ao carrinho!');
     }
@@ -72,7 +81,7 @@ class CartPageController extends Controller
 
         $cartItem = $this->cartService->findItemById($item);
 
-        if (! $cartItem || $cartItem->cart->user_id !== $request->user()->id) {
+        if (! $cartItem || ! $this->cartItemBelongsToRequest($cartItem, $request)) {
             abort(404);
         }
 
@@ -85,7 +94,7 @@ class CartPageController extends Controller
     {
         $cartItem = $this->cartService->findItemById($item);
 
-        if (! $cartItem || $cartItem->cart->user_id !== $request->user()->id) {
+        if (! $cartItem || ! $this->cartItemBelongsToRequest($cartItem, $request)) {
             abort(404);
         }
 
@@ -96,8 +105,18 @@ class CartPageController extends Controller
 
     public function clear(Request $request): RedirectResponse
     {
-        $this->cartService->clear($request->user()->id);
+        $this->cartService->clearForContext($request->user()?->id, $request->session()->getId());
+        $request->session()->forget('guest_cart_id');
 
         return back()->with('success', 'Carrinho limpo!');
+    }
+
+    private function cartItemBelongsToRequest(\App\Models\CartItem $cartItem, Request $request): bool
+    {
+        if ($request->user()) {
+            return $cartItem->cart->user_id === $request->user()->id;
+        }
+
+        return $cartItem->cart->session_id === $request->session()->getId();
     }
 }

@@ -67,6 +67,7 @@ class OrderFlowTest extends TestCase
         $this->assertNotNull($order);
         $this->assertEquals(200.0, $order->subtotal);
         $this->assertEquals(20.0, $order->tax);
+        $this->assertEquals(0.0, (float) $order->shipping_cost);
         $this->assertEquals(220.0, $order->total);
 
         // 4. Verify cart is cleared
@@ -166,5 +167,32 @@ class OrderFlowTest extends TestCase
         $showResponse->assertStatus(200)
             ->assertJsonPath('data.id', $orderId)
             ->assertJsonStructure(['data' => ['id', 'status', 'total', 'items', 'shipping_address']]);
+    }
+
+    public function test_order_totalization_applies_shipping_rule_for_subtotal_below_free_shipping_threshold(): void
+    {
+        $product = Product::factory()->create([
+            'price' => 80.0,
+            'quantity' => 5,
+            'active' => true,
+        ]);
+        $address = $this->validAddress();
+
+        $this->actingAs($this->customer, 'sanctum')
+            ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'quantity' => 1]);
+
+        $this->actingAs($this->customer, 'sanctum')
+            ->postJson('/api/v1/orders', [
+                'shipping_address' => $address,
+                'billing_address' => $address,
+            ])
+            ->assertStatus(201);
+
+        $order = Order::where('user_id', $this->customer->id)->firstOrFail();
+
+        $this->assertEquals(80.0, $order->subtotal);
+        $this->assertEquals(8.0, $order->tax);
+        $this->assertEquals(19.9, (float) $order->shipping_cost);
+        $this->assertEquals(107.9, (float) $order->total);
     }
 }

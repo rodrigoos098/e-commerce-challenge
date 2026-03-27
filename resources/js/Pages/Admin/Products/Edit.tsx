@@ -10,7 +10,7 @@ import Button from '@/Components/Shared/Button';
 import type { Product, Category, Tag } from '@/types/admin';
 
 // — Schema — mesmas regras do Create ——————————————————————
-const productSchema = z.object({
+const baseProductSchema = z.object({
   name: z.string().min(3, 'Nome deve ter ao menos 3 caracteres').max(255),
   description: z.string().min(10, 'Descrição deve ter ao menos 10 caracteres'),
   price: z.number({ message: 'Preço inválido' }).positive('Preço deve ser maior que zero'),
@@ -27,11 +27,12 @@ const productSchema = z.object({
     .number({ message: 'Quantidade mínima inválida' })
     .int('Deve ser inteiro')
     .nonnegative('Não pode ser negativa'),
+  stock_adjustment_reason: z.string().max(255, 'Motivo deve ter no máximo 255 caracteres').optional(),
   category_id: z.number({ message: 'Selecione uma categoria' }).positive('Selecione uma categoria'),
   active: z.boolean().default(true),
 });
 
-type ProductForm = z.infer<typeof productSchema>;
+type ProductForm = z.infer<typeof baseProductSchema>;
 
 // — Props ——————————————————————
 interface ProductsEditProps {
@@ -45,6 +46,15 @@ export default function ProductsEdit({ product, categories, tags }: ProductsEdit
   const [selectedTags, setSelectedTags] = useState<number[]>(product.tags.map((t) => t.id));
   const [activeToggle, setActiveToggle] = useState(product.active);
   const [submitting, setSubmitting] = useState(false);
+  const productSchema = baseProductSchema.superRefine((data, ctx) => {
+    if (data.quantity !== product.quantity && !data.stock_adjustment_reason?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['stock_adjustment_reason'],
+        message: 'Informe o motivo do ajuste de estoque',
+      });
+    }
+  });
 
   const {
     register,
@@ -59,6 +69,7 @@ export default function ProductsEdit({ product, categories, tags }: ProductsEdit
       cost_price: product.cost_price,
       quantity: product.quantity,
       min_quantity: product.min_quantity,
+      stock_adjustment_reason: '',
       category_id: product.category?.id ?? 0,
       active: product.active,
     },
@@ -214,6 +225,13 @@ export default function ProductsEdit({ product, categories, tags }: ProductsEdit
                   hint="Alertas de estoque baixo abaixo deste valor"
                 />
               </div>
+              <FormField
+                label="Motivo do Ajuste"
+                name="stock_adjustment_reason"
+                register={register('stock_adjustment_reason')}
+                error={errors.stock_adjustment_reason?.message}
+                hint="Obrigatório quando a quantidade em estoque for alterada"
+              />
             </div>
 
             {/* Tags */}

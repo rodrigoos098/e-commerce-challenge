@@ -60,6 +60,29 @@ class Order extends Model
     ];
 
     /**
+     * Allowed order status transitions.
+     *
+     * @var array<string, list<string>>
+     */
+    public const ALLOWED_TRANSITIONS = [
+        'pending' => ['processing', 'cancelled'],
+        'processing' => ['shipped', 'cancelled'],
+        'shipped' => ['delivered'],
+        'delivered' => [],
+        'cancelled' => [],
+    ];
+
+    /**
+     * Statuses a customer can cancel on their own.
+     *
+     * @var list<string>
+     */
+    public const CUSTOMER_CANCELLABLE_STATUSES = [
+        'pending',
+        'processing',
+    ];
+
+    /**
      * Get the user that owns the order.
      */
     public function user(): BelongsTo
@@ -73,5 +96,21 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Determine whether the order can transition to the given status.
+     */
+    public function canTransitionTo(string $status): bool
+    {
+        return in_array($status, self::ALLOWED_TRANSITIONS[$this->status] ?? [], true);
+    }
+
+    /**
+     * Determine whether the customer can cancel this order.
+     */
+    public function canBeCancelledByCustomer(): bool
+    {
+        return in_array($this->status, self::CUSTOMER_CANCELLABLE_STATUSES, true);
     }
 }

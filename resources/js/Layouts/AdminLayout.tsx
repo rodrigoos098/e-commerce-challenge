@@ -45,6 +45,12 @@ const IconStock = () => (
     </svg>
 );
 
+const IconTags = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5.586a2 2 0 011.414.586l5.414 5.414a2 2 0 010 2.828l-6.586 6.586a2 2 0 01-2.828 0L3.586 11.999A2 2 0 013 10.585V5a2 2 0 012-2h2z" />
+    </svg>
+);
+
 const IconMenu = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -89,6 +95,7 @@ function buildBreadcrumbs(path: string, pageTitle?: string): Array<{ label: stri
         dashboard: 'Dashboard',
         products: 'Produtos',
         categories: 'Categorias',
+        tags: 'Tags',
         orders: 'Pedidos',
         stock: 'Estoque',
         create: 'Novo',
@@ -129,6 +136,12 @@ const navItems: NavItem[] = [
         href: '/admin/categories',
         icon: <IconCategories />,
         matchPaths: ['/admin/categories'],
+    },
+    {
+        label: 'Tags',
+        href: '/admin/tags',
+        icon: <IconTags />,
+        matchPaths: ['/admin/tags'],
     },
     {
         label: 'Pedidos',

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Category;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -295,6 +295,38 @@ class AuthorizationTest extends TestCase
             ]);
     }
 
+    public function test_customer_can_cancel_own_pending_order(): void
+    {
+        $customer = $this->createCustomer();
+        $order = Order::factory()->create([
+            'user_id' => $customer->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($customer, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/cancel")
+            ->assertStatus(200)
+            ->assertJsonPath('data.status', 'cancelled');
+    }
+
+    public function test_customer_cannot_cancel_another_users_order(): void
+    {
+        $customer = $this->createCustomer();
+        $otherCustomer = $this->createCustomer();
+        $order = Order::factory()->create([
+            'user_id' => $otherCustomer->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($customer, 'sanctum')
+            ->putJson("/api/v1/orders/{$order->id}/cancel")
+            ->assertStatus(403)
+            ->assertJson([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
     public function test_api_order_status_route_enforces_order_policy_update(): void
     {
         $admin = $this->createAdmin();
@@ -384,6 +416,37 @@ class AuthorizationTest extends TestCase
                 'shipping_country' => 'BR',
                 'same_billing' => true,
             ])
+            ->assertForbidden();
+    }
+
+    public function test_customer_can_cancel_own_pending_order_via_web(): void
+    {
+        $customer = $this->createCustomer();
+        $order = Order::factory()->create([
+            'user_id' => $customer->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($customer)
+            ->put("/customer/orders/{$order->id}/cancel")
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'cancelled',
+        ]);
+    }
+
+    public function test_customer_cannot_cancel_non_cancellable_order_via_web(): void
+    {
+        $customer = $this->createCustomer();
+        $order = Order::factory()->create([
+            'user_id' => $customer->id,
+            'status' => 'shipped',
+        ]);
+
+        $this->actingAs($customer)
+            ->put("/customer/orders/{$order->id}/cancel")
             ->assertForbidden();
     }
 

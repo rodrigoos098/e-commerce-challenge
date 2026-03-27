@@ -5,6 +5,7 @@ namespace Tests\Feature\Web\Admin;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\StockMovement;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -39,6 +40,12 @@ class AdminContractsTest extends TestCase
         $category = Category::factory()->create();
         $product = Product::factory()->for($category)->create();
         $tags = Tag::factory()->count(2)->create();
+        $movement = StockMovement::factory()->create([
+            'product_id' => $product->id,
+            'type' => 'ajuste',
+            'quantity' => 4,
+            'reason' => 'Contagem fisica no inventario',
+        ]);
 
         $product->tags()->attach($tags->pluck('id'));
 
@@ -56,7 +63,10 @@ class AdminContractsTest extends TestCase
                     ->sort()
                     ->values()
                     ->all() === $tags->pluck('id')->sort()->values()->all())
-                ->has('movements'));
+                ->has('movements', 1)
+                ->where('movements.0.id', $movement->id)
+                ->where('movements.0.type', 'ajuste')
+                ->where('movements.0.notes', 'Contagem fisica no inventario'));
     }
 
     public function test_admin_product_edit_includes_loaded_category_and_tags(): void
@@ -79,6 +89,25 @@ class AdminContractsTest extends TestCase
                 ->where('product.tags.0.id', $tag->id)
                 ->has('categories')
                 ->has('tags'));
+    }
+
+    public function test_admin_tags_index_exposes_tags_with_product_counts(): void
+    {
+        $admin = $this->createAdmin();
+        $tag = Tag::factory()->create([
+            'name' => 'Lancamento',
+            'slug' => 'lancamento',
+        ]);
+        Product::factory()->count(2)->create()->each(fn (Product $product) => $tag->products()->attach($product));
+
+        $this->actingAs($admin)
+            ->get('/admin/tags')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Admin/Tags/Index')
+                ->has('tags', 1)
+                ->where('tags.0.name', 'Lancamento')
+                ->where('tags.0.products_count', 2));
     }
 
     public function test_admin_order_show_includes_structured_addresses(): void

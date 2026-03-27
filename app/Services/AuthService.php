@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Traits\LogsActivity;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -28,6 +29,7 @@ class AuthService
         ]);
 
         $user->assignRole('customer');
+        event(new Registered($user));
 
         $token = $user->createToken('api-token')->plainTextToken;
 
@@ -119,6 +121,7 @@ class AuthService
         ]);
 
         $user->assignRole('customer');
+        event(new Registered($user));
 
         $this->logActivity('auth', 'User registered', [
             'registered_user_id' => $user->id,

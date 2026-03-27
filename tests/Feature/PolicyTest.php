@@ -150,4 +150,25 @@ class PolicyTest extends TestCase
 
         $this->assertTrue(Gate::forUser($this->customer)->denies('delete', $order));
     }
+
+    public function test_order_policy_cancel_allows_customer_for_own_pending_order(): void
+    {
+        $order = Order::factory()->create(['user_id' => $this->customer->id, 'status' => 'pending']);
+
+        $this->assertTrue(Gate::forUser($this->customer)->allows('cancel', $order));
+    }
+
+    public function test_order_policy_cancel_denies_customer_for_non_cancellable_status(): void
+    {
+        $order = Order::factory()->create(['user_id' => $this->customer->id, 'status' => 'shipped']);
+
+        $this->assertTrue(Gate::forUser($this->customer)->denies('cancel', $order));
+    }
+
+    public function test_order_policy_cancel_denies_admin_via_gate(): void
+    {
+        $order = Order::factory()->create(['user_id' => $this->customer->id, 'status' => 'pending']);
+
+        $this->assertTrue(Gate::forUser($this->admin)->denies('cancel', $order));
+    }
 }

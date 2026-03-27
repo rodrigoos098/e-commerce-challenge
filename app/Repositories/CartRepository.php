@@ -40,10 +40,24 @@ class CartRepository implements CartRepositoryInterface
         return $cart->load(['items.product.category']);
     }
 
-    protected function createCart(int $userId): Cart
+    public function findOrCreateForSession(string $sessionId): Cart
+    {
+        $cart = $this->findBySessionId($sessionId);
+
+        if ($cart) {
+            return $cart;
+        }
+
+        return $this->createCart(null, $sessionId)->load(['items.product.category']);
+    }
+
+    protected function createCart(?int $userId = null, ?string $sessionId = null): Cart
     {
         /** @var Cart $cart */
-        $cart = Cart::query()->create(['user_id' => $userId]);
+        $cart = Cart::query()->create([
+            'user_id' => $userId,
+            'session_id' => $sessionId,
+        ]);
 
         return $cart;
     }
@@ -70,6 +84,17 @@ class CartRepository implements CartRepositoryInterface
         $cart = $carts->first();
 
         return $cart;
+    }
+
+    /**
+     * Find a cart by session ID with items and products eager-loaded.
+     */
+    public function findBySessionId(string $sessionId): ?Cart
+    {
+        return Cart::query()
+            ->with(['items.product.category'])
+            ->where('session_id', $sessionId)
+            ->first();
     }
 
     /**
@@ -132,6 +157,14 @@ class CartRepository implements CartRepositoryInterface
     public function findItemByCartAndProduct(Cart $cart, int $productId): ?CartItem
     {
         return $cart->items()->where('product_id', $productId)->first();
+    }
+
+    /**
+     * Delete a cart record.
+     */
+    public function deleteCart(Cart $cart): bool
+    {
+        return (bool) $cart->delete();
     }
 
     protected function isUniqueUserCartViolation(QueryException $exception): bool

@@ -91,9 +91,9 @@ export default function Login() {
                                 <label htmlFor="password" className="block text-sm font-semibold text-warm-600">
                                     Senha
                                 </label>
-                                <a href="#" className="text-xs text-kintsugi-600 hover:text-kintsugi-700 transition-colors">
+                                <Link href="/forgot-password" className="text-xs text-kintsugi-600 hover:text-kintsugi-700 transition-colors">
                                     Esqueceu a senha?
-                                </a>
+                                </Link>
                             </div>
                             <input
                                 id="password"

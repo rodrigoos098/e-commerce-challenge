@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { toast } from 'react-hot-toast';
 import { formatPrice } from '@/utils/format';
 import { useCartSound } from '@/hooks/useCartSound';
@@ -25,20 +25,11 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
     const [confirmAdd, setConfirmAdd] = useState(false);
     const { playCartSound } = useCartSound();
 
-    const { auth } = usePage<any>().props;
-    const user = auth?.user;
-
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
         if (product.quantity === 0 || adding) { return; }
-
-        if (!user) {
-            toast.error('Você precisa de uma conta para adicionar itens ao carrinho.');
-            router.get('/login');
-            return;
-        }
 
         setAdding(true);
         router.post(

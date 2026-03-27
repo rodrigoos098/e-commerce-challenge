@@ -19,6 +19,7 @@ class OrderResource extends JsonResource
             'user_id' => $this->user_id,
             'user' => $this->whenLoaded('user', fn () => (new UserResource($this->user))->resolve($request)),
             'status' => $this->status,
+            'can_cancel' => $request->user()?->can('cancel', $this->resource) ?? false,
             'subtotal' => (float) $this->subtotal,
             'tax' => (float) $this->tax,
             'shipping_cost' => (float) $this->shipping_cost,

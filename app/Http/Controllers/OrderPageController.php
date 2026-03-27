@@ -83,6 +83,15 @@ class OrderPageController extends Controller
 
         $order = $this->orderService->createFromCart($dto);
 
-        return redirect("/customer/orders/{$order->id}")->with('success', 'Pedido criado com sucesso!');
+        return redirect("/customer/orders/{$order->id}")->with('success', 'Pedido criado e enviado para processamento.');
+    }
+
+    public function cancel(Order $order): RedirectResponse
+    {
+        $this->authorize('cancel', $order);
+
+        $this->orderService->cancel($order);
+
+        return back()->with('success', 'Pedido cancelado com sucesso!');
     }
 }

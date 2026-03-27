@@ -44,6 +44,7 @@ class UpdateProductRequest extends FormRequest
             'category_id' => ['sometimes', 'required', 'integer', 'exists:categories,id'],
             'tag_ids' => ['nullable', 'array'],
             'tag_ids.*' => ['integer', 'exists:tags,id'],
+            'stock_adjustment_reason' => ['nullable', 'string', 'max:255'],
         ];
     }
 
