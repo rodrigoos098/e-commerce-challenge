@@ -414,6 +414,36 @@ class ValidationTest extends TestCase
             ]);
     }
 
+    public function test_web_checkout_returns_specific_stock_error_when_cart_quantity_exceeds_available_stock(): void
+    {
+        $customer = $this->createCustomer();
+
+        $product = Product::factory()->create([
+            'name' => 'Notebook Pro',
+            'price' => 75.0,
+            'quantity' => 1,
+            'active' => true,
+        ]);
+
+        $cart = Cart::factory()->create([
+            'user_id' => $customer->id,
+        ]);
+
+        CartItem::factory()->create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+        ]);
+
+        $this->actingAs($customer)
+            ->from('/customer/checkout')
+            ->post('/customer/orders', $this->validWebCheckoutPayload())
+            ->assertRedirect('/customer/checkout')
+            ->assertSessionHasErrors([
+                'cart' => 'O produto "Notebook Pro" possui apenas 1 unidade(s) disponivel(is). Ajuste o carrinho e tente novamente.',
+            ]);
+    }
+
     // ── ValidParentCategory rule ───────────────────────────────────────────────────
 
     public function test_valid_parent_category_rule_rejects_nonexistent_parent(): void

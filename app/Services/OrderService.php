@@ -108,7 +108,10 @@ class OrderService
 
                     if (! $product || ! $product->active) {
                         throw ValidationException::withMessages([
-                            'cart' => ["Product '{$cartItem->product?->name}' is no longer available."],
+                            'cart' => [sprintf(
+                                'O produto %s nao esta mais disponivel para compra.',
+                                $cartItem->product?->name ? "\"{$cartItem->product->name}\"" : 'selecionado',
+                            )],
                         ]);
                     }
 
@@ -116,7 +119,7 @@ class OrderService
 
                     if ($product->quantity < $requiredQuantity) {
                         throw ValidationException::withMessages([
-                            'cart' => ["Insufficient stock for product '{$product->name}'. Available: {$product->quantity}."],
+                            'cart' => ["O produto \"{$product->name}\" possui apenas {$product->quantity} unidade(s) disponivel(is). Ajuste o carrinho e tente novamente."],
                         ]);
                     }
 

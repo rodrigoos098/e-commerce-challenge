@@ -24,6 +24,7 @@ export const appRoutes = {
     },
     addresses: {
       index: '/customer/addresses',
+      lookup: '/customer/addresses/lookup',
       store: '/customer/addresses',
       update: (addressId: number): string => `/customer/addresses/${addressId}`,
       destroy: (addressId: number): string => `/customer/addresses/${addressId}`,

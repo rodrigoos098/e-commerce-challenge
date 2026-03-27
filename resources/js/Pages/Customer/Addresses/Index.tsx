@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Resolver } from 'react-hook-form';
@@ -9,6 +9,7 @@ import Modal from '@/Components/Shared/Modal';
 import PublicLayout from '@/Layouts/PublicLayout';
 import Spinner from '@/Components/Shared/Spinner';
 import type { CustomerAddressesPageProps, SavedAddress } from '@/types/public';
+import { lookupZipCode, normalizeZipCode } from '@/utils/cepLookup';
 import { appRoutes } from '@/utils/routes';
 
 const addressSchema = z.object({
@@ -89,19 +90,87 @@ export default function CustomerAddressesIndex({ addresses }: CustomerAddressesP
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema) as Resolver<AddressFormData>,
     defaultValues,
   });
+  const [zipLookupStatus, setZipLookupStatus] = useState<
+    'idle' | 'loading' | 'success' | 'not-found' | 'error'
+  >('idle');
+  const zipCode = watch('zip_code');
+  const lastLookedUpZipCode = useRef<string | null>(null);
+
+  useEffect(() => {
+    const normalizedZipCode = normalizeZipCode(zipCode);
+
+    if (normalizedZipCode.length !== 8) {
+      lastLookedUpZipCode.current = null;
+      setZipLookupStatus('idle');
+
+      return;
+    }
+
+    if (lastLookedUpZipCode.current === normalizedZipCode) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    const timeoutId = window.setTimeout(async () => {
+      setZipLookupStatus('loading');
+
+      try {
+        const result = await lookupZipCode(normalizedZipCode, abortController.signal);
+
+        lastLookedUpZipCode.current = normalizedZipCode;
+
+        if (!result) {
+          setZipLookupStatus('not-found');
+
+          return;
+        }
+
+        if (result.street) {
+          setValue('street', result.street, { shouldDirty: true });
+        }
+
+        if (result.city) {
+          setValue('city', result.city, { shouldDirty: true });
+        }
+
+        if (result.state) {
+          setValue('state', result.state, { shouldDirty: true });
+        }
+
+        setZipLookupStatus('success');
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        setZipLookupStatus('error');
+      }
+    }, 350);
+
+    return () => {
+      abortController.abort();
+      window.clearTimeout(timeoutId);
+    };
+  }, [setValue, zipCode]);
 
   const startCreate = () => {
     setEditingAddress(null);
+    lastLookedUpZipCode.current = null;
+    setZipLookupStatus('idle');
     reset(defaultValues);
   };
 
   const startEdit = (address: SavedAddress) => {
     setEditingAddress(address);
+    lastLookedUpZipCode.current = normalizeZipCode(address.zip_code);
+    setZipLookupStatus('idle');
     reset({
       label: address.label,
       recipient_name: address.recipient_name,
@@ -124,6 +193,8 @@ export default function CustomerAddressesIndex({ addresses }: CustomerAddressesP
           editingAddress ? 'Endereço atualizado com sucesso!' : 'Endereço criado com sucesso!'
         );
         setEditingAddress(null);
+        lastLookedUpZipCode.current = null;
+        setZipLookupStatus('idle');
         reset(defaultValues);
       },
       onError: () => toast.error('Não foi possível salvar o endereço.'),
@@ -347,12 +418,36 @@ export default function CustomerAddressesIndex({ addresses }: CustomerAddressesP
                 placeholder="Casa, trabalho, apartamento..."
               />
               <Field
+                id="zip_code"
+                label="CEP"
+                register={register}
+                error={errors.zip_code?.message}
+                placeholder="01310-100"
+              />
+              <Field
                 id="recipient_name"
                 label="Destinatário"
                 register={register}
                 error={errors.recipient_name?.message}
                 placeholder="Nome completo"
               />
+              {zipLookupStatus !== 'idle' && (
+                <p
+                  className={`-mt-2 text-xs ${
+                    zipLookupStatus === 'error' || zipLookupStatus === 'not-found'
+                      ? 'text-warm-500'
+                      : 'text-kintsugi-600'
+                  }`}
+                >
+                  {zipLookupStatus === 'loading' && 'Consultando CEP...'}
+                  {zipLookupStatus === 'success' &&
+                    'Rua, cidade e estado preenchidos automaticamente. Você pode ajustar se precisar.'}
+                  {zipLookupStatus === 'not-found' &&
+                    'Não foi possível localizar esse CEP. Continue preenchendo manualmente.'}
+                  {zipLookupStatus === 'error' &&
+                    'A consulta do CEP falhou no momento. Continue preenchendo manualmente.'}
+                </p>
+              )}
               <Field
                 id="street"
                 label="Rua e número"
@@ -375,13 +470,6 @@ export default function CustomerAddressesIndex({ addresses }: CustomerAddressesP
                   register={register}
                   error={errors.state?.message}
                   placeholder="SP"
-                />
-                <Field
-                  id="zip_code"
-                  label="CEP"
-                  register={register}
-                  error={errors.zip_code?.message}
-                  placeholder="01310-100"
                 />
                 <Field
                   id="country"

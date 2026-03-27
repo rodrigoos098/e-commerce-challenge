@@ -41,15 +41,64 @@ class CheckoutPageController extends Controller
             fallbackToAddresses: $request->input('shipping_mode', 'saved') === 'saved',
         );
         $totals = $this->cartTotalsService->calculate($cart->items, $shippingZipCode);
+        $items = $cart->items->map(function ($item) use ($request): array {
+            return [
+                'id' => $item->id,
+                'product' => (new ProductResource($item->product))->toArray($request),
+                'quantity' => (int) $item->quantity,
+            ];
+        });
+        $stockIssues = $items
+            ->map(function (array $item): ?array {
+                $product = $item['product'];
+                $availableQuantity = (int) ($product['quantity'] ?? 0);
+                $requestedQuantity = (int) $item['quantity'];
+
+                if (! ($product['active'] ?? false)) {
+                    return [
+                        'item_id' => $item['id'],
+                        'product_id' => $product['id'],
+                        'product_name' => $product['name'],
+                        'requested_quantity' => $requestedQuantity,
+                        'available_quantity' => 0,
+                        'reason' => 'unavailable',
+                        'message' => "O produto {$product['name']} nao esta mais disponivel para compra.",
+                    ];
+                }
+
+                if (! ($product['in_stock'] ?? false) || $availableQuantity === 0) {
+                    return [
+                        'item_id' => $item['id'],
+                        'product_id' => $product['id'],
+                        'product_name' => $product['name'],
+                        'requested_quantity' => $requestedQuantity,
+                        'available_quantity' => 0,
+                        'reason' => 'out_of_stock',
+                        'message' => "O produto {$product['name']} esgotou e precisa ser removido do carrinho.",
+                    ];
+                }
+
+                if ($availableQuantity < $requestedQuantity) {
+                    return [
+                        'item_id' => $item['id'],
+                        'product_id' => $product['id'],
+                        'product_name' => $product['name'],
+                        'requested_quantity' => $requestedQuantity,
+                        'available_quantity' => $availableQuantity,
+                        'reason' => 'insufficient_stock',
+                        'message' => "O produto {$product['name']} tem apenas {$availableQuantity} unidade(s) disponivel(is). Ajuste a quantidade para continuar.",
+                    ];
+                }
+
+                return null;
+            })
+            ->filter()
+            ->values();
 
         return Inertia::render('Customer/Checkout', [
             'cart' => [
                 'id' => $cart->id,
-                'items' => $cart->items->map(fn ($item) => [
-                    'id' => $item->id,
-                    'product' => (new ProductResource($item->product))->toArray($request),
-                    'quantity' => (int) $item->quantity,
-                ])->toArray(),
+                'items' => $items->values()->all(),
                 'subtotal' => $totals['subtotal'],
                 'tax' => $totals['tax'],
                 'shipping_cost' => $totals['shipping_cost'],
@@ -59,6 +108,13 @@ class CheckoutPageController extends Controller
                 'shipping_rule_description' => $totals['shipping_rule_description'],
                 'shipping_is_free' => $totals['shipping_is_free'],
                 'item_count' => $cart->items->count(),
+                'stock_check' => [
+                    'has_issues' => $stockIssues->isNotEmpty(),
+                    'message' => $stockIssues->count() === 1
+                        ? $stockIssues->first()['message']
+                        : 'Alguns itens do seu carrinho ficaram indisponiveis ou com estoque insuficiente. Revise o carrinho antes de concluir o pagamento.',
+                    'issues' => $stockIssues->all(),
+                ],
             ],
             'addresses' => $addresses->map(fn (Address $address): array => [
                 'id' => $address->id,

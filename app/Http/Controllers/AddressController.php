@@ -6,9 +6,12 @@ use App\Http\Requests\Web\StoreAddressRequest;
 use App\Http\Requests\Web\UpdateAddressRequest;
 use App\Models\Address;
 use App\Models\User;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -96,6 +99,52 @@ class AddressController extends Controller
         ]);
 
         return back()->with('success', 'Endereco padrao de cobranca atualizado!');
+    }
+
+    public function lookup(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'zip_code' => ['required', 'string', 'max:20'],
+        ]);
+
+        $zipCode = preg_replace('/\D+/', '', $validated['zip_code']) ?? '';
+
+        if (strlen($zipCode) !== 8) {
+            return response()->json([
+                'found' => false,
+            ], 422);
+        }
+
+        try {
+            $response = Http::acceptJson()
+                ->timeout(5)
+                ->get("https://viacep.com.br/ws/{$zipCode}/json/");
+        } catch (ConnectionException) {
+            return response()->json([
+                'found' => false,
+            ]);
+        }
+
+        if (! $response->ok()) {
+            return response()->json([
+                'found' => false,
+            ]);
+        }
+
+        $payload = $response->json();
+
+        if (! is_array($payload) || ($payload['erro'] ?? false) === true) {
+            return response()->json([
+                'found' => false,
+            ]);
+        }
+
+        return response()->json([
+            'found' => true,
+            'street' => trim((string) ($payload['logradouro'] ?? '')),
+            'city' => trim((string) ($payload['localidade'] ?? '')),
+            'state' => trim((string) ($payload['uf'] ?? '')),
+        ]);
     }
 
     /**

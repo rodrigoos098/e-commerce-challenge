@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -205,6 +206,47 @@ class AddressBookTest extends TestCase
 
         $this->assertSame('Maria Cliente', $order->shipping_address['name']);
         $this->assertSame('Rua Um, 10', $order->shipping_address['street']);
+    }
+
+    public function test_customer_can_lookup_zip_code_through_backend_proxy(): void
+    {
+        $customer = $this->createCustomer();
+
+        Http::fake([
+            'https://viacep.com.br/ws/01310100/json/' => Http::response([
+                'logradouro' => 'Avenida Paulista',
+                'localidade' => 'Sao Paulo',
+                'uf' => 'SP',
+            ]),
+        ]);
+
+        $this->actingAs($customer)
+            ->getJson('/customer/addresses/lookup?zip_code=01310-100')
+            ->assertOk()
+            ->assertJson([
+                'found' => true,
+                'street' => 'Avenida Paulista',
+                'city' => 'Sao Paulo',
+                'state' => 'SP',
+            ]);
+    }
+
+    public function test_customer_can_receive_not_found_response_when_zip_lookup_fails(): void
+    {
+        $customer = $this->createCustomer();
+
+        Http::fake([
+            'https://viacep.com.br/ws/99999999/json/' => Http::response([
+                'erro' => true,
+            ]),
+        ]);
+
+        $this->actingAs($customer)
+            ->getJson('/customer/addresses/lookup?zip_code=99999-999')
+            ->assertOk()
+            ->assertJson([
+                'found' => false,
+            ]);
     }
 
     public function test_checkout_can_create_order_with_manual_billing_when_same_billing_is_false(): void

@@ -68,6 +68,7 @@ Route::middleware('auth')->group(function (): void {
         Route::post('/orders', [OrderPageController::class, 'store'])->middleware(['verified', 'can:create,'.Order::class])->name('orders.store');
         Route::put('/orders/{order}/cancel', [OrderPageController::class, 'cancel'])->middleware('can:cancel,order')->name('orders.cancel');
         Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
+        Route::get('/addresses/lookup', [AddressController::class, 'lookup'])->name('addresses.lookup');
         Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
         Route::put('/addresses/{address}', [AddressController::class, 'update'])->middleware('can:update,address')->name('addresses.update');
         Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->middleware('can:delete,address')->name('addresses.destroy');

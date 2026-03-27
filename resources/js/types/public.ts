@@ -32,6 +32,22 @@ export interface CartItem {
   subtotal?: number;
 }
 
+export interface CheckoutStockIssue {
+  item_id: number;
+  product_id: number;
+  product_name: string;
+  requested_quantity: number;
+  available_quantity: number;
+  reason: 'unavailable' | 'out_of_stock' | 'insufficient_stock';
+  message: string;
+}
+
+export interface CheckoutStockCheck {
+  has_issues: boolean;
+  message: string;
+  issues: CheckoutStockIssue[];
+}
+
 export interface Cart {
   id: number;
   user_id?: number;
@@ -45,6 +61,7 @@ export interface Cart {
   shipping_rule_description: string;
   shipping_is_free: boolean;
   item_count: number;
+  stock_check?: CheckoutStockCheck;
   items_count?: number;
   created_at?: string | null;
   updated_at?: string | null;
