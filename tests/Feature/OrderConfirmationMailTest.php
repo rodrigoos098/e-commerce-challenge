@@ -26,7 +26,7 @@ class OrderConfirmationMailTest extends TestCase
 
         $html = (new OrderConfirmationMail($order))->render();
 
-        $this->assertStringContainsString('Confirmacao do pedido', $html);
+        $this->assertStringContainsString('Recebemos seu pedido', $html);
         $this->assertStringContainsString('Rua das Flores, 100', $html);
         $this->assertStringContainsString('Sao Paulo - SP | 01000-000 | BR', $html);
         $this->assertStringNotContainsString('Undefined array key', $html);

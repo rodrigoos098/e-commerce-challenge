@@ -1,12 +1,20 @@
 <x-mail::message>
-# Pagamento confirmado
+# Pagamento confirmado! 💫
 
-Ola, **{{ $order->user->name }}**!
+Olá, **{{ $order->user->name }}**!
 
-Confirmamos o pagamento do seu pedido. Agora seguimos com a preparacao da entrega.
+Ótima notícia — recebemos a confirmação do pagamento do seu pedido. Agora nossa equipe começa a preparar tudo com o cuidado que cada peça merece.
 
 @include('emails.orders.partials.order-details', ['order' => $order])
 
-Obrigado,
-{{ config('app.name') }}
+<x-mail::button :url="config('app.url')" color="primary">
+Ver detalhes do pedido
+</x-mail::button>
+
+<x-mail::panel>
+Quando seu pedido for despachado, você receberá um email com as informações de rastreio. Cada etapa cuidadosamente acompanhada.
+</x-mail::panel>
+
+Com carinho,<br>
+**Equipe {{ config('app.name') }}**
 </x-mail::message>

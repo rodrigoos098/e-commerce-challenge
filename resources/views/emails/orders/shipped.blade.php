@@ -1,12 +1,20 @@
 <x-mail::message>
-# Pedido enviado
+# Seu pedido está a caminho! 📦
 
-Ola, **{{ $order->user->name }}**!
+Olá, **{{ $order->user->name }}**!
 
-Seu pedido foi enviado e esta a caminho do endereco informado.
+Boas novas — seu pedido foi despachado e já está a caminho do endereço informado. Cada peça foi embalada com o cuidado que merece.
 
 @include('emails.orders.partials.order-details', ['order' => $order])
 
-Obrigado,
-{{ config('app.name') }}
+<x-mail::button :url="config('app.url')" color="primary">
+Rastrear pedido
+</x-mail::button>
+
+<x-mail::panel>
+A entrega pode levar alguns dias úteis. Assim que for entregue, avisaremos você por email.
+</x-mail::panel>
+
+Com carinho,<br>
+**Equipe {{ config('app.name') }}**
 </x-mail::message>
