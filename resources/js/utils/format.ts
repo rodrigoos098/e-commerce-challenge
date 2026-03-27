@@ -1,8 +1,35 @@
+const priceFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+});
+
+const dateTimeFormatter = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+});
+
 /**
  * Format a numeric value as Brazilian Real currency.
  *
  * @example formatPrice(199.9) // "R$ 199,90"
  */
 export function formatPrice(value: number): string {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return priceFormatter.format(value);
+}
+
+export function formatDateTime(value: string | Date): string {
+  return dateTimeFormatter.format(new Date(value));
+}
+
+export function formatDate(value: string | Date): string {
+  return dateFormatter.format(new Date(value));
 }

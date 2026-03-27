@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Toaster, toast } from 'react-hot-toast';
 import Footer from '@/Components/Public/Footer';
+import { appRoutes } from '@/utils/routes';
 
 interface PublicLayoutProps {
   children: React.ReactNode;
@@ -148,24 +149,23 @@ function Header({ cartCount }: { cartCount: number }) {
   const handleSearchSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      if (searchQuery.trim()) {
-        router.get(
-          '/products',
-          { search: searchQuery },
-          { preserveScroll: true, preserveState: true }
-        );
-      }
+      const trimmedQuery = searchQuery.trim();
+
+      router.get(appRoutes.products.index, trimmedQuery ? { search: trimmedQuery } : {}, {
+        preserveScroll: true,
+        preserveState: true,
+      });
     },
     [searchQuery]
   );
 
   const handleLogout = useCallback(() => {
-    router.post('/logout');
+    router.post(appRoutes.auth.logout);
   }, []);
 
   const navLinks = [
-    { label: 'Início', href: '/' },
-    { label: 'Coleção', href: '/products' },
+    { label: 'Início', href: appRoutes.home },
+    { label: 'Coleção', href: appRoutes.products.index },
   ];
 
   return (
@@ -175,7 +175,7 @@ function Header({ cartCount }: { cartCount: number }) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 group">
+          <Link href={appRoutes.home} className="flex items-center gap-2 shrink-0 group">
             <span className="font-display text-2xl font-bold text-warm-800 tracking-tight">
               Shopsugi
               <span className="ml-0.5 inline-block text-kintsugi-500 kintsugi-shimmer transition-all duration-300 group-hover:text-kintsugi-600 group-hover:scale-125 group-hover:rotate-6">
@@ -220,7 +220,7 @@ function Header({ cartCount }: { cartCount: number }) {
           <div className="flex items-center gap-3 shrink-0">
             {/* Cart */}
             <Link
-              href="/cart"
+              href={appRoutes.cart.index}
               className="relative text-warm-600 hover:text-kintsugi-500 transition-colors duration-150 p-1"
               aria-label={`Carrinho com ${cartCount} itens`}
             >
@@ -263,14 +263,21 @@ function Header({ cartCount }: { cartCount: number }) {
                         <p className="text-sm font-semibold text-warm-700 truncate">{user.email}</p>
                       </div>
                       <Link
-                        href="/customer/orders"
+                        href={appRoutes.customer.orders.index}
                         className="block px-4 py-2 text-sm text-warm-600 hover:bg-warm-50 transition-colors"
                         onClick={() => setUserDropdownOpen(false)}
                       >
                         Meus Pedidos
                       </Link>
                       <Link
-                        href="/customer/profile"
+                        href={appRoutes.customer.addresses.index}
+                        className="block px-4 py-2 text-sm text-warm-600 hover:bg-warm-50 transition-colors"
+                        onClick={() => setUserDropdownOpen(false)}
+                      >
+                        Meus Endereços
+                      </Link>
+                      <Link
+                        href={appRoutes.customer.profile}
                         className="block px-4 py-2 text-sm text-warm-600 hover:bg-warm-50 transition-colors"
                         onClick={() => setUserDropdownOpen(false)}
                       >
@@ -278,7 +285,7 @@ function Header({ cartCount }: { cartCount: number }) {
                       </Link>
                       {user.roles?.includes('admin') && (
                         <Link
-                          href="/admin/dashboard"
+                          href={appRoutes.admin.dashboard}
                           className="block px-4 py-2 text-sm text-kintsugi-500 font-medium hover:bg-kintsugi-50 transition-colors"
                           onClick={() => setUserDropdownOpen(false)}
                         >
@@ -300,13 +307,13 @@ function Header({ cartCount }: { cartCount: number }) {
             ) : (
               <div className="hidden sm:flex items-center gap-2">
                 <Link
-                  href="/login"
+                  href={appRoutes.auth.login}
                   className="text-sm font-medium text-warm-600 hover:text-kintsugi-500 transition-colors"
                 >
                   Entrar
                 </Link>
                 <Link
-                  href="/register"
+                  href={appRoutes.auth.register}
                   className="rounded-full bg-kintsugi-500 px-4 py-1.5 text-sm font-semibold text-white hover:bg-kintsugi-600 transition-colors shadow-sm"
                 >
                   Criar conta
@@ -360,14 +367,14 @@ function Header({ cartCount }: { cartCount: number }) {
               <>
                 <div className="border-t border-warm-200 mt-2 pt-2 flex flex-col gap-1">
                   <Link
-                    href="/login"
+                    href={appRoutes.auth.login}
                     onClick={() => setMobileOpen(false)}
                     className="block rounded-lg px-3 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50"
                   >
                     Entrar
                   </Link>
                   <Link
-                    href="/register"
+                    href={appRoutes.auth.register}
                     onClick={() => setMobileOpen(false)}
                     className="block rounded-lg px-3 py-2 text-sm font-medium bg-kintsugi-500 text-white text-center hover:bg-kintsugi-600"
                   >
@@ -379,19 +386,35 @@ function Header({ cartCount }: { cartCount: number }) {
             {user && (
               <div className="border-t border-warm-200 mt-2 pt-2 flex flex-col gap-1">
                 <Link
-                  href="/customer/orders"
+                  href={appRoutes.customer.orders.index}
                   onClick={() => setMobileOpen(false)}
                   className="block rounded-lg px-3 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50"
                 >
                   Meus Pedidos
                 </Link>
                 <Link
-                  href="/customer/profile"
+                  href={appRoutes.customer.addresses.index}
+                  onClick={() => setMobileOpen(false)}
+                  className="block rounded-lg px-3 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50"
+                >
+                  Meus Endereços
+                </Link>
+                <Link
+                  href={appRoutes.customer.profile}
                   onClick={() => setMobileOpen(false)}
                   className="block rounded-lg px-3 py-2 text-sm font-medium text-warm-600 hover:bg-warm-50"
                 >
                   Meu Perfil
                 </Link>
+                {user.roles?.includes('admin') && (
+                  <Link
+                    href={appRoutes.admin.dashboard}
+                    onClick={() => setMobileOpen(false)}
+                    className="block rounded-lg px-3 py-2 text-sm font-medium text-kintsugi-600 hover:bg-kintsugi-50"
+                  >
+                    Painel Admin
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
