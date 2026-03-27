@@ -10,7 +10,7 @@
 - Composer 2+
 - Node.js 18+
 - MySQL 8.0+ ou SQLite para uso local
-- Redis para reproduzir o comportamento oficial de cache tags e filas
+- Redis para o cache com tags
 
 ---
 
@@ -52,6 +52,9 @@ php artisan key:generate
 # REDIS_HOST=127.0.0.1
 # REDIS_PORT=6379
 
+# Filas assincronas usam o driver database por padrao
+# MAIL_MAILER=log
+
 php artisan migrate --seed
 npm install
 npm run build
@@ -71,14 +74,35 @@ Esse comando sobe em paralelo:
 - `php artisan queue:listen --tries=1 --timeout=0`
 - `npm run dev`
 
+Importante:
+
+- o worker de fila e necessario para processar jobs assincronos de follow-up do pedido e envio de e-mails
+- a criacao do pedido em si continua sincrona e nao depende do worker
+
 ---
 
 ## E-mail Local (Mailpit)
 
-O projeto usa o **Mailpit** para interceptar envios de e-mail assíncronos no ambiente de desenvolvimento (como a confirmação de pedido).
+Por padrao, o `.env.example` usa `MAIL_MAILER=log`, entao os e-mails sao escritos no log.
 
-1. **Rodar**: Execute o arquivo `mailpit.exe` presente no seu sistema (ex: `C:\Users\seu_usuario\mailpit.exe`).
-2. **Caixa de Entrada (Web UI)**: Com o Mailpit rodando, acesse no navegador: `http://localhost:8025`
+Para testar os e-mails transacionais localmente com Mailpit, ajuste o `.env` para algo como:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=127.0.0.1
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+Com o Mailpit rodando:
+
+1. SMTP: `127.0.0.1:1025`
+2. Web UI: `http://localhost:8025`
+
+Os e-mails de pedido sao enviados por job em fila, entao o worker tambem precisa estar ativo.
 
 ---
 
@@ -86,9 +110,9 @@ O projeto usa o **Mailpit** para interceptar envios de e-mail assíncronos no am
 
 Depois de `php artisan migrate --seed`:
 
-| Papel | Email | Senha |
-|---|---|---|
-| Admin | admin@example.com | password |
+| Papel   | Email                | Senha    |
+| ------- | -------------------- | -------- |
+| Admin   | admin@example.com    | password |
 | Cliente | customer@example.com | password |
 
 O seeder tambem cria clientes adicionais com dados fake.
@@ -154,14 +178,19 @@ Acesse:
 
 ### Pedidos e estoque
 
-- Criacao de pedido e baixa de estoque acontecem na mesma transacao
-- `stock_movements` sao gravados durante a criacao do pedido
-- O fluxo nao depende de job assincrono para atualizar estoque
+- `OrderService` cria o pedido de forma sincrona e transacional a partir do carrinho atual
+- o calculo final do pedido ja inclui frete mockado e exige simulacao de pagamento antes da conclusao
+- a baixa de estoque e os registros em `stock_movements` acontecem dentro da mesma transacao da criacao do pedido
+- o carrinho e limpo apenas depois que pedido e estoque sao persistidos com sucesso
+- apos o commit, os eventos do pedido disparam notificacoes e jobs de follow-up
 
 ### Filas
 
-- `SendOrderConfirmationEmail`: envio assincrono do email de confirmacao
-- O listener de `OrderCreated` despacha o job de email
+- a conexao padrao de fila e `database` (`QUEUE_CONNECTION=database`)
+- `config/queue.php` mantem `after_commit=false` globalmente; jobs que precisam esperar a transacao usam `afterCommit()` explicitamente
+- `ProcessOrderPipeline` e disparado em `OrderCreated`, mas hoje faz apenas follow-up/carregamento do estado final e logs
+- `SendOrderConfirmationEmail` envia notificacoes transacionais de pedido criado, pagamento confirmado, envio, entrega e cancelamento
+- os jobs assincronos nao executam mais a etapa critica de baixa de estoque
 
 ---
 
@@ -224,7 +253,7 @@ PUT    /api/v1/orders/{id}/status
 Sucesso:
 
 ```json
-{ "success": true, "data": { } }
+{ "success": true, "data": {} }
 ```
 
 Listagem paginada:
