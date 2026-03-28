@@ -13,11 +13,14 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        $adminPassword = env('ADMIN_PASSWORD', 'password');
+        $customerPassword = env('CUSTOMER_PASSWORD', 'password');
+
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
                 'name' => 'Admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make($adminPassword),
             ]
         );
         $admin->assignRole('admin');
@@ -26,7 +29,7 @@ class UserSeeder extends Seeder
             ['email' => 'customer@example.com'],
             [
                 'name' => 'Customer',
-                'password' => Hash::make('password'),
+                'password' => Hash::make($customerPassword),
             ]
         );
         $customer->assignRole('customer');
