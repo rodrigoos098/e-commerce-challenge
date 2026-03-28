@@ -1,9 +1,7 @@
 interface LogoProps {
-    className?: string;
+  className?: string;
 }
 
 export default function Logo({ className = 'h-10 sm:h-12 w-auto' }: LogoProps) {
-    return (
-        <img src="/storage/logo.svg" alt="Shopsugi Logo" className={className} />
-    );
+  return <img src="/logo.svg" alt="Shopsugi Logo" className={className} />;
 }

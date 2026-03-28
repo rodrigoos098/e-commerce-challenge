@@ -305,7 +305,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-2 px-6 py-5 border-b border-warm-800/60">
-        <img src="/storage/logo-white.svg" alt="Shopsugi Logo" className="h-9 sm:h-10 w-auto" />
+        <img src="/logo-white.svg" alt="Shopsugi Logo" className="h-9 sm:h-10 w-auto" />
         <span className="text-warm-500 text-[10px] uppercase tracking-widest ml-auto font-bold">
           Admin
         </span>

@@ -176,7 +176,11 @@ function Header({ cartCount }: { cartCount: number }) {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
           <Link href={appRoutes.home} className="flex items-center gap-2 shrink-0 group py-2">
-            <img src="/storage/logo.svg" alt="Shopsugi Logo" className="h-10 sm:h-12 w-auto transition-transform duration-300 group-hover:scale-105" />
+            <img
+              src="/logo.svg"
+              alt="Shopsugi Logo"
+              className="h-10 sm:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop nav */}
