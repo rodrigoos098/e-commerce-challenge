@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { formatPrice } from '@/utils/format';
 
 interface PriceFilterProps {
   min: number;
@@ -95,13 +94,6 @@ export default function PriceFilter({
         Faixa de Preço
       </h3>
 
-      {/* Price display */}
-      <div className="mb-4 flex items-center justify-between text-sm text-warm-600">
-        <span className="font-medium">{formatPrice(localMin)}</span>
-        <span className="text-warm-400">até</span>
-        <span className="font-medium">{formatPrice(localMax)}</span>
-      </div>
-
       <div className="mb-4 grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <label htmlFor="price-min" className="text-xs font-medium text-warm-500">
@@ -138,7 +130,8 @@ export default function PriceFilter({
         </div>
       </div>
 
-      {/* Min slider */}
+      <div className="mb-2 text-xs text-warm-400">Digite ou ajuste pelos controles abaixo.</div>
+
       <div className="space-y-3">
         <div className="relative">
           <label className="sr-only">Preço mínimo</label>
@@ -153,7 +146,6 @@ export default function PriceFilter({
           />
         </div>
 
-        {/* Max slider */}
         <div className="relative">
           <label className="sr-only">Preço máximo</label>
           <input
@@ -168,7 +160,6 @@ export default function PriceFilter({
         </div>
       </div>
 
-      {/* Actions */}
       <div className="mt-4 flex gap-2">
         <button
           type="button"

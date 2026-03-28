@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { router } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import ProductGrid from '@/Components/Public/ProductGrid';
@@ -81,6 +81,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
   const [priceMin, setPriceMin] = useState(Number(currentFilters.price_min ?? DEFAULT_MIN_PRICE));
   const [priceMax, setPriceMax] = useState(Number(currentFilters.price_max ?? DEFAULT_MAX_PRICE));
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const didMountSearchEffect = useRef(false);
 
   const buildFilterParams = (
     overrides: Partial<
@@ -148,6 +149,12 @@ export default function ProductsIndex({ products, categories, filters }: Product
 
   // Search debounce — only reacts to search changes; other filters call router.get directly
   useEffect(() => {
+    if (!didMountSearchEffect.current) {
+      didMountSearchEffect.current = true;
+
+      return;
+    }
+
     const timer = setTimeout(() => {
       router.get('/products', buildFilterParams({ page: undefined }), {
         preserveScroll: true,
@@ -183,9 +190,29 @@ export default function ProductsIndex({ products, categories, filters }: Product
   };
 
   const handlePageChange = (page: number) => {
-    router.get('/products', buildFilterParams({ page }), {
+    const params: Record<string, string | number | undefined> = {};
+
+    if (search) {
+      params.search = search;
+    }
+
+    if (categoryId) {
+      params.category_id = categoryId;
+    }
+
+    if (priceMin > DEFAULT_MIN_PRICE) {
+      params.price_min = priceMin;
+    }
+
+    if (priceMax < DEFAULT_MAX_PRICE) {
+      params.price_max = priceMax;
+    }
+
+    params.page = page;
+
+    router.get('/products', params, {
       preserveScroll: false,
-      preserveState: false,
+      preserveState: true,
     });
   };
 

@@ -15,6 +15,8 @@ use App\Services\StockService;
 use App\Services\TagService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -83,6 +85,7 @@ class AdminProductController extends Controller
             quantity: (int) $validated['quantity'],
             minQuantity: isset($validated['min_quantity']) ? (int) $validated['min_quantity'] : 5,
             active: $validated['active'] ?? true,
+            imageUrl: $this->storeProductImage($request->file('image')),
             categoryId: (int) $validated['category_id'],
             tagIds: $validated['tags'] ?? null,
         );
@@ -148,9 +151,13 @@ class AdminProductController extends Controller
             quantity: null,
             minQuantity: isset($validated['min_quantity']) ? (int) $validated['min_quantity'] : null,
             active: $validated['active'] ?? null,
+            imageUrl: $request->hasFile('image') ? $this->replaceProductImage($product, $request->file('image')) : null,
             categoryId: isset($validated['category_id']) ? (int) $validated['category_id'] : null,
             tagIds: $validated['tags'] ?? null,
-            presentFields: array_key_exists('cost_price', $validated) ? ['cost_price'] : [],
+            presentFields: array_values(array_filter([
+                array_key_exists('cost_price', $validated) ? 'cost_price' : null,
+                $request->hasFile('image') ? 'image_url' : null,
+            ])),
         );
 
         $this->productService->update($product, $dto);
@@ -164,6 +171,28 @@ class AdminProductController extends Controller
         }
 
         return redirect('/admin/products')->with('success', 'Produto atualizado com sucesso!');
+    }
+
+    private function storeProductImage(?UploadedFile $image): ?string
+    {
+        if (! $image) {
+            return null;
+        }
+
+        return '/storage/'.$image->store('products', 'public');
+    }
+
+    private function replaceProductImage(Product $product, ?UploadedFile $image): ?string
+    {
+        if (! $image) {
+            return null;
+        }
+
+        if ($product->image_url && str_starts_with($product->image_url, '/storage/products/')) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $product->image_url));
+        }
+
+        return $this->storeProductImage($image);
     }
 
     public function destroy(Product $product): RedirectResponse

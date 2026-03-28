@@ -40,6 +40,10 @@ interface FormFieldProps {
   step?: number | string;
   includeEmptyOption?: boolean;
   emptyOptionLabel?: string;
+  value?: string | number;
+  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  accept?: string;
 }
 
 const baseInputClasses =
@@ -70,6 +74,10 @@ export default function FormField({
   step,
   includeEmptyOption = true,
   emptyOptionLabel = '— Selecione —',
+  value,
+  onChange,
+  inputMode,
+  accept,
 }: FormFieldProps) {
   const fieldClasses = [baseInputClasses, error ? errorInputClasses : ''].join(' ').trim();
   const hintId = hint ? `${name}-hint` : undefined;
@@ -112,6 +120,8 @@ export default function FormField({
           className={fieldClasses}
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
+          value={value}
+          onChange={onChange}
           {...register}
         />
       );
@@ -125,6 +135,8 @@ export default function FormField({
           className={fieldClasses}
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
+          value={value}
+          onChange={onChange}
           {...register}
         >
           {includeEmptyOption && <option value="">{emptyOptionLabel}</option>}
@@ -142,6 +154,7 @@ export default function FormField({
         <input
           id={name}
           type="file"
+          accept={accept}
           disabled={disabled}
           className={[
             fieldClasses,
@@ -150,6 +163,7 @@ export default function FormField({
           ].join(' ')}
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
+          onChange={onChange}
           {...register}
         />
       );
@@ -161,12 +175,15 @@ export default function FormField({
         type={type}
         placeholder={placeholder}
         disabled={disabled}
+        inputMode={inputMode}
         min={min}
         max={max}
         step={step}
         className={fieldClasses}
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy}
+        value={value}
+        onChange={onChange}
         {...register}
       />
     );

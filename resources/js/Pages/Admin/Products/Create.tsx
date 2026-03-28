@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Resolver } from 'react-hook-form';
@@ -8,6 +8,7 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import FormField from '@/Components/Admin/FormField';
 import Button from '@/Components/Shared/Button';
 import type { Category, Tag } from '@/types/admin';
+import { formatCurrencyInput, parseCurrencyInput } from '@/utils/format';
 
 const toRequiredNumber = (value: unknown): number | undefined => {
   if (value === '' || value === null || value === undefined) {
@@ -88,8 +89,11 @@ export default function ProductsCreate({ categories, tags }: ProductsCreateProps
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [activeToggle, setActiveToggle] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
@@ -102,6 +106,19 @@ export default function ProductsCreate({ categories, tags }: ProductsCreateProps
     },
   });
 
+  useEffect(() => {
+    if (!selectedImage) {
+      setImagePreviewUrl(null);
+
+      return;
+    }
+
+    const nextPreviewUrl = URL.createObjectURL(selectedImage);
+    setImagePreviewUrl(nextPreviewUrl);
+
+    return () => URL.revokeObjectURL(nextPreviewUrl);
+  }, [selectedImage]);
+
   function toggleTag(tagId: number) {
     setSelectedTags((prev) =>
       prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
@@ -112,8 +129,9 @@ export default function ProductsCreate({ categories, tags }: ProductsCreateProps
     setSubmitting(true);
     router.post(
       '/admin/products',
-      { ...data, active: activeToggle, tags: selectedTags },
+      { ...data, active: activeToggle, tags: selectedTags, image: selectedImage ?? undefined },
       {
+        forceFormData: true,
         onFinish: () => setSubmitting(false),
       }
     );
@@ -160,6 +178,31 @@ export default function ProductsCreate({ categories, tags }: ProductsCreateProps
                 Informações básicas
               </h2>
 
+              <div className="space-y-3">
+                <FormField
+                  label="Imagem do Produto"
+                  name="image"
+                  type="file"
+                  accept="image/*"
+                  hint="Envie JPG, PNG ou WEBP com até 5 MB"
+                  onChange={(event) => {
+                    const file =
+                      event.target instanceof HTMLInputElement ? event.target.files?.[0] : null;
+                    setSelectedImage(file ?? null);
+                  }}
+                />
+
+                {imagePreviewUrl && (
+                  <div className="overflow-hidden rounded-xl border border-warm-200 bg-warm-50 p-3">
+                    <img
+                      src={imagePreviewUrl}
+                      alt="Pré-visualização da imagem do produto"
+                      className="h-44 w-full rounded-lg object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+
               <FormField
                 label="Nome do Produto"
                 name="name"
@@ -199,30 +242,42 @@ export default function ProductsCreate({ categories, tags }: ProductsCreateProps
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  label="Preço de Venda (R$)"
+                <Controller
                   name="price"
-                  type="number"
-                  required
-                  placeholder="0,00"
-                  min={0.01}
-                  step={0.01}
-                  register={register('price', { setValueAs: toRequiredNumber })}
-                  error={errors.price?.message}
-                  hint="Preço exibido para o cliente"
+                  control={control}
+                  render={({ field }) => (
+                    <FormField
+                      label="Preço de Venda"
+                      name="price"
+                      type="text"
+                      required
+                      placeholder="R$ 0,00"
+                      inputMode="numeric"
+                      value={formatCurrencyInput(field.value)}
+                      onChange={(event) =>
+                        field.onChange(parseCurrencyInput(event.target.value) ?? undefined)
+                      }
+                      error={errors.price?.message}
+                      hint="Preço exibido para o cliente"
+                    />
+                  )}
                 />
-                <FormField
-                  label="Preço de Custo (R$)"
+                <Controller
                   name="cost_price"
-                  type="number"
-                  placeholder="0,00"
-                  min={0}
-                  step={0.01}
-                  register={register('cost_price', {
-                    setValueAs: toNullableNumber,
-                  })}
-                  error={errors.cost_price?.message}
-                  hint="Valor pago pelo produto (interno)"
+                  control={control}
+                  render={({ field }) => (
+                    <FormField
+                      label="Preço de Custo"
+                      name="cost_price"
+                      type="text"
+                      placeholder="R$ 0,00"
+                      inputMode="numeric"
+                      value={formatCurrencyInput(field.value ?? null)}
+                      onChange={(event) => field.onChange(parseCurrencyInput(event.target.value))}
+                      error={errors.cost_price?.message}
+                      hint="Valor pago pelo produto (interno)"
+                    />
+                  )}
                 />
               </div>
             </div>

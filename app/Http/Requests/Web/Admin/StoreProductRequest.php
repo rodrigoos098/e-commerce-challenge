@@ -20,6 +20,7 @@ class StoreProductRequest extends AdminFormRequest
             'tags' => ['nullable', 'array'],
             'tags.*' => ['integer', 'exists:tags,id'],
             'active' => ['boolean'],
+            'image' => ['nullable', 'image', 'max:5120'],
         ];
     }
 }

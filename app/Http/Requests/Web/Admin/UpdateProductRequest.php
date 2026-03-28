@@ -26,6 +26,7 @@ class UpdateProductRequest extends AdminFormRequest
             'tags' => ['nullable', 'array'],
             'tags.*' => ['integer', 'exists:tags,id'],
             'active' => ['boolean'],
+            'image' => ['nullable', 'image', 'max:5120'],
             'stock_adjustment_reason' => ['nullable', 'string', 'max:255'],
         ];
     }

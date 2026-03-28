@@ -813,7 +813,13 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                     </div>
                   )}
 
-                  <div className="mt-6 flex justify-end">
+                  <div className="mt-6 flex items-center justify-between gap-3">
+                    <Link
+                      href={appRoutes.cart.index}
+                      className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
+                    >
+                      Voltar ao carrinho
+                    </Link>
                     <button
                       type="button"
                       onClick={goNextFromShipping}
@@ -881,14 +887,22 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                     </>
                   )}
 
-                  <div className="mt-6 flex justify-between">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
-                    >
-                      ← Anterior
-                    </button>
+                  <div className="mt-6 flex items-center justify-between gap-3">
+                    <div className="flex gap-3">
+                      <Link
+                        href={appRoutes.cart.index}
+                        className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
+                      >
+                        Voltar ao carrinho
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
+                      >
+                        ← Anterior
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={goNextFromBilling}
@@ -925,14 +939,22 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                     se você editar seus cadastros depois.
                   </div>
 
-                  <div className="mt-6 flex justify-between">
-                    <button
-                      type="button"
-                      onClick={() => setStep(2)}
-                      className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
-                    >
-                      ← Anterior
-                    </button>
+                  <div className="mt-6 flex items-center justify-between gap-3">
+                    <div className="flex gap-3">
+                      <Link
+                        href={appRoutes.cart.index}
+                        className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
+                      >
+                        Voltar ao carrinho
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setStep(2)}
+                        className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
+                      >
+                        ← Anterior
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={goNextFromReview}
@@ -1012,13 +1034,21 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
                   </div>
 
                   <div className="mt-6 flex justify-between">
-                    <button
-                      type="button"
-                      onClick={() => setStep(3)}
-                      className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
-                    >
-                      ← Anterior
-                    </button>
+                    <div className="flex gap-3">
+                      <Link
+                        href={appRoutes.cart.index}
+                        className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
+                      >
+                        Voltar ao carrinho
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setStep(3)}
+                        className="rounded-xl border border-warm-200 px-6 py-2.5 text-sm font-semibold text-warm-600 transition-all hover:bg-warm-50"
+                      >
+                        ← Anterior
+                      </button>
+                    </div>
                     <button
                       type="submit"
                       disabled={submitting || !paymentSimulated || hasStockIssues}

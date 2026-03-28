@@ -12,23 +12,8 @@ function decodePaginationLabel(label: string): string {
     .replace(/&gt;/g, '>');
 }
 
-/** Return page numbers to show with null gaps representing ellipsis. */
-function windowedPages(current: number, last: number): (number | null)[] {
-  if (last <= 7) {
-    return Array.from({ length: last }, (_, i) => i + 1);
-  }
-  const pages: (number | null)[] = [1];
-  if (current > 3) {
-    pages.push(null);
-  }
-  for (let p = Math.max(2, current - 1); p <= Math.min(last - 1, current + 1); p++) {
-    pages.push(p);
-  }
-  if (current < last - 2) {
-    pages.push(null);
-  }
-  pages.push(last);
-  return pages;
+function allPages(last: number): number[] {
+  return Array.from({ length: last }, (_, i) => i + 1);
 }
 
 export interface Column<T> {
@@ -57,6 +42,7 @@ interface DataTableProps<T extends { id: number | string }> {
   emptyMessage?: string;
   loading?: boolean;
   baseUrl?: string;
+  onPageChange?: (page: number) => void;
 }
 
 function SortIcon({ direction }: { direction?: 'asc' | 'desc' | null }) {
@@ -140,6 +126,7 @@ export default function DataTable<T extends { id: number | string }>({
   emptyMessage = 'Nenhum registro encontrado.',
   loading = false,
   baseUrl,
+  onPageChange,
 }: DataTableProps<T>) {
   const { url } = usePage();
 
@@ -222,67 +209,70 @@ export default function DataTable<T extends { id: number | string }>({
               {(pagination.current_page - 1) * pagination.per_page + 1}–
               {Math.min(pagination.current_page * pagination.per_page, pagination.total)}
             </span>{' '}
-            de <span className="font-medium text-warm-600">{pagination.total}</span> registros
+            de <span className="font-medium text-warm-600">{pagination.total}</span> registros ·
+            Página <span className="font-medium text-warm-600">{pagination.current_page}</span> de{' '}
+            <span className="font-medium text-warm-600">{pagination.last_page}</span>
           </p>
-          <div className="flex items-center gap-1">
-            {pagination.links
-              ? pagination.links.map((link, idx) => {
-                  const isDisabled = !link.url;
-                  const isActive = link.active;
-                  const label = decodePaginationLabel(link.label);
-                  return isDisabled ? (
-                    <span
-                      key={idx}
-                      className="px-2.5 py-1.5 text-xs rounded text-warm-400 cursor-default"
-                    >
-                      {label}
-                    </span>
-                  ) : (
-                    <Link
-                      key={idx}
-                      href={link.url!}
-                      className={[
-                        'px-2.5 py-1.5 text-xs rounded transition-colors',
-                        isActive
-                          ? 'bg-kintsugi-600 text-white font-semibold'
-                          : 'text-warm-600 hover:bg-warm-100',
-                      ].join(' ')}
-                    >
-                      {label}
-                    </Link>
-                  );
-                })
-              : windowedPages(pagination.current_page, pagination.last_page).map((page, idx) => {
-                  if (page === null) {
-                    return (
+          <div className="max-w-full overflow-x-auto">
+            <div className="flex min-w-max items-center gap-1">
+              {pagination.links && !onPageChange
+                ? pagination.links.map((link, idx) => {
+                    const isDisabled = !link.url;
+                    const isActive = link.active;
+                    const label = decodePaginationLabel(link.label);
+                    return isDisabled ? (
                       <span
-                        key={`gap-${idx}`}
-                        className="px-1.5 py-1.5 text-xs text-warm-400 cursor-default"
+                        key={idx}
+                        className="px-2.5 py-1.5 text-xs rounded text-warm-400 cursor-default"
                       >
-                        …
+                        {label}
                       </span>
+                    ) : (
+                      <Link
+                        key={idx}
+                        href={link.url!}
+                        className={[
+                          'px-2.5 py-1.5 text-xs rounded transition-colors',
+                          isActive
+                            ? 'bg-kintsugi-600 text-white font-semibold'
+                            : 'text-warm-600 hover:bg-warm-100',
+                        ].join(' ')}
+                      >
+                        {label}
+                      </Link>
                     );
-                  }
-                  const isActive = page === pagination.current_page;
-                  const href = buildPaginationHref(page, url, baseUrl);
-                  return isActive ? (
-                    <span
-                      key={page}
-                      className="px-2.5 py-1.5 text-xs rounded bg-kintsugi-600 text-white font-semibold"
-                      aria-current="page"
-                    >
-                      {page}
-                    </span>
-                  ) : (
-                    <Link
-                      key={page}
-                      href={href}
-                      className="px-2.5 py-1.5 text-xs rounded text-warm-600 hover:bg-warm-100 transition-colors"
-                    >
-                      {page}
-                    </Link>
-                  );
-                })}
+                  })
+                : allPages(pagination.last_page).map((page) => {
+                    const isActive = page === pagination.current_page;
+                    const href = buildPaginationHref(page, url, baseUrl);
+                    return isActive ? (
+                      <span
+                        key={page}
+                        className="px-2.5 py-1.5 text-xs rounded bg-kintsugi-600 text-white font-semibold"
+                        aria-current="page"
+                      >
+                        {page}
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        type="button"
+                        onClick={() => {
+                          if (onPageChange) {
+                            onPageChange(page);
+
+                            return;
+                          }
+
+                          window.location.href = href;
+                        }}
+                        className="px-2.5 py-1.5 text-xs rounded text-warm-600 hover:bg-warm-100 transition-colors"
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+            </div>
           </div>
         </nav>
       )}

@@ -10,6 +10,8 @@ use App\Models\Tag;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -150,6 +152,35 @@ class AdminContractsTest extends TestCase
             'id' => $product->id,
             'cost_price' => null,
         ]);
+    }
+
+    public function test_admin_can_upload_product_image_when_creating_a_product(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->createAdmin();
+        $category = Category::factory()->create();
+
+        $this->actingAs($admin)
+            ->post('/admin/products', [
+                'name' => 'Produto com Imagem',
+                'description' => 'Descricao de teste',
+                'price' => 199.90,
+                'cost_price' => 120.00,
+                'quantity' => 5,
+                'min_quantity' => 1,
+                'category_id' => $category->id,
+                'active' => true,
+                'image' => UploadedFile::fake()->create('produto.jpg', 128, 'image/jpeg'),
+            ])
+            ->assertRedirect('/admin/products')
+            ->assertSessionHas('success', 'Produto criado com sucesso!');
+
+        $product = Product::query()->where('name', 'Produto com Imagem')->firstOrFail();
+
+        $this->assertNotNull($product->image_url);
+        $this->assertStringStartsWith('/storage/products/', $product->image_url);
+        $this->assertTrue(Storage::disk('public')->exists(str_replace('/storage/', '', $product->image_url)));
     }
 
     public function test_admin_product_update_requires_stock_adjustment_reason_when_quantity_changes(): void

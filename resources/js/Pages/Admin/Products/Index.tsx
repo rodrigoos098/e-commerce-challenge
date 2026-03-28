@@ -60,6 +60,19 @@ export default function ProductsIndex({ products, categories, filters = {} }: Pr
     applyFilters({ active: value, page: '1' });
   }
 
+  function handlePageChange(page: number) {
+    router.get(
+      '/admin/products',
+      {
+        search,
+        category_id: categoryFilter,
+        active: activeFilter,
+        page: String(page),
+      },
+      { preserveState: true, preserveScroll: true }
+    );
+  }
+
   function confirmDelete(product: Product) {
     setDeleteModal({ open: true, product });
   }
@@ -247,6 +260,7 @@ export default function ProductsIndex({ products, categories, filters = {} }: Pr
           columns={columns}
           data={productData}
           pagination={paginationMeta}
+          onPageChange={handlePageChange}
           emptyMessage="Nenhum produto encontrado com os filtros aplicados."
         />
       </div>

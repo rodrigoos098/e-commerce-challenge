@@ -17,6 +17,7 @@ readonly class ProductDTO
         public ?int $quantity = null,
         public ?int $minQuantity = null,
         public ?bool $active = null,
+        public ?string $imageUrl = null,
         public ?int $categoryId = null,
         public ?array $tagIds = null,
         public ?string $slug = null,
@@ -41,6 +42,7 @@ readonly class ProductDTO
             quantity: array_key_exists('quantity', $input) && $request->input('quantity') !== null ? (int) $request->input('quantity') : null,
             minQuantity: array_key_exists('min_quantity', $input) && $request->input('min_quantity') !== null ? (int) $request->input('min_quantity') : null,
             active: array_key_exists('active', $input) && $request->input('active') !== null ? (bool) $request->input('active') : null,
+            imageUrl: array_key_exists('image_url', $input) ? $request->input('image_url') : null,
             categoryId: array_key_exists('category_id', $input) && $request->input('category_id') !== null ? (int) $request->input('category_id') : null,
             tagIds: array_key_exists('tag_ids', $input) ? $request->input('tag_ids', []) : null,
             slug: array_key_exists('slug', $input) ? $request->input('slug') : null,
@@ -53,6 +55,7 @@ readonly class ProductDTO
                 'quantity',
                 'min_quantity',
                 'active',
+                'image_url',
                 'category_id',
             ])),
         );
@@ -74,6 +77,7 @@ readonly class ProductDTO
             'quantity' => $this->quantity,
             'min_quantity' => $this->minQuantity,
             'active' => $this->active,
+            'image_url' => $this->imageUrl,
             'category_id' => $this->categoryId,
         ], fn ($value, string $key) => $value !== null || in_array($key, $this->presentFields, true), ARRAY_FILTER_USE_BOTH);
     }

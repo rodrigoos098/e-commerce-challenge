@@ -26,6 +26,24 @@ export function formatPrice(value: number): string {
   return priceFormatter.format(value);
 }
 
+export function formatCurrencyInput(value: number | null | undefined): string {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return '';
+  }
+
+  return formatPrice(value);
+}
+
+export function parseCurrencyInput(value: string): number | null {
+  const digits = value.replace(/\D/g, '');
+
+  if (!digits) {
+    return null;
+  }
+
+  return Number(digits) / 100;
+}
+
 export function formatDateTime(value: string | Date): string {
   return dateTimeFormatter.format(new Date(value));
 }

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Resolver } from 'react-hook-form';
@@ -8,6 +8,7 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import FormField from '@/Components/Admin/FormField';
 import Button from '@/Components/Shared/Button';
 import type { Product, Category, Tag } from '@/types/admin';
+import { formatCurrencyInput, parseCurrencyInput } from '@/utils/format';
 
 const toRequiredNumber = (value: unknown): number | undefined => {
   if (value === '' || value === null || value === undefined) {
@@ -80,6 +81,8 @@ export default function ProductsEdit({ product, categories, tags }: ProductsEdit
   const [selectedTags, setSelectedTags] = useState<number[]>(product.tags.map((t) => t.id));
   const [activeToggle, setActiveToggle] = useState(product.active);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(product.image_url ?? null);
   const productSchema = baseProductSchema.superRefine((data, ctx) => {
     if (data.quantity !== product.quantity && !data.stock_adjustment_reason?.trim()) {
       ctx.addIssue({
@@ -91,6 +94,7 @@ export default function ProductsEdit({ product, categories, tags }: ProductsEdit
   });
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
@@ -109,6 +113,19 @@ export default function ProductsEdit({ product, categories, tags }: ProductsEdit
     },
   });
 
+  useEffect(() => {
+    if (!selectedImage) {
+      setImagePreviewUrl(product.image_url ?? null);
+
+      return;
+    }
+
+    const nextPreviewUrl = URL.createObjectURL(selectedImage);
+    setImagePreviewUrl(nextPreviewUrl);
+
+    return () => URL.revokeObjectURL(nextPreviewUrl);
+  }, [product.image_url, selectedImage]);
+
   function toggleTag(tagId: number) {
     setSelectedTags((prev) =>
       prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
@@ -117,10 +134,17 @@ export default function ProductsEdit({ product, categories, tags }: ProductsEdit
 
   function onSubmit(data: ProductForm) {
     setSubmitting(true);
-    router.put(
+    router.post(
       `/admin/products/${product.id}`,
-      { ...data, active: activeToggle, tags: selectedTags },
       {
+        _method: 'put',
+        ...data,
+        active: activeToggle,
+        tags: selectedTags,
+        image: selectedImage ?? undefined,
+      },
+      {
+        forceFormData: true,
         onFinish: () => setSubmitting(false),
       }
     );
@@ -174,6 +198,30 @@ export default function ProductsEdit({ product, categories, tags }: ProductsEdit
               <h2 className="text-sm font-semibold text-warm-600 uppercase tracking-wider border-b border-warm-200 pb-3">
                 Informações básicas
               </h2>
+              <div className="space-y-3">
+                <FormField
+                  label="Imagem do Produto"
+                  name="image"
+                  type="file"
+                  accept="image/*"
+                  hint="Envie JPG, PNG ou WEBP com até 5 MB"
+                  onChange={(event) => {
+                    const file =
+                      event.target instanceof HTMLInputElement ? event.target.files?.[0] : null;
+                    setSelectedImage(file ?? null);
+                  }}
+                />
+
+                {imagePreviewUrl && (
+                  <div className="overflow-hidden rounded-xl border border-warm-200 bg-warm-50 p-3">
+                    <img
+                      src={imagePreviewUrl}
+                      alt="Pré-visualização da imagem do produto"
+                      className="h-44 w-full rounded-lg object-cover"
+                    />
+                  </div>
+                )}
+              </div>
               <FormField
                 label="Nome do Produto"
                 name="name"
@@ -208,26 +256,40 @@ export default function ProductsEdit({ product, categories, tags }: ProductsEdit
                 Preços
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  label="Preço de Venda (R$)"
+                <Controller
                   name="price"
-                  type="number"
-                  required
-                  min={0.01}
-                  step={0.01}
-                  register={register('price', { setValueAs: toRequiredNumber })}
-                  error={errors.price?.message}
+                  control={control}
+                  render={({ field }) => (
+                    <FormField
+                      label="Preço de Venda"
+                      name="price"
+                      type="text"
+                      required
+                      placeholder="R$ 0,00"
+                      inputMode="numeric"
+                      value={formatCurrencyInput(field.value)}
+                      onChange={(event) =>
+                        field.onChange(parseCurrencyInput(event.target.value) ?? undefined)
+                      }
+                      error={errors.price?.message}
+                    />
+                  )}
                 />
-                <FormField
-                  label="Preço de Custo (R$)"
+                <Controller
                   name="cost_price"
-                  type="number"
-                  min={0}
-                  step={0.01}
-                  register={register('cost_price', {
-                    setValueAs: toNullableNumber,
-                  })}
-                  error={errors.cost_price?.message}
+                  control={control}
+                  render={({ field }) => (
+                    <FormField
+                      label="Preço de Custo"
+                      name="cost_price"
+                      type="text"
+                      placeholder="R$ 0,00"
+                      inputMode="numeric"
+                      value={formatCurrencyInput(field.value ?? null)}
+                      onChange={(event) => field.onChange(parseCurrencyInput(event.target.value))}
+                      error={errors.cost_price?.message}
+                    />
+                  )}
                 />
               </div>
             </div>
