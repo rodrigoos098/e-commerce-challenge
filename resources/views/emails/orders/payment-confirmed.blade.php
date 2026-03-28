@@ -7,12 +7,12 @@ Olá, **{{ $order->user->name }}**!
 
 @include('emails.orders.partials.order-details', ['order' => $order])
 
-<x-mail::button :url="config('app.url')" color="primary">
+<x-mail::button :url="route('orders.show', $order)" color="primary">
 Ver detalhes do pedido
 </x-mail::button>
 
 <x-mail::panel>
-Quando seu pedido for despachado, você receberá um email com as informações de rastreio. Cada etapa cuidadosamente acompanhada.
+Quando seu pedido for despachado, você receberá um novo email com atualização. Cada etapa cuidadosamente acompanhada.
 </x-mail::panel>
 
 Com carinho,<br>

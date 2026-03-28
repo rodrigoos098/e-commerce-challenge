@@ -7,7 +7,7 @@ Que alegria ter você conosco. Seu pedido foi recebido com carinho e já estamos
 
 @include('emails.orders.partials.order-details', ['order' => $order])
 
-<x-mail::button :url="config('app.url')" color="primary">
+<x-mail::button :url="route('orders.show', $order)" color="primary">
 Acompanhar meu pedido
 </x-mail::button>
 

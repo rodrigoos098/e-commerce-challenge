@@ -15,12 +15,12 @@
 </td>
 </tr>
 <tr>
-<td align="center" style="color: #8C7B66; font-size: 12px; line-height: 1.6; font-family: 'DM Sans', sans-serif;">
+<td align="center" style="color: #5C4E3D; font-size: 12px; line-height: 1.6; font-family: 'DM Sans', -apple-system, 'Segoe UI', Tahoma, sans-serif;">
 {{ Illuminate\Mail\Markdown::parse($slot) }}
 </td>
 </tr>
 <tr>
-<td align="center" style="padding-top: 8px; color: #8C7B66; font-size: 11px; font-family: 'DM Sans', sans-serif;">
+<td align="center" style="padding-top: 8px; color: #5C4E3D; font-size: 12px; font-family: 'DM Sans', -apple-system, 'Segoe UI', Tahoma, sans-serif;">
 Feito com carinho — cada detalhe importa. ✨
 </td>
 </tr>

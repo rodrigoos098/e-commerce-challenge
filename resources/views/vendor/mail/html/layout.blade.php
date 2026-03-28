@@ -6,15 +6,20 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap');
-
 @media only screen and (max-width: 600px) {
 .inner-body {
 width: 100% !important;
 }
 
 .footer {
+width: 100% !important;
+}
+
+.gold-strip-table {
 width: 100% !important;
 }
 
@@ -40,7 +45,7 @@ width: 100% !important;
 {{-- Gold accent strip --}}
 <tr>
 <td align="center">
-<table width="600" cellpadding="0" cellspacing="0" role="presentation" style="margin: 0 auto;">
+<table class="gold-strip-table" width="600" cellpadding="0" cellspacing="0" role="presentation" style="margin: 0 auto; max-width: 600px;">
 <tr>
 <td class="gold-strip" style="background-color: #A67C1F; height: 4px; line-height: 4px; font-size: 4px;">&nbsp;</td>
 </tr>

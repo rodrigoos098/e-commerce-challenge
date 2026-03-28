@@ -48,8 +48,8 @@ class OrderConfirmationMailTest extends TestCase
         $html = (new OrderConfirmationMail($order))->render();
 
         $this->assertStringContainsString('Maria da Silva', $html);
-        $this->assertStringContainsString('Endereco de entrega', $html);
-        $this->assertStringContainsString('Endereco de cobranca', $html);
+        $this->assertStringContainsString('Endereço de entrega', $html);
+        $this->assertStringContainsString('Endereço de cobrança', $html);
         $this->assertStringContainsString('Av. Brasil, 2000', $html);
     }
 

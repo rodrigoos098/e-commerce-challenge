@@ -7,8 +7,8 @@ Boas novas — seu pedido foi despachado e já está a caminho do endereço info
 
 @include('emails.orders.partials.order-details', ['order' => $order])
 
-<x-mail::button :url="config('app.url')" color="primary">
-Rastrear pedido
+<x-mail::button :url="route('orders.show', $order)" color="primary">
+Ver meu pedido
 </x-mail::button>
 
 <x-mail::panel>

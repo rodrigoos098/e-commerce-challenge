@@ -1,18 +1,18 @@
 <x-mail::message>
-# Pedido cancelado
+# Pedido cancelado 💙
 
 Olá, **{{ $order->user->name }}**,
 
-Informamos que seu pedido foi cancelado. Sabemos que isso pode ser frustrante — se houve algum problema, estamos aqui para ajudar.
+Lamentamos muito informar que seu pedido foi cancelado. Se algo não correu como esperado, estamos aqui para ajudar.
 
 @include('emails.orders.partials.order-details', ['order' => $order])
 
-<x-mail::button :url="config('app.url')" color="primary">
+<x-mail::button :url="config('app.url')" color="error">
 Voltar à loja
 </x-mail::button>
 
 <x-mail::panel>
-Se o cancelamento não foi intencional ou se precisar de ajuda, entre em contato conosco. Estamos sempre disponíveis para cuidar de você.
+Se o cancelamento não foi intencional ou se precisar de qualquer apoio, entre em contato com nossa equipe. Queremos garantir que tudo se resolva da melhor forma.
 </x-mail::panel>
 
 Com carinho,<br>
