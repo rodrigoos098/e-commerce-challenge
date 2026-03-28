@@ -124,7 +124,7 @@ return [
              * Use a null logger to prevent swagger-php warnings from being thrown as exceptions
              * by Laravel's error handler (E_USER_WARNING → ErrorException).
              */
-            'logger' => new \Psr\Log\NullLogger(),
+            'logger' => \Psr\Log\NullLogger::class,
 
             /**
              * analyser: defaults to \OpenApi\StaticAnalyser .
