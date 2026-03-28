@@ -1,5 +1,5 @@
 <x-mail::message>
-# Pedido cancelado 💙
+# Pedido cancelado ⚠️
 
 Olá, **{{ $order->user->name }}**,
 
