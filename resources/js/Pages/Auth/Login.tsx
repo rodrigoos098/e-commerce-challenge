@@ -56,7 +56,7 @@ export default function Login() {
                     <Link href="/" className="inline-flex items-center gap-2">
                         <Logo />
                     </Link>
-                    <h1 className="mt-6 text-2xl font-bold text-warm-700">Bem-vindo ao Shopsugi<span className="kintsugi-shimmer">ツ</span></h1>
+                    <h1 className="mt-6 text-2xl font-bold text-warm-700">Bem-vindo ao Shopsugi</h1>
                     <p className="mt-1 text-sm text-warm-500">Entre na sua conta para continuar.</p>
                 </div>
 

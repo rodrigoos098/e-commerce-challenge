@@ -175,13 +175,8 @@ function Header({ cartCount }: { cartCount: number }) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <Link href={appRoutes.home} className="flex items-center gap-2 shrink-0 group">
-            <span className="font-display text-2xl font-bold text-warm-800 tracking-tight">
-              Shopsugi
-              <span className="ml-0.5 inline-block text-kintsugi-500 kintsugi-shimmer transition-all duration-300 group-hover:text-kintsugi-600 group-hover:scale-125 group-hover:rotate-6">
-                ツ
-              </span>
-            </span>
+          <Link href={appRoutes.home} className="flex items-center gap-2 shrink-0 group py-2">
+            <img src="/storage/logo.svg" alt="Shopsugi Logo" className="h-10 sm:h-12 w-auto transition-transform duration-300 group-hover:scale-105" />
           </Link>
 
           {/* Desktop nav */}

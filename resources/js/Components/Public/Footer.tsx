@@ -10,9 +10,7 @@ export default function Footer() {
                     {/* Brand — elevated Kintsugi tagline */}
                     <div className="sm:col-span-1">
                         <Link href="/" className="inline-block mb-4">
-                            <span className="font-display text-2xl font-bold text-white tracking-tight">
-                                Shopsugi<span className="ml-0.5 text-kintsugi-400 kintsugi-shimmer">ツ</span>
-                            </span>
+                            <img src="/storage/logo-white.svg" alt="Shopsugi Logo" className="h-12 w-auto" />
                         </Link>
                         <p className="font-display text-base italic text-warm-300 leading-relaxed mb-3">
                             Arte feita à mão, entregue com carinho.
@@ -65,7 +63,7 @@ export default function Footer() {
                         <KintsugiDivider variant="short" className="opacity-30" />
                     </div>
                     <p className="text-xs text-warm-500">
-                        © {new Date().getFullYear()} Shopsugi<span className="kintsugi-shimmer">ツ</span>. Todos os direitos reservados.
+                        © {new Date().getFullYear()} Shopsugi. Todos os direitos reservados.
                     </p>
                 </div>
             </div>
