@@ -12,13 +12,13 @@
     <meta property="og:site_name" content="{{ config('app.name', 'E-Commerce') }}">
     <meta property="og:title" content="{{ config('app.name', 'E-Commerce') }}">
     <meta property="og:description" content="Curadoria premium de artesanato e design. Celebramos a beleza nas imperfeições.">
-    <meta property="og:image" content="{{ url('/shopsugi_og_image.jpg') }}">
-    <meta property="og:image:secure_url" content="{{ url('/shopsugi_og_image.jpg') }}">
+    <meta property="og:image" content="{{ url('/shopsugi_og_image_1_1.jpg') }}">
+    <meta property="og:image:secure_url" content="{{ url('/shopsugi_og_image_1_1.jpg') }}">
     <meta property="og:image:alt" content="Shopsugi - Presentes que contam histórias">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ config('app.name', 'E-Commerce') }}">
     <meta name="twitter:description" content="Curadoria premium de artesanato e design. Celebramos a beleza nas imperfeições.">
-    <meta name="twitter:image" content="{{ url('/shopsugi_og_image.jpg') }}">
+    <meta name="twitter:image" content="{{ url('/shopsugi_og_image_1_1.jpg') }}">
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.tsx'])
     @inertiaHead

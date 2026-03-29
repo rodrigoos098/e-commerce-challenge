@@ -436,7 +436,7 @@ function Header({ cartCount }: { cartCount: number }) {
 const DEFAULT_TITLE = 'Shopsugiツ';
 const DEFAULT_DESCRIPTION =
   'Curadoria premium de artesanato e design. Celebramos a beleza nas imperfeições.';
-const DEFAULT_IMAGE = '/shopsugi_og_image.jpg';
+const DEFAULT_IMAGE = '/shopsugi_og_image_1_1.jpg';
 
 function resolveAbsoluteUrl(path: string): string {
   if (/^https?:\/\//.test(path)) {
