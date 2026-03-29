@@ -246,7 +246,10 @@ export default function CustomerAddressesIndex({ addresses }: CustomerAddressesP
   };
 
   return (
-    <PublicLayout title="Meus Endereços">
+    <PublicLayout
+      title="Meus Endereços"
+      description="Cadastre e gerencie enderecos de entrega e cobranca para agilizar seus proximos pedidos."
+    >
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>

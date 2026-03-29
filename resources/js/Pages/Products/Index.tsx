@@ -245,7 +245,10 @@ export default function ProductsIndex({ products, categories, filters }: Product
   };
 
   return (
-    <PublicLayout title="Coleção">
+    <PublicLayout
+      title="Coleção"
+      description="Explore a coleção Shopsugi com peças únicas de artesanato e design para presentear com significado."
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         {/* Page header */}
         <div className="mb-6 flex items-center justify-between">

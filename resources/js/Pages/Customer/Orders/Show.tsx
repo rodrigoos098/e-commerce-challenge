@@ -86,7 +86,10 @@ export default function OrderShow({ order }: OrderShowPageProps) {
   };
 
   return (
-    <PublicLayout title={`Pedido #${order.id}`}>
+    <PublicLayout
+      title={`Pedido #${order.id}`}
+      description={`Acompanhe o status, pagamento e itens do pedido #${order.id} na Shopsugi.`}
+    >
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
         <nav aria-label="Navegacao" className="mb-6 flex items-center gap-2 text-sm text-warm-400">
           <Link

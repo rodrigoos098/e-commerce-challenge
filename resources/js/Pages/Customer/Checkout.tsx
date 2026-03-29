@@ -762,7 +762,10 @@ export default function Checkout({ cart, addresses }: CheckoutPageProps) {
   };
 
   return (
-    <PublicLayout title="Checkout">
+    <PublicLayout
+      title="Checkout"
+      description="Confirme endereco, pagamento e resumo do pedido para concluir sua compra na Shopsugi."
+    >
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <h1 className="mb-2 text-2xl font-extrabold text-warm-700 sm:text-3xl">Finalizar Compra</h1>
         <p className="mb-8 text-sm text-warm-500">

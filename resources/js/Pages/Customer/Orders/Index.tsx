@@ -42,7 +42,10 @@ export default function OrdersIndex({ orders }: OrdersPageProps) {
   };
 
   return (
-    <PublicLayout title="Meus Pedidos">
+    <PublicLayout
+      title="Meus Pedidos"
+      description="Acompanhe seus pedidos, pagamentos e entregas em um unico lugar."
+    >
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
         <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-warm-700 mb-8">
           Meus Pedidos

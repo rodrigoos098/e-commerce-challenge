@@ -29,7 +29,10 @@ export default function Cart({ cart }: CartPageProps) {
 
   if (cart.items.length === 0) {
     return (
-      <PublicLayout title="Carrinho">
+      <PublicLayout
+        title="Carrinho"
+        description="Revise sua sacola e escolha as peças que vao contar a sua historia."
+      >
         <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-kintsugi-50">
             <svg
@@ -77,7 +80,10 @@ export default function Cart({ cart }: CartPageProps) {
   }
 
   return (
-    <PublicLayout title="Carrinho">
+    <PublicLayout
+      title="Carrinho"
+      description="Revise sua sacola e finalize a selecao de presentes e pecas autorais da Shopsugi."
+    >
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
           <h1 className="font-display text-2xl font-extrabold text-warm-700 sm:text-3xl">

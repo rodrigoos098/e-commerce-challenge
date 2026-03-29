@@ -73,7 +73,11 @@ export default function ProductShow({ product, related_products }: ProductShowPa
   };
 
   return (
-    <PublicLayout title={product.name}>
+    <PublicLayout
+      title={product.name}
+      description={product.description}
+      image={getProductImageSrc(product)}
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         {/* Breadcrumb */}
         <nav aria-label="Navegação" className="mb-8 flex items-center gap-2 text-sm text-warm-400">

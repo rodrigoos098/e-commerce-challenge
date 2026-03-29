@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Toaster, toast } from 'react-hot-toast';
 import Footer from '@/Components/Public/Footer';
 import { appRoutes } from '@/utils/routes';
@@ -7,6 +7,8 @@ import { appRoutes } from '@/utils/routes';
 interface PublicLayoutProps {
   children: React.ReactNode;
   title?: string;
+  description?: string;
+  image?: string;
   cartCount?: number;
 }
 
@@ -431,20 +433,56 @@ function Header({ cartCount }: { cartCount: number }) {
 
 // ——— Layout ———————————————————————————————————————————————
 
-export default function PublicLayout({ children, title, cartCount = 0 }: PublicLayoutProps) {
+const DEFAULT_TITLE = 'Shopsugiツ';
+const DEFAULT_DESCRIPTION =
+  'Curadoria premium de artesanato e design. Celebramos a beleza nas imperfeições.';
+const DEFAULT_IMAGE = '/shopsugi_og_image.jpg';
+
+function resolveAbsoluteUrl(path: string): string {
+  if (/^https?:\/\//.test(path)) {
+    return path;
+  }
+
+  if (typeof window === 'undefined') {
+    return path;
+  }
+
+  return new URL(path.startsWith('/') ? path : `/${path}`, window.location.origin).toString();
+}
+
+export default function PublicLayout({
+  children,
+  title,
+  description,
+  image,
+  cartCount = 0,
+}: PublicLayoutProps) {
   const { cart_count } = usePage<PageProps>().props;
   const effectiveCartCount = cart_count ?? cartCount;
-
-  useEffect(() => {
-    if (title) {
-      document.title = `${title} — Shopsugiツ`;
-    } else {
-      document.title = 'Shopsugiツ — Arte em cada detalhe';
-    }
-  }, [title]);
+  const pageTitle = title
+    ? `${title} | ${DEFAULT_TITLE}`
+    : `${DEFAULT_TITLE} | Arte em cada detalhe`;
+  const pageDescription = description ?? DEFAULT_DESCRIPTION;
+  const pageImage = resolveAbsoluteUrl(image ?? DEFAULT_IMAGE);
+  const pageUrl = typeof window === 'undefined' ? undefined : window.location.href;
 
   return (
     <div className="min-h-screen flex flex-col bg-warm-50">
+      <Head title={pageTitle}>
+        <meta name="description" content={pageDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={DEFAULT_TITLE} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content={pageImage} />
+        <meta property="og:image:secure_url" content={pageImage} />
+        <meta property="og:image:alt" content={title ?? DEFAULT_TITLE} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={pageImage} />
+        {pageUrl ? <meta property="og:url" content={pageUrl} /> : null}
+      </Head>
       <div
         className="pointer-events-none fixed inset-0 z-[9999] h-full w-full opacity-[0.07] mix-blend-multiply"
         style={{
