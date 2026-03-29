@@ -24,3 +24,5 @@ Homestead.yaml
 Thumbs.db
 tmpclaude-*
 .worktrees/
+/DEPLOY.md
+/homologacao.md
