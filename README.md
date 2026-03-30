@@ -1,4 +1,5 @@
 # PROJECT.md — Shopsugi E-commerce
+<img width="1920" height="919" alt="Screenshot 2026-03-30 at 12-45-58 Shopsugi" src="https://github.com/user-attachments/assets/ef15e2d5-ce4b-460d-a42c-c8ad28d8f703" />
 
 ## Indice
 
